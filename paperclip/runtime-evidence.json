@@ -1,0 +1,58 @@
+{
+  "verifiedDate": "2026-10-21",
+  "paperclipCommit": "41c18aa443fe791fa67b27eef28fd7239f5e9d5d",
+  "service": {
+    "label": "com.calligentai.business-empire.paperclip",
+    "status": "running",
+    "apiHealth": 200,
+    "ui": 200,
+    "url": "http://127.0.0.1:3110"
+  },
+  "routes": {
+    "codex": {
+      "model": "gpt-6-luna",
+      "endpoint": "http://127.0.0.1:6000/v1",
+      "runId": "14492d97-5157-4895-87d5-e65c52939de5",
+      "status": "succeeded",
+      "marker": "EMPIRE_CODEX_ROUTE_OK"
+    },
+    "opencode": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "gatewayModel": "opencode-go:deepseek-v4-pro",
+      "endpoint": "http://127.0.0.1:8789/v1",
+      "runId": "5c732082-a5f8-4bca-b788-893404a262b7",
+      "status": "succeeded",
+      "exitCode": 0,
+      "marker": "EMPIRE_OPENCODE_GO_OK"
+    }
+  },
+  "zen": {
+    "selected": false,
+    "gatewayRun": "ed99ddb2-b722-4547-8114-67adee80345d",
+    "gatewayResult": "403 FreeTierError: free tier only usable from OpenCode",
+    "directRun": "15f7fc77-05ae-4298-917c-9a21800baa29",
+    "directResult": "cancelled at user instruction"
+  },
+  "bootstrap": {
+    "rerunExitCode": 0,
+    "agents": 2,
+    "projects": 1,
+    "goals": 1,
+    "issues": 3
+  },
+  "validation": {
+    "configurationTests": 4,
+    "result": "passed",
+    "goModelPinRedObserved": true,
+    "zenTestsRemovedReason": "User selected OpenCode Go; Zen route abandoned",
+    "debugCycle": "blocked: requires configured review check; explicit manual diff review used",
+    "review": "Explicit review of scripts, routing, secret isolation, pinned workflow and submodule; no additional external review provider invoked"
+  },
+  "limitations": [
+    "GitHub Actions startup_failure unresolved",
+    "Hard zero-spend enforcement not proven; budgetMonthlyCents=0 is not a spending cap",
+    "Restore test pending",
+    "Two-task orchestration and tenant isolation acceptance pending",
+    "M0 requirements and licensing gates remain open"
+  ]
+}

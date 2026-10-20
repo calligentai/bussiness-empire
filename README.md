@@ -16,3 +16,7 @@ From repository root, run: shasum -a 256 -c docs/sources/SHA256SUMS
 Then run: git diff --check
 
 Documentation bootstrap has no application dependencies. Git, authenticated GitHub CLI and SHA-256 verification are required. Runtime isolation, manifests and lockfiles remain mandatory before application implementation.
+
+## Paperclip control plane
+
+[Install and operate the orchestrator](docs/runbooks/paperclip.md). Upstream source is pinned as a Git submodule. Runtime state and credentials are excluded from Git.
