@@ -698,6 +698,49 @@
       },
       "executionPath": "LIVE - opencode_local adapter dispatching and completing",
       "unblockAction": "board injects a GitHub token and makes act + Docker available"
+    },
+    "m1_acceptance_20261021": {
+      "observedAt": "2026-10-21T21:50:00Z",
+      "trigger": "board directive 2026-10-21T21:41 'CONTINU IN ENGLISH' (issue reopened to in_progress; watchdog review BUS-5 re-armed by the harness)",
+      "scope": "M1 acceptance exercise that was never run: two parallel code changes, failing-test gate, agent writes off main",
+      "method": "throwaway local clone in the run scratch dir; the real repository, its branches and main/lavabean were never modified",
+      "twoParallelChangesMergeConflictFree": {
+        "base": "origin/feature/paperclip-orchestrator (the PR integration base; lavabean itself predates tests/ and docs/sources/)",
+        "branchA": {
+          "paths": [
+            "harness-a2/output.md"
+          ]
+        },
+        "branchB": {
+          "paths": [
+            "harness-b2/output.md"
+          ]
+        },
+        "pathsDisjoint": true,
+        "merge": "git merge harness-b2 into a throwaway merge-test2 branch -> 'Merge made by the ort strategy', 0 unmerged paths, both artifacts present",
+        "mainLavabeanUntouched": "origin/lavabean still at 6c03347 in the clone"
+      },
+      "failingTestsBlockTheGate": {
+        "ciStep": "python -m unittest discover -s tests -v (workflow paperclip-checks.yml, job configuration)",
+        "green": "exit 0 on the committed tree; sha256sum -c docs/sources/SHA256SUMS exit 0",
+        "red": "one injected failing test -> 'FAILED (failures=1)', unittest exit 1 -> the CI test step fails",
+        "restored": "exit 0 again after removing the injected test",
+        "limit": "the GitHub required-check/branch-protection side still needs a token; what is proven is that a red test fails the workflow's own test step"
+      },
+      "agentCannotModifyMainDirectly": {
+        "observed": "main and lavabean are the same commit (6c03347) and both are 0 commits ahead of origin; no agent commit is reachable from either",
+        "agentWork": "feature/paperclip-orchestrator (11 commits ahead of origin), feature/dev-workflow, feature/documentation, feature/hermes-pi-adapters",
+        "worktrees": "4 isolated git worktrees on disk, one per feature branch (docs/workflow.md: one feature per branch and worktree, one writer per worktree, PR target lavabean)",
+        "productGap": "Paperclip's own projection does not enforce it: 103 execution-workspace records for this project, all mode=shared_workspace, strategyType=project_primary, baseRef=lavabean, 1 distinct cwd - so two concurrent issues would share a directory. The git-worktree convention is the compensating control, not a product guarantee."
+      },
+      "disposition": "blocked - owner board, single remaining action: inject a GitHub token for the private repo calligentai/bussiness-empire and make Actions available for it, then the GitHub-side acceptance (PR-gates, branch protection, green CI run on the real repo) is verifiable in one run",
+      "constraintsRespected": [
+        "no paid routes",
+        "no new dependencies",
+        "no merge or deploy",
+        "no production mutation",
+        "real repository and main/lavabean untouched"
+      ]
     }
   }
 }

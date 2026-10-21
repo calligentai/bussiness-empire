@@ -65,7 +65,15 @@ functionally pinned. Recorded so nobody re-derives the wrong conclusion.
   that needs real spend.
 - Restore test — **done 2026-10-21c** (see blocker 3 below): the on-disk backup restores
   cleanly into a standalone Postgres instance.
-- Two-task orchestration / tenant isolation acceptance — not exercised.
+- Two-task orchestration / tenant isolation acceptance — **exercised 2026-10-21 (M1
+  acceptance pass)**: in a throwaway clone two parallel branches with disjoint paths merge
+  conflict-free (`Merge made by the 'ort' strategy`, 0 unmerged paths), and a red test
+  fails the workflow's own step (`python -m unittest discover -s tests -v` → exit 1) while
+  the committed tree is green (exit 0). `main` and `lavabean` are the same commit and are
+  0 ahead of origin — no agent commit reaches either. Caveat: Paperclip's own workspace
+  projection is `shared_workspace` / `project_primary` (103 workspace records, one distinct
+  cwd), so per-issue isolation is a git-worktree convention (`docs/workflow.md`), not a
+  product guarantee.
 - M0 requirements and licensing gates — remain open.
 
 ## 4. Blockers for this heartbeat
@@ -102,10 +110,13 @@ functionally pinned. Recorded so nobody re-derives the wrong conclusion.
 The orchestration/routing half of BE-HQ-001 is **installed and verified**: service live on
 loopback, 4 adapters registered with pinned routes, bootstrap idempotent, 4 config tests +
 5 source hashes green, spend at 0, **spend now enforced by an active hard-stop budget
-policy**, restore capability proven, and the CI failure proven to be account-side rather
-than a repository defect. The issue is `blocked` with a named unblock owner and action
-(board: inject a GitHub token for the private repo and make Actions available, then
-resume the orchestrator). It is not `done` because PR-gates / branch protection / a green
-CI run need those credentials, and the production restore path is platform-controlled.
-The stale self-owned block (BUS-3 blocked by its own watchdog review issue) was removed in
-the fix pass, so the review no longer re-triggers on every heartbeat.
+policy**, restore capability proven, the CI failure proven to be account-side rather than a
+repository defect, and the M1 acceptance criteria (parallel changes merge conflict-free,
+a red test fails the gate, agent writes stay off `main`) exercised with observed
+RED/GREEN evidence. The issue is `blocked` with a named unblock owner and action: the
+board injects a GitHub token for the private repo and makes Actions available, after
+which the GitHub-side acceptance (PR-gates, branch protection, a green CI run on the real
+repo) is verifiable in one run. It is not `done` because those checks and the
+platform-controlled production restore path still need that access. The stale self-owned
+block (BUS-3 blocked by its own watchdog review issue) was removed, so the review no longer
+re-triggers on every heartbeat.
