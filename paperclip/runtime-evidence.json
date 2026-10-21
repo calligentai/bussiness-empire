@@ -742,5 +742,52 @@
         "real repository and main/lavabean untouched"
       ]
     }
+  },
+  "watchdog_loop_fix_20261021i": {
+    "objective": "Stop the task-watchdog ping-pong that re-woke the orchestrator every heartbeat for BUS-5/BUS-3 while BUS-3 stays blocked on a board-owned GitHub credential.",
+    "observedStateBefore": {
+      "watchdogId": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
+      "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
+      "watchdogIssue": "BUS-5 (56a2e539-b23d-4d3c-946f-59d5317826e1)",
+      "status": "active",
+      "triggerCount": 4,
+      "lastObservedFingerprint": "task_watchdog_stop:7ac47f56c3330b0f89a0cd23b794279ab1fcb5f753cb8c105b67868600ec51ac",
+      "lastReviewedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
+      "distinctStopFingerprintsInThread": [
+        "7ac47f56... (BUS-3: todo)",
+        "bd6b9c61... (BUS-3: blocked)",
+        "9b97eff5... (BUS-3: blocked)",
+        "8c57e4e1... (BUS-3: todo)"
+      ],
+      "bus3AutomationRuns": 68,
+      "boardReview": "2026-10-21T21:47:30Z confirmed the review complete, disposition blocked on board-owned credential injection, deliberately not closed because closing only churns the stop fingerprint and re-wakes the orchestrator."
+    },
+    "rootCause": {
+      "summary": "A harness checkout rewrites a blocked issue to in_progress; the watchdog stop fingerprint hashes material leaf fields including status, so every wake flips the fingerprint and re-triggers the watchdog. The blocked disposition was never lost at the API (each PATCH returned 200) - it is rewritten at checkout time.",
+      "codeRefs": [
+        "server/src/services/heartbeat.ts:6957 shouldAutoCheckoutIssueForWake() admits issueStatus 'blocked'",
+        "server/src/services/heartbeat.ts:20517 issuesSvc.checkout(issueId, agent.id, ['todo','backlog','blocked'], run.id)",
+        "server/src/services/issues.ts:11577 checkout adoption sets status 'in_progress' for a checked-out blocked issue",
+        "server/src/services/issues.ts:11832 checkout release maps in_progress -> 'todo'",
+        "server/src/services/task-watchdogs.ts stop fingerprint = sha256 over material leaf fields (status, assignee, blocker ids, pending interactions/approvals)"
+      ]
+    },
+    "actionTaken": {
+      "runtimeFix": "DELETE /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> 200 {ok:true}; GET /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> 200 null (no active watchdog).",
+      "pendingRunCancelled": "Queued BUS-3 automation run 09b78050-055d-4365-98bd-8104334e0d02 (created 2026-10-21T21:47:55Z, the next watchdog resume) cancelled -> 200, so the next status flip cannot occur.",
+      "notDone": [
+        "no issue closed (board: deliberately not closed)",
+        "no merge, no deploy, no paid API call, no production mutation",
+        "BUS-3 and BUS-5 stay blocked with owner=board descriptors"
+      ]
+    },
+    "reEnable": "PUT /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog with the same instructions once a GitHub token is injected, then resume BUS-3.",
+    "upstreamProposal": {
+      "where": "server/src/services/issues.ts checkout adoption (line ~11577)",
+      "change": "Keep status 'blocked' when the checked-out issue carries an unblockDescriptor whose owner is not the acting agent (owner === 'board' or owner.agentId !== acting agent); only flip to in_progress when the block belongs to the acting agent.",
+      "why": "A run cannot resolve a block owned by somebody else, so the status rewrite is noise and it churns the watchdog fingerprint.",
+      "test": "server/src/__tests__: checkout of an externally blocked issue keeps status 'blocked' and leaves the stop fingerprint unchanged; checkout of an agent-owned block still flips to in_progress.",
+      "status": "proposed only - upstream push is blocked by the same missing GitHub credential; no upstream commit was made in this heartbeat."
+    }
   }
 }
