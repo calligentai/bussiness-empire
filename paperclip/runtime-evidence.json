@@ -273,5 +273,53 @@
       "Spend enforcement unproven: all costCents 0; budgetMonthlyCents=0 is a budget line, not a cap"
     ],
     "finalDisposition": "in_progress"
+  },
+  "heartbeat_20261021d": {
+    "observedAt": "2026-10-21T15:42:00Z",
+    "trigger": "resume delta of 21c; latest comment 3b8923ab is this agent's own - no new user directive",
+    "stateAtWake": {
+      "commit": "9503771",
+      "branch": "feature/paperclip-orchestrator",
+      "worktreeClean": true,
+      "issueStatus": "in_progress",
+      "comments": 41,
+      "evidenceBlocksPresent": [
+        "heartbeat_20261021",
+        "heartbeat_20261021b",
+        "heartbeat_20261021c"
+      ],
+      "noDuplicateWork": "21c artifacts re-verified on disk; nothing new to do"
+    },
+    "githubBlockerInvestigation": {
+      "result": "CONFIRMED UNRESOLVABLE HERE",
+      "ghAuthStatus": "not logged into any GitHub hosts (exit 1)",
+      "hostsYml": "records user 'calligentai' but has NO token field - the token file is absent",
+      "envTokensChecked": [
+        "GH_TOKEN",
+        "GITHUB_TOKEN",
+        "PAPERCLIP_GIT_TOKEN",
+        "PAPERCLIP_GITHUB_BROKER_TOKEN",
+        "GH_ENTERPRISE_TOKEN",
+        "GITHUB_ENTERPRISE_TOKEN"
+      ],
+      "envTokenValues": "ALL EMPTY - no credential value present in the environment",
+      "repoVisibility": "PRIVATE - unauth GET returns 404, forged-bearer GET returns 401",
+      "conclusion": "The repo is private and no token is available in this runtime, so no GitHub-backed write (PR, managed-credential issue update) can complete. This is a genuine first-class blocker, not a transient state.",
+      "unblockOwner": "human board / platform - requires gh auth login or an injected token; cannot be self-resolved by the orchestrator"
+    },
+    "ciBlockerInvestigation": {
+      "result": "CONFIRMED UNREPRODUCIBLE HERE",
+      "act": "absent",
+      "dockerCLI": "present but daemon not running (no /var/run/docker.sock)",
+      "pyyaml": "absent",
+      "note": "paperclip-checks.yml / docs-integrity.yml are syntactically simple and contain no obvious defect; the startup_failure is environmental, not a workflow-file bug"
+    },
+    "blockers": [
+      "GitHub: private repo, no token in runtime, gh not logged in -> GitHub-backed writes cannot complete (unblock: human board / platform auth)",
+      "CI: no act, no docker daemon -> paperclip-checks.yml startup_failure not reproducible here",
+      "Production restore path: platform-controlled, no API (on-disk backup restorability proven in 21c)",
+      "Spend enforcement unproven: all costCents 0; budgetMonthlyCents=0 is a budget line, not a cap"
+    ],
+    "finalDisposition": "in_progress"
   }
 }
