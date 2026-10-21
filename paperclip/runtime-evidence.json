@@ -788,6 +788,26 @@
       "why": "A run cannot resolve a block owned by somebody else, so the status rewrite is noise and it churns the watchdog fingerprint.",
       "test": "server/src/__tests__: checkout of an externally blocked issue keeps status 'blocked' and leaves the stop fingerprint unchanged; checkout of an agent-owned block still flips to in_progress.",
       "status": "proposed only - upstream push is blocked by the same missing GitHub credential; no upstream commit was made in this heartbeat."
-    }
+    },
+    "finalStateVerified": {
+      "checkedAt": "2026-10-21T22:03:30Z",
+      "BUS-5": {
+        "status": "blocked",
+        "owner": "board",
+        "blockedTransitionAt": "2026-10-21T22:01:18.832Z",
+        "watchdog": false,
+        "newQueuedRuns": 0
+      },
+      "BUS-3": {
+        "status": "blocked",
+        "owner": "board",
+        "blockedTransitionAt": "2026-10-21T21:46:47.116Z",
+        "watchdog": false,
+        "newQueuedRuns": 0,
+        "latestRun": "09b78050 cancelled"
+      },
+      "boardCommentId": "c56d7c3a-12ab-4db5-8a61-113f565a3469"
+    },
+    "operationalNote": "Posting a comment on a blocked issue reopens it: the reopen path cleared BUS-5 back to todo and dropped the unblockDescriptor right after the PATCH. Order matters - post the comment first, then PATCH status=blocked together with unblockDescriptor, and do not comment again afterwards or the reopen loop restarts."
   }
 }
