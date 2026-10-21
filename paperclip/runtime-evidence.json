@@ -321,5 +321,33 @@
       "Spend enforcement unproven: all costCents 0; budgetMonthlyCents=0 is a budget line, not a cap"
     ],
     "finalDisposition": "in_progress"
+  },
+  "recovery_20261021": {
+    "observedAt": "2026-10-21T15:47:00Z",
+    "trigger": "issue_disposition_repair; cause=deliverable_wait_without_target; previous run ended without a recorded disposition",
+    "recoveryContract": "RECOVER, not deliver. Did not produce the deliverable; no escalation note needed because an assignee path exists.",
+    "actionTaken": "Recorded a typed waiting disposition via the constrained issue watchdog API instead of leaving the issue with only a comment (comments are evidence, not liveness paths).",
+    "watchdog": {
+      "route": "PUT /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog",
+      "schema": "upsertIssueWatchdogSchema (strict: agentId guid + optional instructions)",
+      "id": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
+      "watchdogAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
+      "status": "active",
+      "verifiedViaGET": true,
+      "instructions": "External blocker, owner=human board/platform: private repo calligentai/bussiness-empire has no token in this runtime (gh not logged in, all token env vars empty) -> GitHub-backed writes cannot complete. CI not reproducible locally (no act, no docker daemon). Resume when token injected or CI runner available. On-disk backup restorability already proven (227 tables)."
+    },
+    "routeAcceptanceProbe": {
+      "route": "PATCH /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032",
+      "result": "200 accepted a real partial update (requestDepth: 0); issue.status stayed in_progress",
+      "note": "Probed route shape only; no status mutation performed - status change is a production mutation requiring human approval"
+    },
+    "disposition": "in_progress",
+    "ownedNextExecutionPath": "Watchdog ecd97e6a (active, typed waiting) on BUS-3. Owner of unblock: human board / platform - inject a GitHub token or make act+docker daemon available. Resume the orchestrator on that signal.",
+    "notDone": [
+      "GitHub writes (private repo, no token in runtime)",
+      "CI startup_failure (no act/docker daemon locally)",
+      "spend enforcement unproven",
+      "production acceptance"
+    ]
   }
 }
