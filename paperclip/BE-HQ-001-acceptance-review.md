@@ -57,12 +57,16 @@ functionally pinned. Recorded so nobody re-derives the wrong conclusion.
    GitHub (PR, issue update via the managed-credentials path) cannot complete.
 2. **No CI runner.** `act` is not installed and there is no Docker daemon, so the
    `startup_failure` item cannot be reproduced or fixed here.
-3. **No restore path.** The OpenAPI spec (`/api/openapi.json`) exposes only
+3. **Restore path.** The OpenAPI spec (`/api/openapi.json`) exposes only
    `POST /api/instance/database-backups`, which *triggers* a backup; there is no restore
    endpoint in the spec. Calling it returns a real backup record (200, e.g.
-   `paperclip-20261021-173127.sql.gz`, 3.36 MB) and 18 backups now sit on disk under
-   retention — so backup *creation* works, but restore is platform-controlled and cannot
-   be exercised from here.
+   `paperclip-20261021-173127.sql.gz`, 3.36 MB) and backups sit on disk under retention —
+   so backup *creation* works. **Restore capability proven (heartbeat 2026-10-21c):**
+   the on-disk backup was piped via `psql` into a standalone `initdb`+`pg_ctl` instance
+   and restored cleanly — 227 tables, `issues=4, agents=4, companies=1, comments=67,
+   heartbeat_runs=232`, BUS-3 still `in_progress`. The temp instance was stopped and its
+   /tmp artifacts removed; the production instance was never touched. What remains
+   platform-controlled is the *production* restore path itself, which still has no API.
 
 ## 5. Verdict
 

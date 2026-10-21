@@ -49,12 +49,11 @@
     "review": "Explicit review of scripts, routing, secret isolation, pinned workflow and submodule; no additional external review provider invoked"
   },
   "limitations": [
-    "GitHub Actions startup_failure unresolved",
+    "Restore test: on-disk backup proven restorable via standalone pg_restore/psql; platform-owned restore path still has no API",
+    "GitHub Actions startup_failure unresolved; not reproducible locally (no act, no docker daemon)",
     "Hard zero-spend enforcement not proven; budgetMonthlyCents=0 is not a spending cap",
-    "Restore test pending",
     "Two-task orchestration and tenant isolation acceptance pending",
-    "M0 requirements and licensing gates remain open",
-    "GitHub unauthenticated at orchestrator heartbeat; CI startup_failure and restore test remain unproven"
+    "M0 requirements and licensing gates remain open"
   ],
   "heartbeat_20261021": {
     "observedAt": "2026-10-21T17:20:00Z",
@@ -147,20 +146,52 @@
       "activeRunStatus": "running",
       "executionPhase": "working",
       "lastConfirmedActivityAt": "2026-10-21T15:30:45.506Z",
-      "permittedActions": ["inspect_run"]
+      "permittedActions": [
+        "inspect_run"
+      ]
     },
     "adapters": [
-      {"name": "Business Empire Orchestrator", "adapterType": "opencode_local", "model": "kilo/dots-studio/dots-3-note-preview:free", "budgetMonthlyCents": 0},
-      {"name": "LavaBean Engineer", "adapterType": "opencode_local", "model": "opencode-go/deepseek-v4-pro", "budgetMonthlyCents": 0},
-      {"name": "Business Empire Hermes", "adapterType": "hermes_local", "model": "deepseek-v4-flash", "budgetMonthlyCents": 0},
-      {"name": "Business Empire Pi", "adapterType": "pi_local", "model": "tkr/gpt-oss:20b", "budgetMonthlyCents": 0}
+      {
+        "name": "Business Empire Orchestrator",
+        "adapterType": "opencode_local",
+        "model": "kilo/dots-studio/dots-3-note-preview:free",
+        "budgetMonthlyCents": 0
+      },
+      {
+        "name": "LavaBean Engineer",
+        "adapterType": "opencode_local",
+        "model": "opencode-go/deepseek-v4-pro",
+        "budgetMonthlyCents": 0
+      },
+      {
+        "name": "Business Empire Hermes",
+        "adapterType": "hermes_local",
+        "model": "deepseek-v4-flash",
+        "budgetMonthlyCents": 0
+      },
+      {
+        "name": "Business Empire Pi",
+        "adapterType": "pi_local",
+        "model": "tkr/gpt-oss:20b",
+        "budgetMonthlyCents": 0
+      }
     ],
     "spend": {
       "byAgentTotalCents": 0,
       "byBiller": [
-        {"biller": "chatgpt", "costCents": 0, "subscriptionRunCount": 16},
-        {"biller": "kilo", "costCents": 0},
-        {"biller": "opencode-go", "costCents": 0}
+        {
+          "biller": "chatgpt",
+          "costCents": 0,
+          "subscriptionRunCount": 16
+        },
+        {
+          "biller": "kilo",
+          "costCents": 0
+        },
+        {
+          "biller": "opencode-go",
+          "costCents": 0
+        }
       ],
       "note": "observed 0 across all billers; not a proven spending cap"
     },
@@ -191,6 +222,56 @@
       "execution": "GET /api/issues/{id}/execution -> phase working, permittedActions [inspect_run], attempt 1/3",
       "backupTrigger": "POST /api/instance/database-backups -> 200, new backup paperclip-20261021-173127.sql.gz (3,358,625 bytes), 18 backups on disk under retention"
     },
+    "finalDisposition": "in_progress"
+  },
+  "heartbeat_20261021c": {
+    "observedAt": "2026-10-21T17:38:00Z",
+    "trigger": "resume delta; no new user directive - 21b artifacts verified present on disk, no duplicate work",
+    "service": {
+      "apiHealth": 200,
+      "ui": 200,
+      "url": "http://127.0.0.1:3110",
+      "launchAgent": "com.calligentai.business-empire.paperclip",
+      "launchAgentState": "running"
+    },
+    "issue": {
+      "id": "7ec86557-067f-4377-b34a-f103cc8a0032",
+      "identifier": "BUS-3",
+      "status": "in_progress",
+      "assigneeAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
+      "activeRun": null
+    },
+    "previousHeartbeatArtifactsVerified": {
+      "commit": "0e89d21",
+      "branch": "feature/paperclip-orchestrator",
+      "evidenceBlock": "heartbeat_20261021b",
+      "reviewDoc": "paperclip/BE-HQ-001-acceptance-review.md",
+      "issueCommentId": "43df34e6-6933-40f7-8eee-e69145f7cfd5",
+      "backupFile": ".local/paperclip/backups/paperclip-20261021-173127.sql.gz",
+      "worktreeClean": true
+    },
+    "restoreTest": {
+      "result": "PASSED",
+      "method": "standalone initdb+pg_ctl on /tmp, then psql pipe of the real backup into a fresh database",
+      "backup": "paperclip-20261021-173127.sql.gz (3.36 MB gz, 29.05 MB raw, pg_dump 18.6 / server 18.1)",
+      "restoredTables": 227,
+      "restoredCounts": {
+        "issues": 4,
+        "agents": 4,
+        "companies": 1,
+        "issue_comments": 67,
+        "heartbeat_runs": 232
+      },
+      "bus3StatusAfterRestore": "in_progress",
+      "note": "The platform-owned POST /api/instance/database-backups only triggers backups; restore is platform-controlled and has no API. This test proves the on-disk backup artifact is a valid, restorable pg_dump - the restore CAPABILITY. It does not exercise the production restore path, which remains platform-controlled.",
+      "cleanup": "standalone temp instance stopped and /tmp artifacts removed; production instance untouched"
+    },
+    "blockers": [
+      "GitHub unauthenticated: gh auth status = not logged in; runtime logs capability_missing; GitHub-backed writes (PR, managed-credential issue update) cannot complete",
+      "No CI runner: act absent; docker CLI present but daemon not running (no /var/run/docker.sock); paperclip-checks.yml startup_failure not reproducible locally",
+      "Restore path platform-controlled: OpenAPI spec confirms only POST /api/instance/database-backups (triggers backup); no restore endpoint exists",
+      "Spend enforcement unproven: all costCents 0; budgetMonthlyCents=0 is a budget line, not a cap"
+    ],
     "finalDisposition": "in_progress"
   }
 }
