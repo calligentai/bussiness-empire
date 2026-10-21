@@ -667,6 +667,37 @@
         },
         "commit": "5dc3b22"
       }
+    },
+    "heartbeat_20261021i": {
+      "observedAt": "2026-10-21T21:40:56Z",
+      "trigger": "issue_commented (ba87380d, board direction); descriptor fix pass",
+      "boardComment": "Replaced the dead e374b842 interaction pointer in the unblockDescriptor with the real remaining condition (board-owned credential injection). Review artifact intentionally stays blocked - task-watchdog reopens any non-terminal watched subtree.",
+      "descriptorFix": {
+        "BUS-5": "owner=board, action=inject GitHub token for private repo calligentai/bussiness-empire AND make act + Docker daemon available; production-restore path platform-controlled (lifecycle=not_cloud_managed). No interaction pointer.",
+        "BUS-3": "owner=board, action=inject GitHub token OR make act + Docker daemon available; then resume orchestrator on opencode free route. No interaction pointer."
+      },
+      "dispositions": {
+        "BUS-3": {
+          "status": "blocked",
+          "owner": "board",
+          "blockedTransitionAt": "2026-10-21T21:40:18.640Z",
+          "checkoutRunId": null
+        },
+        "BUS-5": {
+          "status": "blocked",
+          "owner": "board",
+          "blockedTransitionAt": "2026-10-21T21:39:57.462Z",
+          "checkoutRunId": null
+        }
+      },
+      "blockersReconfirmed": {
+        "gh": "gh not logged in; all four token env vars unset; repo GET=404",
+        "ci": "act absent; docker daemon down; pyyaml import fails",
+        "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
+        "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
+      },
+      "executionPath": "LIVE - opencode_local adapter dispatching and completing",
+      "unblockAction": "board injects a GitHub token and makes act + Docker available"
     }
   }
 }
