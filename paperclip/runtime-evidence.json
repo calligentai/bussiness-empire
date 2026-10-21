@@ -448,6 +448,28 @@
         "unblockAction": "respond to interaction e374b842 (re-create a fresh request_item_verdicts since the prior one expired) OR inject a GitHub token and make act+Docker available",
         "livePath": "watchdog ecd97e6a owns the next execution path; agent wakeup/heartbeat/invoke routes are live and verified"
       }
+    },
+    "heartbeat_20261021f": {
+      "observedAt": "2026-10-21T16:42:15Z",
+      "trigger": "BUS-5 reopened via comment (ecf0981c); re-applied blocked disposition after harness rollback",
+      "service": {
+        "apiHealth": 200,
+        "ui": 200,
+        "url": "http://127.0.0.1:3110"
+      },
+      "blockersReconfirmedAtReopen": {
+        "gh": "gh not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo GET=404",
+        "ci": "act not found; docker CLI present but daemon down; pyyaml import fails",
+        "production_restore": "GET /api/instance/lifecycle -> not_cloud_managed; no agent-creatable restore route",
+        "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
+      },
+      "executionPath": "LIVE - adapter opencode_local dispatching and completing (b787b6af exit 0; b1515b30 running). BUS-3 watchdog ecd97e6a active.",
+      "disposition": {
+        "issue": "BUS-5",
+        "status": "blocked",
+        "owner": "board",
+        "action": "respond to interaction e374b842 (expired) or inject GitHub token + make act+Docker available"
+      }
     }
   }
 }
