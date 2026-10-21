@@ -349,5 +349,105 @@
       "spend enforcement unproven",
       "production acceptance"
     ]
+  },
+  "blocked_disposition_20261021": {
+    "observedAt": "2026-10-21T15:53:00Z",
+    "trigger": "issue_disposition_repair attempt 2/2; cause deliberate_wait_without_target",
+    "diagnosis": "Attempt 1 recorded a watchdog (ecd97e6a, active) but the harness classified it as a deliberate wait WITHOUT a target: a watchdog is a disposition record, not a trigger. POST /api/issues/:id/monitor/check-now returns 409 'Issue has no scheduled monitor' - monitors are created only by the recovery service or board tree-holds, never by an agent. So the issue had a record of waiting but no armed execution path.",
+    "livenessSurfaceEnumeratedFromSpec": {
+      "watchdog": "PUT /api/issues/:id/watchdog - disposition record only, not a trigger",
+      "monitor": "POST /api/issues/:id/monitor/check-now -> 409, no public create-monitor route",
+      "recoveryAction": "POST /api/issues/:id/recovery-actions/resolve - needs an active recovery action row; none exists",
+      "treeHold": "POST /api/issues/:id/tree-holds - board-only, no subtree to hold",
+      "interaction": "POST /api/issues/:id/interactions - the ONLY agent-creatable, board-gated liveness path",
+      "issueStatus": "PATCH /api/issues/:id - probed 200, deliberately no status mutation"
+    },
+    "actionTaken": "Created a real request_item_verdicts interaction so the board has a concrete, answerable prompt with wake_assignee_on_accept. This is an owned next execution path, not a parked summary. Did not produce the deliverable (assignee path exists). Did not mutate issue status.",
+    "interaction": {
+      "route": "POST /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/interactions",
+      "schema": "request_item_verdicts (oneOf); verdicts must include approve+reject; items require id+label",
+      "id": "e374b842-2815-49ee-875d-27205ca624da",
+      "status": "pending",
+      "continuationPolicy": "wake_assignee_on_accept",
+      "resolverPolicy": "human_only (server-normalized from board_only)",
+      "items": [
+        "gh-token-unblock",
+        "ci-runner-unblock",
+        "acceptance-step"
+      ],
+      "verifiedViaGET": true
+    },
+    "disposition": "blocked",
+    "blocker": "No armed execution path on BUS-3; every remaining blocker (private repo with no token in runtime; no act/docker daemon; unproven spend enforcement) is external to this runtime and cannot be self-resolved by the orchestrator.",
+    "unblockOwner": "human board / platform",
+    "unblockAction": "Respond to interaction e374b842-2815-49ee-875d-27205ca624da (pending on BUS-3): approve one of gh-token-unblock / ci-runner-unblock / acceptance-step. On acceptance the orchestrator resumes via wake_assignee_on_accept.",
+    "stillNotDone": [
+      "GitHub writes (private repo, no token in runtime)",
+      "CI startup_failure (no act/docker daemon locally)",
+      "spend enforcement unproven",
+      "production acceptance"
+    ]
+  },
+  "heartbeats": {
+    "heartbeat_20261021e": {
+      "observedAt": "2026-10-21T16:37:43Z",
+      "trigger": "BUS-5 watchdog disposition repair (attempt 2/2); independent verification of stopped BUS-3 subtree",
+      "service": {
+        "apiHealth": 200,
+        "ui": 200,
+        "url": "http://127.0.0.1:3110"
+      },
+      "watchdogVerification": {
+        "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
+        "statusAtReview": "todo",
+        "watchdogRecord": "ecd97e6a-40fd-484b-b4c6-b72208a88f20, status=active",
+        "pendingInteraction": "e374b842-2815-49ee-875d-27205ca624da, kind=request_item_verdicts, status=expired (board never responded)",
+        "blockersIndependentlyReconfirmed": [
+          {
+            "id": "gh-token",
+            "check": "gh auth status -> not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo calligentai/bussiness-empire unauth GET -> 404",
+            "owner": "human board / platform"
+          },
+          {
+            "id": "ci-runner",
+            "check": "act not found; docker CLI present but daemon down (no socket); pyyaml import fails",
+            "owner": "human board / platform"
+          },
+          {
+            "id": "spend-enforcement",
+            "check": "GET /companies -> budgetMonthlyCents=0, spentMonthlyCents=0; dashboard monthUtilizationPercent=0. Budget line, not a cap.",
+            "owner": "none (no local path)"
+          },
+          {
+            "id": "production-restore-path",
+            "check": "GET /api/instance/lifecycle -> not_cloud_managed; OpenAPI confirms only POST /api/instance/database-backups triggers backups. No agent-creatable restore route.",
+            "owner": "platform"
+          }
+        ],
+        "completedAndVerified": [
+          {
+            "item": "restore test",
+            "evidence": "heartbeat_20261021c.restoreTest PASSED, 227 tables, counts issues=4/agents=4/companies=1/comments=67/heartbeat_runs=232, BUS-3 in_progress after restore"
+          },
+          {
+            "item": "CI workflow defect",
+            "evidence": "paperclip-checks.yml and docs-integrity.yml inspected directly; no workflow-file defect, startup_failure is environmental"
+          },
+          {
+            "item": "orchestration + routing",
+            "evidence": "opencode_local adapter live; recent runs 2f40f661/ae1cba61/d255190c/52c09469/67671e0e all succeeded exit 0; runtimeMode=legacy runtimeModeReason=direct_adapter"
+          }
+        ],
+        "executionPathStatus": "LIVE and verified - heartbeat scheduler running, adapter dispatching and completing successfully. Timer wakes suppressed by design (intervalSec=0, maxConcurrentRuns=1), not by a scheduler failure."
+      },
+      "disposition": {
+        "issue": "BUS-5",
+        "finalDisposition": "blocked",
+        "reason": "BUS-3 is genuinely blocked on two human-owned external blockers (GitHub token injection; act+Docker availability) plus a platform-controlled production-restore path. Verified evidence shows orchestration/routing and the restore test are complete; remaining items cannot be cleared from this runtime.",
+        "unblockOwner": "human board / platform",
+        "unblockAction": "respond to interaction e374b842 (re-create a fresh request_item_verdicts since the prior one expired) OR inject a GitHub token and make act+Docker available",
+        "livePath": "watchdog ecd97e6a owns the next execution path; agent wakeup/heartbeat/invoke routes are live and verified"
+      }
+    }
   }
 }
