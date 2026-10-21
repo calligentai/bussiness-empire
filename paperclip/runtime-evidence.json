@@ -809,5 +809,42 @@
       "boardCommentId": "c56d7c3a-12ab-4db5-8a61-113f565a3469"
     },
     "operationalNote": "Posting a comment on a blocked issue reopens it: the reopen path cleared BUS-5 back to todo and dropped the unblockDescriptor right after the PATCH. Order matters - post the comment first, then PATCH status=blocked together with unblockDescriptor, and do not comment again afterwards or the reopen loop restarts."
+  },
+  "watchdog_loop_tail_20261021j": {
+    "runId": "30f498c2-5132-4d58-aa5a-d2ae06639e03",
+    "wake": {
+      "reason": "issue_reopened_via_comment",
+      "originCommentId": "c56d7c3a-12ab-4db5-8a61-113f565a3469",
+      "originAuthor": "board (user)",
+      "originAt": "2026-10-21T22:00:41Z",
+      "note": "Tail dispatch of the pre-fix loop: the board comment reopened BUS-5 and the harness checked it out (checkoutRunId=30f498c2). No new board instruction since; board disposition unchanged."
+    },
+    "verifiedAt": "2026-10-21T22:12:55Z",
+    "stateVerified": {
+      "BUS-3": {
+        "status": "blocked",
+        "blockedTransitionAt": "2026-10-21T21:46:47.116Z",
+        "checkoutRunId": null,
+        "watchdog": "GET /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> null",
+        "runs": "latest 09b78050 cancelled (created 2026-10-21T21:47:55Z); no new run since the runtime fix"
+      },
+      "BUS-5": {
+        "statusAtRunStart": "in_progress",
+        "blockedTransitionAt": "2026-10-21T22:01:18.832Z",
+        "watchdog": "GET /api/issues/56a2e539-b23d-4d3c-946f-59d5317826e1/watchdog -> null",
+        "descriptor": "board-approved action text preserved verbatim"
+      },
+      "loopStopped": "No watchdog on either issue, no queued resume run, no new BUS-3 run: the ping-pong that produced 4 stop fingerprints and 68 BUS-3 runs has not recurred."
+    },
+    "githubBlockerReconfirmed": {
+      "tokenEnvVars": "all empty (len 0): PAPERCLIP_GITHUB_BROKER_TOKEN, PAPERCLIP_GIT_TOKEN, GH_TOKEN, GITHUB_TOKEN, GH_ENTERPRISE_TOKEN",
+      "launcherControl": "unset token -> 'Paperclip: GitHub capability_missing'; dummy token -> 'capability_rejected' (401): the broker probe path works, no credential is injected",
+      "gh": "not logged in; private repo calligentai/bussiness-empire unreachable",
+      "act": "not installed; docker CLI present but daemon down; no Docker Desktop/OrbStack in /Applications (board descriptor: act/Docker are no longer the ask - CI proven account-side)",
+      "lifecycle": "/api/instance/lifecycle -> not_cloud_managed (production restore path stays platform-controlled)"
+    },
+    "reEnableProcedureVerified": "OpenAPI exposes PUT /api/issues/{id}/watchdog (Create or update an issue watchdog) - the board re-enable instruction is valid; re-enable on the watched issue 7ec86557-067f-4377-b34a-f103cc8a0032 once a token lands, then resume BUS-3.",
+    "disposition": "BUS-5 blocked, unblock owner board, board-approved descriptor unchanged. Nothing merged, deployed, paid, closed or mutated in production.",
+    "upstreamProposalStatus": "unchanged - proposal only, not implemented; upstream push still blocked by the same missing GitHub credential."
   }
 }
