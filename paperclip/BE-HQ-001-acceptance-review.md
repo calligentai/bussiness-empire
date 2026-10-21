@@ -22,7 +22,7 @@ scope for this heartbeat and is not claimed here.
 
 ## 2. Routing — the core ask of BE-HQ-001
 
-The four registered adapters and their pinned routes:
+The four registered adapters and their pinned routes (snapshot taken during this review):
 
 | Agent | adapterType | model | endpoint |
 |---|---|---|---|
@@ -30,6 +30,13 @@ The four registered adapters and their pinned routes:
 | LavaBean Engineer | `opencode_local` | `opencode-go/deepseek-v4-pro` | `http://127.0.0.1:8789/v1` |
 | Business Empire Hermes | `hermes_local` | `deepseek-v4-flash` | existing |
 | Business Empire Pi | `pi_local` | `tkr/gpt-oss:20b` | existing |
+
+Live adapter configs re-read at the end of the fix pass (2026-10-21T21:35Z, unchanged by
+this pass): Orchestrator `opencode_local` / `kilo/dots-studio/dots-3-note-preview:free`,
+LavaBean `opencode_local` / `meta/muse-spark-1.3`, Hermes `hermes_local` / `auto` /
+`deepseek-v4-flash`, Pi `pi_local` / `tkr/ollama3:gpt-oss:20b`. The LavaBean and Pi routes
+above were re-pinned by their owners after this table was written; no provider, model or
+routing endpoint was changed by the orchestrator.
 
 `scripts/paperclip_config.py` builds these entries with `routingEvidence` carrying the
 endpoint + chosen model, and `opencode_local` injects `OPENCODE_CONFIG_CONTENT` so the

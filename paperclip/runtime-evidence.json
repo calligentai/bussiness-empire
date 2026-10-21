@@ -616,7 +616,57 @@
         "no new dependencies",
         "no production mutations",
         "no merge or deploy"
-      ]
+      ],
+      "liveEndState": {
+        "observedAt": "2026-10-21T21:35:00Z",
+        "service": {
+          "ui": 200,
+          "api": 200
+        },
+        "bus3": {
+          "status": "blocked",
+          "blockedBy": [],
+          "unblockDescriptorOwner": "board"
+        },
+        "bus5": {
+          "status": "blocked",
+          "staleExpiredInteractionReference": false
+        },
+        "watchdog": {
+          "observedEqualsReviewed": true,
+          "triggerCount": 4,
+          "state": "already_reviewed"
+        },
+        "adapters": [
+          {
+            "name": "LavaBean Engineer",
+            "adapterType": "opencode_local",
+            "model": "meta/muse-spark-1.3"
+          },
+          {
+            "name": "Business Empire Orchestrator",
+            "adapterType": "opencode_local",
+            "model": "kilo/dots-studio/dots-3-note-preview:free"
+          },
+          {
+            "name": "Business Empire Hermes",
+            "adapterType": "hermes_local",
+            "model": "deepseek-v4-flash"
+          },
+          {
+            "name": "Business Empire Pi",
+            "adapterType": "pi_local",
+            "model": "tkr/ollama3:gpt-oss:20b"
+          }
+        ],
+        "spendByBiller": {
+          "chatgpt": 0,
+          "kilo": 0,
+          "opencode-go": 0,
+          "tkr": 0
+        },
+        "commit": "5dc3b22"
+      }
     }
   }
 }
