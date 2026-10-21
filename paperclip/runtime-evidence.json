@@ -501,6 +501,37 @@
         }
       },
       "unblockAction": "board responds to interaction e374b842 (expired) OR injects GitHub token and makes act+Docker available"
+    },
+    "heartbeat_20261021h": {
+      "observedAt": "2026-10-21T21:20:13Z",
+      "trigger": "task_watchdog_stopped_subtree (fingerprint 8c57e4e1...); BUS-3 re-blocked by harness at 21:18",
+      "watchdogRun": {
+        "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
+        "stoppedLeaf": "BUS-3: todo (harness had rolled back the blocked disposition)",
+        "dispositionReapplied": "blocked with unblockDescriptor owner=board; blockedTransitionAt=2026-10-21T21:19:30.961Z",
+        "watchdogRecord": "ecd97e6a, status=active, triggerCount=4, lastCompletedAt=2026-10-21T21:19:18Z",
+        "livePath": "BUS-5 watchdog issue owns the next execution path; opencode_local adapter live (f7d95cff running)"
+      },
+      "blockersReconfirmed": {
+        "gh": "gh not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo GET=404",
+        "ci": "act absent; docker daemon down; pyyaml import fails",
+        "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
+        "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
+      },
+      "dispositions": {
+        "BUS-3": {
+          "status": "blocked",
+          "owner": "board",
+          "blockedTransitionAt": "2026-10-21T21:19:30.961Z"
+        },
+        "BUS-5": {
+          "status": "blocked",
+          "owner": "board",
+          "blockedTransitionAt": "2026-10-21T21:19:18.220Z",
+          "checkoutRunId": null
+        }
+      },
+      "unblockAction": "board responds to interaction e374b842 (expired) OR injects GitHub token and makes act+Docker available"
     }
   }
 }
