@@ -470,6 +470,37 @@
         "owner": "board",
         "action": "respond to interaction e374b842 (expired) or inject GitHub token + make act+Docker available"
       }
+    },
+    "heartbeat_20261021g": {
+      "observedAt": "2026-10-21T20:40:12Z",
+      "trigger": "task_watchdog_stopped_subtree (fingerprint bd6b9c61...); BUS-3 re-blocked at 20:36:48 by harness",
+      "watchdogRun": {
+        "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
+        "stoppedLeaf": "BUS-3: blocked",
+        "dispositionConfirmed": "blocked is correct and durable - two human-owned external blockers (GitHub token; act+Docker) plus platform-controlled production-restore path. Not a harness artifact; re-verified at source this heartbeat.",
+        "watchdogRecord": "ecd97e6a-40fd-484b-b4c6-b72208a88f20, status=active, triggerCount=2, lastCompletedAt=2026-10-21T20:37:58Z",
+        "livePath": "BUS-5 watchdog issue owns the next execution path; opencode_local adapter live (646a9a24 running, 3689449f exit 0)"
+      },
+      "blockersReconfirmed": {
+        "gh": "gh not logged in; all four token env vars unset; repo GET=404",
+        "ci": "act absent; docker daemon down; pyyaml import fails",
+        "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
+        "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
+      },
+      "dispositions": {
+        "BUS-3": {
+          "status": "blocked",
+          "owner": "board",
+          "blockedTransitionAt": "2026-10-21T20:36:48.077Z"
+        },
+        "BUS-5": {
+          "status": "blocked",
+          "owner": "board",
+          "blockedTransitionAt": "2026-10-21T20:39:47.572Z",
+          "checkoutRunId": null
+        }
+      },
+      "unblockAction": "board responds to interaction e374b842 (expired) OR injects GitHub token and makes act+Docker available"
     }
   }
 }
