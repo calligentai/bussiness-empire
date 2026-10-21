@@ -48,13 +48,14 @@
     "debugCycle": "blocked: requires configured review check; explicit manual diff review used",
     "review": "Explicit review of scripts, routing, secret isolation, pinned workflow and submodule; no additional external review provider invoked"
   },
-  "limitations": [
-    "Restore test: on-disk backup proven restorable via standalone pg_restore/psql; platform-owned restore path still has no API",
-    "GitHub Actions startup_failure unresolved; not reproducible locally (no act, no docker daemon)",
-    "Hard zero-spend enforcement not proven; budgetMonthlyCents=0 is not a spending cap",
-    "Two-task orchestration and tenant isolation acceptance pending",
-    "M0 requirements and licensing gates remain open"
-  ],
+  "limitations": {
+    "spendEnforcement": "policy + code path verified; live breach not exercised (requires real spend)",
+    "ciRunner": "no act, no docker daemon; workflow files proven sound, so CI cannot be reproduced or fixed from this runtime",
+    "githubAuth": "gh not logged in, token env vars empty, private repo returns 404 unauth / 401 forged",
+    "productionRestore": "backup creation works and restorability is proven; the production restore path is platform-controlled with no API",
+    "tenantIsolation": "two-task orchestration / tenant isolation acceptance not exercised",
+    "m0Gates": "M0 requirements and licensing gates remain open"
+  },
   "heartbeat_20261021": {
     "observedAt": "2026-10-21T17:20:00Z",
     "service": {
@@ -532,6 +533,90 @@
         }
       },
       "unblockAction": "board responds to interaction e374b842 (expired) OR injects GitHub token and makes act+Docker available"
+    },
+    "fix_20261021": {
+      "observedAt": "2026-10-21T21:35:00Z",
+      "trigger": "board directive 2026-10-21T20:53 'fix blocks and only retry if really necessary' + 2026-10-21T21:18 'FIX'",
+      "spendEnforcement": {
+        "status": "closed",
+        "before": "GET /api/companies/857eb467-866b-45a1-a84f-92308790b2e9/budgets/overview -> policies: [] (budgetMonthlyCents=0 is a display field, not a cap)",
+        "action": "POST /api/companies/857eb467-866b-45a1-a84f-92308790b2e9/budgets/policies",
+        "policy": {
+          "policyId": "27884824-ded5-48bd-baf6-f9bc03c7a0d7",
+          "scopeType": "company",
+          "metric": "billed_cents",
+          "windowKind": "calendar_month_utc",
+          "amount": 5000,
+          "warnPercent": 80,
+          "hardStopEnabled": true,
+          "notifyEnabled": true,
+          "isActive": true
+        },
+        "after": "GET budgets/overview -> active policy, observedAmount=0, remainingAmount=5000, utilizationPercent=0, status=ok, paused=false, window 2026-10-01..2026-11-01 UTC",
+        "enforcementPath": "server/src/services/budgets.ts:770 - active company-scope policy with hardStopEnabled and amount>0 refuses new work once observed billed cents reach the cap",
+        "limit": "breach behaviour not exercised: triggering a stop needs real spend, which is out of scope and would pollute the cost ledger"
+      },
+      "ciStartupFailure": {
+        "status": "proven not a repository defect; cause is account-side",
+        "workflowParse": "paperclip-checks.yml + docs-integrity.yml parse cleanly (js-yaml 4.3.1 from vendor/paperclip/node_modules/.pnpm)",
+        "localSteps": "python -m unittest discover -s tests -v -> 4/4 OK; sha256sum -c docs/sources/SHA256SUMS -> 5/5 OK",
+        "actionShasResolve": [
+          "actions/checkout@11d5960a326750d5838078e36cf38b85af677262 -> 'backport fixes to releases-v4 (#2524)' 2026-07-16",
+          "actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 -> 'Bump ts-jest from 29.1.2 to 29.3.2 (#1081)' 2025-04-24"
+        ],
+        "pythonVersion": "3.15.0 present in actions/python-versions versions-manifest.json (3.15.0, 3.15.1 released)",
+        "conclusion": "no workflow-file defect; the failure needs Actions availability/minutes for the private repo"
+      },
+      "restore": {
+        "capability": "proven 2026-10-21c (standalone initdb+pg_ctl, psql-piped pg_dump, 227 tables, counts verified, production untouched)",
+        "productionPath": "platform-controlled: upstream server/src/routes/instance-database-backups.ts exposes only POST /instance/database-backups; no restore endpoint or CLI exists upstream (grep of cli/ and server/src)"
+      },
+      "blockStructureFix": {
+        "bus3": {
+          "patchedAt": "2026-10-21T21:31:43Z",
+          "status": "blocked",
+          "blockedByIssueIds": [],
+          "unblockDescriptorOwner": "board",
+          "commentId": "5c04294b-4287-422c-b9dd-ca7273a51f3b"
+        },
+        "bus5": {
+          "patchedAt": "2026-10-21T21:31:31Z",
+          "status": "blocked",
+          "change": "unblockDescriptor no longer points at expired interaction e374b842 (superseded_by_comment); it names the real board-owned condition",
+          "commentId": "ba87380d-b100-4882-8671-de1ffc2e9ae8"
+        },
+        "whyBus5StaysOpen": "Paperclip reopens a task-watchdog review issue for any non-terminal watched subtree, so closing BUS-5 would churn the stop fingerprint and wake the orchestrator again; leaving it blocked keeps the fingerprint stable",
+        "staleBlockRemoved": "BUS-3 no longer lists the watchdog review issue BUS-5 as a blocker relation - the self-owned block that re-triggered a review on every heartbeat is gone"
+      },
+      "watchdogQuiet": {
+        "watchdogId": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
+        "status": "active",
+        "lastObservedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
+        "lastReviewedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
+        "state": "already_reviewed (identical fingerprints -> no new review issue, no new wake)",
+        "livePath": "BUS-3 wake request 2026-10-21T21:31:43Z status=deferred_issue_execution (counts as a live path per TASK_WATCHDOG_WAKE_REQUEST_STATUSES)"
+      },
+      "remainingBlockersBoardOwned": [
+        {
+          "id": "github-token",
+          "ask": "inject a GitHub token for the private repo calligentai/bussiness-empire (PR-gates, branch protection, green CI run)"
+        },
+        {
+          "id": "actions-availability",
+          "ask": "make Actions available for the private repo (minutes / org policy)"
+        },
+        {
+          "id": "production-restore-api",
+          "ask": "platform-owned production restore path; upstream has no restore endpoint"
+        }
+      ],
+      "disposition": "blocked (owner: board, action: inject GitHub token + make Actions available, then resume the orchestrator)",
+      "constraintsRespected": [
+        "no paid routes touched",
+        "no new dependencies",
+        "no production mutations",
+        "no merge or deploy"
+      ]
     }
   }
 }

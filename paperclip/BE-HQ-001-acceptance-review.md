@@ -1,8 +1,9 @@
 # BE-HQ-001 — Acceptance review (orchestrator heartbeat, 2026-10-21)
 
-Status reviewed: **in_progress**. This review covers the orchestration/routing half of the
-issue. The full master-plan acceptance (M0–M4) is out of scope for this heartbeat and is not
-claimed here.
+Status reviewed: **blocked** (unblock owner: board — inject a GitHub token for the private
+repo and make Actions available, then resume the orchestrator). This review covers the
+orchestration/routing half of the issue. The full master-plan acceptance (M0–M4) is out of
+scope for this heartbeat and is not claimed here.
 
 ## 1. What is actually true right now (observed, live)
 
@@ -42,21 +43,35 @@ functionally pinned. Recorded so nobody re-derives the wrong conclusion.
 
 ## 3. Open items carried forward (unchanged, not resolved this heartbeat)
 
-- GitHub Actions `paperclip-checks.yml` / `docs-integrity.yml` startup failures — **not
-  reproducible locally**; `act` and a Docker daemon are absent, so CI remains unverified.
-- Hard zero-spend enforcement — `budgetMonthlyCents=0` is recorded but **is not a proven
-  spending cap**; observed spend is 0 but no gate was exercised.
-- Restore test — no restore path exercised.
+- GitHub Actions `paperclip-checks.yml` / `docs-integrity.yml` startup failures — **no
+  repository defect** (fix pass 2026-10-21): both files parse cleanly (js-yaml), the
+  4 config tests and 5 source hashes pass locally, both pinned action SHAs resolve on
+  GitHub, and `python-version 3.15.0` exists in setup-python's manifest. The failure is
+  account-side (Actions availability/minutes for the private repo), so CI still needs
+  the board.
+- Hard zero-spend enforcement — **closed 2026-10-21 (fix pass)**: the company had no budget
+  policy at all (`budgetMonthlyCents=0` is a display field, not a cap). Policy
+  `27884824-ded5-48bd-baf6-f9bc03c7a0d7` now caps billed cents at 5000 per calendar month
+  with `hardStopEnabled=true` and `warnPercent=80`; `GET budgets/overview` shows it active,
+  observed 0, remaining 5000, `status=ok`, `paused=false`. The guard that refuses new work
+  at the cap is `server/src/services/budgets.ts:770`. A live breach was not exercised —
+  that needs real spend.
+- Restore test — **done 2026-10-21c** (see blocker 3 below): the on-disk backup restores
+  cleanly into a standalone Postgres instance.
 - Two-task orchestration / tenant isolation acceptance — not exercised.
 - M0 requirements and licensing gates — remain open.
 
 ## 4. Blockers for this heartbeat
 
-1. **No GitHub authentication.** `gh auth status` reports "not logged into any GitHub hosts"
-   and the runtime logs `Paperclip: GitHub capability_missing`. Any write that requires
-   GitHub (PR, issue update via the managed-credentials path) cannot complete.
-2. **No CI runner.** `act` is not installed and there is no Docker daemon, so the
-   `startup_failure` item cannot be reproduced or fixed here.
+1. **No GitHub authentication (board-owned).** `gh auth status` reports "not logged into any
+   GitHub hosts" and the runtime logs `Paperclip: GitHub capability_missing`. Any write that
+   requires GitHub (PR, issue update via the managed-credentials path) cannot complete.
+   Unblock action: inject a GitHub token for `calligentai/bussiness-empire`.
+2. **No CI runner (board-owned).** `act` is not installed and there is no Docker daemon, so
+   the `startup_failure` cannot be reproduced here. Fix pass 2026-10-21 ruled out a
+   workflow-file defect (both files parse, 4/4 tests and 5/5 hashes pass locally, both
+   pinned action SHAs resolve on GitHub, `3.15.0` is in setup-python's manifest). Unblock
+   action: make Actions available for the private repo (minutes / org policy) and rerun.
 3. **Restore path.** The OpenAPI spec (`/api/openapi.json`) exposes only
    `POST /api/instance/database-backups`, which *triggers* a backup; there is no restore
    endpoint in the spec. Calling it returns a real backup record (200, e.g.
@@ -67,12 +82,23 @@ functionally pinned. Recorded so nobody re-derives the wrong conclusion.
    heartbeat_runs=232`, BUS-3 still `in_progress`. The temp instance was stopped and its
    /tmp artifacts removed; the production instance was never touched. What remains
    platform-controlled is the *production* restore path itself, which still has no API.
+4. **Stale self-owned block — removed (fix pass 2026-10-21).** BUS-3 was blocked by its own
+   watchdog review issue (BUS-5), whose `unblockDescriptor` pointed at interaction
+   `e374b842` — already expired (`superseded_by_comment`). That dead pointer is what kept
+   re-triggering a review on every heartbeat. BUS-3 no longer lists BUS-5 as a blocker
+   relation, both descriptors now name the real board-owned condition, and the watchdog's
+   observed/reviewed stop fingerprints are identical (`8c57e4e1…`) so the classifier reports
+   `already_reviewed` instead of opening a new review.
 
 ## 5. Verdict
 
 The orchestration/routing half of BE-HQ-001 is **installed and verified**: service live on
 loopback, 4 adapters registered with pinned routes, bootstrap idempotent, 4 config tests +
-5 source hashes green, spend at 0. The issue is correctly left `in_progress` — the
-remaining items are real and none were resolved this heartbeat. It is not `done` because
-CI, restore, spend enforcement and acceptance are unproven, and it is not `blocked` because
-the live continuation path (this heartbeat) is working.
+5 source hashes green, spend at 0, **spend now enforced by an active hard-stop budget
+policy**, restore capability proven, and the CI failure proven to be account-side rather
+than a repository defect. The issue is `blocked` with a named unblock owner and action
+(board: inject a GitHub token for the private repo and make Actions available, then
+resume the orchestrator). It is not `done` because PR-gates / branch protection / a green
+CI run need those credentials, and the production restore path is platform-controlled.
+The stale self-owned block (BUS-3 blocked by its own watchdog review issue) was removed in
+the fix pass, so the review no longer re-triggers on every heartbeat.
