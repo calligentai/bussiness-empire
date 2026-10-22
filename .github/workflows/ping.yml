@@ -1,7 +1,0 @@
-name: ping
-on: [push]
-jobs:
-  ping:
-    runs-on: [self-hosted, linux, x64]
-    steps:
-      - run: echo hello from $(hostname)
