@@ -65,15 +65,25 @@ functionally pinned. Recorded so nobody re-derives the wrong conclusion.
   that needs real spend.
 - Restore test — **done 2026-10-21c** (see blocker 3 below): the on-disk backup restores
   cleanly into a standalone Postgres instance.
+- Companion-adapter health — **fixed 2026-10-22**: the Pi agent's model id
+  `tkr/ollama3:gpt-oss:20b` was no longer listed by the provider, so every run failed in
+  ~2s with `adapter_failed`. It now uses `tkr/gpt-oss:20b` (same provider, same model,
+  same route) and run `d87de4a5` succeeded.
 - Two-task orchestration / tenant isolation acceptance — **exercised 2026-10-21 (M1
   acceptance pass)**: in a throwaway clone two parallel branches with disjoint paths merge
   conflict-free (`Merge made by the 'ort' strategy`, 0 unmerged paths), and a red test
   fails the workflow's own step (`python -m unittest discover -s tests -v` → exit 1) while
   the committed tree is green (exit 0). `main` and `lavabean` are the same commit and are
-  0 ahead of origin — no agent commit reaches either. Caveat: Paperclip's own workspace
-  projection is `shared_workspace` / `project_primary` (103 workspace records, one distinct
-  cwd), so per-issue isolation is a git-worktree convention (`docs/workflow.md`), not a
-  product guarantee.
+  0 ahead of origin — no agent commit reaches either. The product-level caveat from that
+  pass is **closed 2026-10-22**: the projection was `shared_workspace` /
+  `project_primary` (103 workspace records, one distinct cwd) because the bootstrap set an
+  `executionWorkspacePolicy` but never enabled the instance flag, and
+  `server/src/services/issues.ts:9769-9775` silently drops the per-issue workspace fields
+  on every write while `enableIsolatedWorkspaces` is false. The flag is now on, the
+  project policy is set, and the bootstrap enables it and converges an existing project.
+  Proof: run `d87de4a5` on BUS-5 executed in its own worktree
+  (`/Users/admin/Projects/bussiness-empire-worktrees/feature/BUS-5-watchdog-review-for-BUS-3`).
+  BUS-3 is pinned to the PR branch through an exact-branch attach.
 - M0 requirements and licensing gates — remain open.
 
 ## 4. Blockers for this heartbeat
