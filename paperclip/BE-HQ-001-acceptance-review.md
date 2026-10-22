@@ -118,5 +118,8 @@ board injects a GitHub token for the private repo and makes Actions available, a
 which the GitHub-side acceptance (PR-gates, branch protection, a green CI run on the real
 repo) is verifiable in one run. It is not `done` because those checks and the
 platform-controlled production restore path still need that access. The stale self-owned
-block (BUS-3 blocked by its own watchdog review issue) was removed, so the review no longer
-re-triggers on every heartbeat.
+block (BUS-3 blocked by its own watchdog review issue) was removed, and on 2026-10-22 the
+board's "unblock box 5" directive was applied: BUS-5 (the watchdog review artifact) is
+`done` - its review was already complete, and the task-watchdog on BUS-3 was removed on
+2026-10-21T21:57, so the harness keeps no review issue alive for this subtree. BUS-3
+carries the single board-owned action (credential injection) and no stale blocker.

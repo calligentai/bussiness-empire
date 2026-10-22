@@ -741,6 +741,30 @@
         "no production mutation",
         "real repository and main/lavabean untouched"
       ]
+    },
+    "unblock_bus5_20261022": {
+      "observedAt": "2026-10-22T02:25:00Z",
+      "trigger": "board directive 2026-10-22T02:20 'unblock box 5' (comment bc0127fd), issue reopened to todo -> claimed by this run",
+      "stateBefore": {
+        "BUS-3": "in_progress (reopened by the comment, no unblockDescriptor)",
+        "BUS-5": "blocked (descriptor owner=board, pointing at the credential injection)",
+        "watchdog": "removed 2026-10-21T21:57:19 (activity issue.watchdog_removed, watchdog ecd97e6a)"
+      },
+      "action": {
+        "BUS-5": "PATCH status=done + review-outcome comment b36cfbab - the review it existed for was already complete, and with the watchdog removed the harness keeps no review issue alive for this subtree",
+        "BUS-3": "PATCH status=blocked + blockedByIssueIds=[] + unblockDescriptor(owner=board) + comment 2b81663c - the single remaining action is the board-owned credential injection"
+      },
+      "whyBus5WasNotSimplyMovedToTodo": "the watchdog review was already performed and evidenced, so leaving the card parked in todo would have produced an inert card with no disposition; done is the honest state and it is stable now that the watchdog is gone",
+      "watchdogNote": "no watchdog record remains on BUS-3 (GET /api/issues/{id}/watchdog -> null), so the blocked/in_progress churn no longer re-triggers a review issue",
+      "remainingBoardAction": "inject a GitHub token for calligentai/bussiness-empire + make Actions available; then PR-gates, branch protection and a green CI run on the real repo are verifiable in one run",
+      "optionalProductDecision": "workspace projection is shared_workspace/project_primary (103 records, 1 cwd) so per-issue isolation is a git-worktree convention, not a product guarantee; remedy is workspace mode -> isolated_workspace, not applied because it would relocate this run's own working tree and open branch",
+      "constraintsRespected": [
+        "no paid routes",
+        "no new dependencies",
+        "no merge or deploy",
+        "no production mutation",
+        "no credential values read or printed"
+      ]
     }
   },
   "watchdog_loop_fix_20261021i": {
