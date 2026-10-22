@@ -831,6 +831,39 @@
         },
         "noCommentOnPurpose": "the harness wakes the assignee on any issue comment authored through this session, so this heartbeat recorded its report only in the run presentation and the durable files, to avoid a self-wake loop"
       }
+    },
+    "adapter_and_isolation_fix_20261022": {
+      "observedAt": "2026-10-22T02:57:00Z",
+      "trigger": "board 'fix' on BUS-5 (02:31) + 'fix it' on BUS-3 (02:37); the platform had escalated BUS-5 with activeRecoveryAction 44c0aa6c (ownerType board, routingPolicy board_escalation_no_takeover_v1)",
+      "rootCauseFound": {
+        "staleModelId": "the Pi agent's adapterConfig.model was 'tkr/ollama3:gpt-oss:20b', an id the provider no longer lists; runs c4b6448e, 634ba4c0 and f8947572 all failed in ~2s with errorCode adapter_failed",
+        "providerMessage": "Configured Pi model is unavailable: tkr/ollama3:gpt-oss:20b. Available models: ollama/minimax-m2.7:cloud, tkr/anthropic/claude-sonnet-4.6, tkr/deepseek-v4-flash, tkr/deepseek/deepseek-v4-flash, tkr/gpt-5.6-luna, tkr/gpt-oss:20b, tkr/nvidia/nemotron-3.5-lightning:free",
+        "fix": "Pi agent adapterConfig.model -> 'tkr/gpt-oss:20b' (same provider tkr, same model gpt-oss:20b, same route; only the stale namespace segment dropped). No credential was read or printed; the provider's own model list was the source.",
+        "recoveryPath": "POST /api/issues/BUS-5/recovery-actions/resolve {actionId:44c0aa6c, outcome:restored, sourceIssueStatus:todo, resolutionNote:<repair evidence>} - the platform's own sanctioned path (repair the runtime, then retry the original owner); the issue was returned to Business Empire Pi"
+      },
+      "runtimeProof": {
+        "run": "d87de4a5-cefd-491b-aab7-ac61a2a60f05",
+        "result": "status succeeded, errorCode null, 44s, empty stderr - the adapter no longer fails on model resolution (was adapter_failed in 2s)",
+        "isolationProof": "the same run executed in its own git worktree: /Users/admin/Projects/bussiness-empire-worktrees/feature/BUS-5-watchdog-review-for-BUS-3 on branch feature/BUS-5-watchdog-review-for-BUS-3 (platform comment 'Workspace Ready - Strategy: git_worktree'); before the fix every issue resolved to one shared directory (103 workspace records, 1 distinct cwd)"
+      },
+      "dispositions": {
+        "BUS-5": "done (monitor cleared, evidence comment 9b78afbd) - the card was worked, the escalation is resolved and the review it existed for is complete",
+        "BUS-3": "blocked, unblockDescriptor owner=board, blockedBy=[] - one action remains and it is the board's: inject a GitHub token for the private repo and make Actions available",
+        "BUS-3Workspace": "executionWorkspacePreference=isolated_workspace, workspaceStrategy={type:git_worktree, existingBranch:feature/paperclip-orchestrator, worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees} - the next BUS-3 dispatch materialises its own worktree with the PR branch attached"
+      },
+      "deliverableChanges": [
+        "scripts/paperclip_config.py: workspace_policy()",
+        "scripts/paperclip-bootstrap.py: enables enableIsolatedWorkspaces, uses workspace_policy() and converges an existing project",
+        "tests/test_paperclip_config.py: test_workspace_policy_gives_every_issue_its_own_git_worktree (RED ImportError -> GREEN 5/5)",
+        ".gitignore: .paperclip/"
+      ],
+      "constraintsRespected": [
+        "no paid routes touched",
+        "no new dependencies",
+        "no merge or deploy",
+        "no production mutation",
+        "no credential values read or printed"
+      ]
     }
   },
   "watchdog_loop_fix_20261021i": {
