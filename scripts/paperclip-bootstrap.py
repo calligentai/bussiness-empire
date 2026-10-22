@@ -2,6 +2,7 @@
 import json,sys,urllib.request,urllib.error
 from pathlib import Path
 from urllib.parse import urlsplit
+from paperclip_config import workspace_policy
 
 ROOT=Path(__file__).resolve().parents[1]
 BASE=sys.argv[1] if len(sys.argv)>1 else 'http://127.0.0.1:3110'
@@ -40,10 +41,17 @@ def main():
             if parent: body['reportsTo']=agents[parent]['id']
             agent=api('POST',f'/companies/{cid}/agents',body)
         agents[key]=agent
+    # The per-issue worktree policy is inert unless the instance enables isolated
+    # workspaces; without this flag every issue resolves to the shared project
+    # workspace and two harnesses write into one directory.
+    api('PATCH','/instance/settings/experimental',{'enableIsolatedWorkspaces':True})
+    policy=workspace_policy(worktree_parent_dir=str(ROOT.parent))
     projects=api('GET',f'/companies/{cid}/projects')
     project=find(projects,'LAVABEAN-PLATFORM')
     if not project:
-        project=api('POST',f'/companies/{cid}/projects',{'name':'LAVABEAN-PLATFORM','description':'First Business Empire venture. GitHub is the source of truth for code/docs; Paperclip coordinates work and evidence.','status':'in_progress','goalIds':[goal['id']],'leadAgentId':agents['codex']['id'],'workspace':{'name':'bussiness-empire','cwd':str(ROOT),'repoUrl':'https://github.com/calligentai/bussiness-empire','repoRef':'lavabean'},'executionWorkspacePolicy':{'enabled':True,'defaultMode':'isolated_workspace','allowIssueOverride':False,'workspaceStrategy':{'type':'git_worktree','baseRef':'origin/lavabean','branchTemplate':'feature/{{issue.identifier}}-{{slug}}','worktreeParentDir':str(ROOT.parent/'paperclip-tasks')}}})
+        project=api('POST',f'/companies/{cid}/projects',{'name':'LAVABEAN-PLATFORM','description':'First Business Empire venture. GitHub is the source of truth for code/docs; Paperclip coordinates work and evidence.','status':'in_progress','goalIds':[goal['id']],'leadAgentId':agents['codex']['id'],'workspace':{'name':'bussiness-empire','cwd':str(ROOT),'repoUrl':'https://github.com/calligentai/bussiness-empire','repoRef':'lavabean'},'executionWorkspacePolicy':policy})
+    elif project.get('executionWorkspacePolicy')!=policy:
+        project=api('PATCH',f'/projects/{project["id"]}',{'executionWorkspacePolicy':policy})
     api('PATCH',f'/companies/{cid}',{'requireBoardApprovalForNewAgents':True,'feedbackDataSharingEnabled':False})
     issues=api('GET',f'/companies/{cid}/issues')
     for task,title,url,owner in [('BE-DOC-001','Centralize project source documents','https://github.com/calligentai/bussiness-empire/pull/1','opencode'),('BE-DEV-001','Establish development workflow and CI','https://github.com/calligentai/bussiness-empire/pull/2','opencode'),('BE-HQ-001','Install and verify Paperclip orchestration and routing','https://github.com/calligentai/bussiness-empire/issues/3','codex')]:

@@ -765,6 +765,41 @@
         "no production mutation",
         "no credential values read or printed"
       ]
+    },
+    "isolation_fix_20261022": {
+      "observedAt": "2026-10-22T02:50:00Z",
+      "trigger": "board directive 2026-10-22T02:37 'fix it' (after the reported shared-workspace gap and the offered remedy)",
+      "rootCause": {
+        "bootstrap": "scripts/paperclip-bootstrap.py already set an executionWorkspacePolicy (isolated_workspace + git_worktree) but never enabled the instance flag, so the policy was inert",
+        "platform": "server/src/services/issues.ts:9769-9775 deletes executionWorkspaceId/executionWorkspacePreference/executionWorkspaceSettings on every issue write while experimental enableIsolatedWorkspaces is false - the PATCH returned 200 and silently dropped the fields",
+        "flag": "GET /api/instance/settings/experimental -> enableIsolatedWorkspaces=false, enableIsolatedWorkspacesByDefault=false"
+      },
+      "fix": {
+        "instance": [
+          "PATCH /api/instance/settings/experimental {enableIsolatedWorkspaces:true}",
+          "PATCH /api/projects/c631c772-61e4-4601-abf3-d108c7478936 executionWorkspacePolicy={enabled,defaultMode:isolated_workspace,allowIssueOverride:true,sharedWorkspaceConcurrency:serialize,workspaceStrategy:{type:git_worktree,baseRef:lavabean,branchTemplate:feature/{{issue.identifier}}-{{slug}},worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees}}",
+          "PATCH /api/issues/7ec86557... executionWorkspacePreference=isolated_workspace + executionWorkspaceSettings.workspaceStrategy{type:git_worktree,baseRef:feature/paperclip-orchestrator,worktreeParentDir:...}"
+        ],
+        "deliverable": [
+          "scripts/paperclip_config.py: new pure workspace_policy(base_ref, worktree_parent_dir)",
+          "scripts/paperclip-bootstrap.py: enables the experimental flag, uses workspace_policy() at project creation and converges an existing project whose policy differs",
+          "tests/test_paperclip_config.py: test_workspace_policy_gives_every_issue_its_own_git_worktree",
+          ".gitignore: .paperclip/ (the default managed worktree parent inside the repo)"
+        ]
+      },
+      "redGreen": {
+        "red": "python -m unittest discover -s tests -v -> ImportError: cannot import name 'workspace_policy' (test written before the implementation)",
+        "green": "python -m unittest discover -s tests -v -> Ran 5 tests, OK",
+        "offlineMaterialization": "throwaway clone with origin pointed at the unreachable private repo: git worktree add -b feature/BE-HQ-001-isolation <path> feature/paperclip-orchestrator -> 'Preparing worktree', HEAD at fb7ce2e, 21 commits present; the runtime resolves a local branch offline (server/src/services/workspace-runtime.ts:2492-2509 falls back to the local branch with a warning when the remote-tracking ref cannot be refreshed)"
+      },
+      "consistency": "workspace_policy() output is byte-equal to the live project executionWorkspacePolicy, so re-running the bootstrap does not churn the live configuration",
+      "constraintsRespected": [
+        "no paid routes",
+        "no new dependencies",
+        "no merge or deploy",
+        "no production mutation",
+        "no credential values read or printed"
+      ]
     }
   },
   "watchdog_loop_fix_20261021i": {

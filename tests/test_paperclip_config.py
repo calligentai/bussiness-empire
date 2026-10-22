@@ -3,7 +3,7 @@ import json
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from paperclip_config import instance_config, routed_adapters
+from paperclip_config import instance_config, routed_adapters, workspace_policy
 
 class ConfigurationTests(unittest.TestCase):
     def test_instance_is_loopback_isolated_and_has_no_telemetry(self):
@@ -32,6 +32,14 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(a['adapterConfig']['model'],'opencode-go/deepseek-v4-pro')
         self.assertEqual(a['routingEvidence']['endpoint'],'http://127.0.0.1:8789/v1')
 
+    def test_workspace_policy_gives_every_issue_its_own_git_worktree(self):
+        p=workspace_policy()
+        self.assertTrue(p['enabled'])
+        self.assertEqual(p['defaultMode'],'isolated_workspace')
+        self.assertTrue(p['allowIssueOverride'])
+        self.assertEqual(p['workspaceStrategy']['type'],'git_worktree')
+        self.assertEqual(p['workspaceStrategy']['baseRef'],'lavabean')
+        self.assertEqual(p['workspaceStrategy']['branchTemplate'],'feature/{{issue.identifier}}-{{slug}}')
     def test_missing_provider_route_fails_closed(self):
         with self.assertRaises(ValueError):
             routed_adapters({'model':'x','model_provider':'missing'}, {'model':'missing/model'},Path('/tmp/empire-test'))

@@ -15,6 +15,23 @@ def instance_config(root, port=3110):
         'secrets':{'provider':'local_encrypted','localEncrypted':{'keyFilePath':str(root/'secrets/master.key')}}
     }
 
+def workspace_policy(base_ref='lavabean', worktree_parent_dir=None):
+    """One git worktree per issue, based on the integration branch.
+
+    The plan requires one feature branch and one isolated worktree per issue.
+    Without this policy every issue resolves to the shared project workspace,
+    so two concurrent harnesses write into the same directory.
+    """
+    strategy={'type':'git_worktree','baseRef':base_ref,'branchTemplate':'feature/{{issue.identifier}}-{{slug}}'}
+    if worktree_parent_dir: strategy['worktreeParentDir']=str(worktree_parent_dir)
+    return {
+        'enabled':True,
+        'defaultMode':'isolated_workspace',
+        'allowIssueOverride':True,
+        'sharedWorkspaceConcurrency':'serialize',
+        'workspaceStrategy':strategy,
+    }
+
 def routed_adapters(codex, opencode, root):
     model=codex.get('model')
     provider=codex.get('model_provider')
