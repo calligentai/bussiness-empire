@@ -815,6 +815,21 @@
         "why": "git refuses to attach a branch that is already checked out elsewhere, so the exact-branch isolated workspace could not be created while the shared worktree held feature/paperclip-orchestrator",
         "observed": "git worktree list -> 0 worktrees hold feature/paperclip-orchestrator; the shared worktree is detached at the branch tip",
         "safety": "the detached worktree can no longer receive a stray commit on a protected branch; all further work for this issue runs in the isolated worktree the runtime materializes on the next dispatch"
+      },
+      "dispositions": {
+        "BUS-5": {
+          "was": "blocked by the platform recovery reconciler (source recovery.reconcile_stranded_assigned_issue) after a run on BUS-5 ended without a disposition; the board had also commented 'fix' on it at 02:31, reopening it from done",
+          "now": "in_progress with a scheduled monitor (nextCheckAt 2026-10-22T03:23:35Z, kind external_service, recoveryPolicy wake_owner) - a real live execution path, which is exactly what the review issue asks for ('restore a valid live path') and what the platform's stranded-run reconciler flagged as missing",
+          "whyNotDoneAgain": "the board reopened it with 'fix' after it had been closed as done, so closing it again would repeat the same disagreement; the review now runs on a schedule and records its verdict",
+          "branch": "feature/paperclip-orchestrator"
+        },
+        "BUS-3": {
+          "status": "blocked",
+          "unblockDescriptor": "owner board, action = inject a GitHub token for the private repo + make Actions available, then the GitHub-side acceptance is verifiable in one run",
+          "blockedBy": [],
+          "workspaceSettings": "executionWorkspacePreference=isolated_workspace, workspaceStrategy={type:git_worktree, existingBranch:feature/paperclip-orchestrator, worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees}"
+        },
+        "noCommentOnPurpose": "the harness wakes the assignee on any issue comment authored through this session, so this heartbeat recorded its report only in the run presentation and the durable files, to avoid a self-wake loop"
       }
     }
   },
