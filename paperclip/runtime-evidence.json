@@ -808,7 +808,14 @@
         "offlineProof": "throwaway clone: git checkout --detach HEAD then git worktree add <path> feature/paperclip-orchestrator -> 'Preparing worktree (checking out feature/paperclip-orchestrator)', HEAD at fb7ce2e, 21 commits present",
         "expectedPath": "/Users/admin/Projects/bussiness-empire-worktrees/feature/paperclip-orchestrator"
       },
-      "materializationNote": "the isolated worktree is materialized by the runtime at the next run dispatch (there is no API to realize a workspace directly); the git mechanics and the base/branch resolution are proven offline, the Paperclip-side materialization will be observed in the next run"
+      "materializationNote": "the isolated worktree is materialized by the runtime at the next run dispatch (there is no API to realize a workspace directly); the git mechanics and the base/branch resolution are proven offline, the Paperclip-side materialization will be observed in the next run",
+      "detachObserved": {
+        "at": "2026-10-22T02:56Z",
+        "action": "git checkout --detach in the shared project-primary worktree (/Users/admin/Projects/bussiness-empire-worktrees/paperclip-orchestrator)",
+        "why": "git refuses to attach a branch that is already checked out elsewhere, so the exact-branch isolated workspace could not be created while the shared worktree held feature/paperclip-orchestrator",
+        "observed": "git worktree list -> 0 worktrees hold feature/paperclip-orchestrator; the shared worktree is detached at the branch tip",
+        "safety": "the detached worktree can no longer receive a stray commit on a protected branch; all further work for this issue runs in the isolated worktree the runtime materializes on the next dispatch"
+      }
     }
   },
   "watchdog_loop_fix_20261021i": {
