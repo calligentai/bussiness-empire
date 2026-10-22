@@ -27,7 +27,7 @@ The four registered adapters and their pinned routes (snapshot taken during this
 | Agent | adapterType | model | endpoint |
 |---|---|---|---|
 | Business Empire Orchestrator | `opencode_local` | `kilo/dots-studio/dots-3-note-preview:free` | OpenCode free route |
-| LavaBean Engineer | `opencode_local` | `opencode-go/deepseek-v4-pro` | `http://127.0.0.1:8789/v1` |
+| LavaBean Engineer | `opencode_local` | `kilo/dots-studio/dots-3-note-preview:free` | OpenCode free route |
 | Business Empire Hermes | `hermes_local` | `deepseek-v4-flash` | existing |
 | Business Empire Pi | `pi_local` | `tkr/gpt-oss:20b` | existing |
 
@@ -69,6 +69,14 @@ functionally pinned. Recorded so nobody re-derives the wrong conclusion.
   `tkr/ollama3:gpt-oss:20b` was no longer listed by the provider, so every run failed in
   ~2s with `adapter_failed`. It now uses `tkr/gpt-oss:20b` (same provider, same model,
   same route) and run `d87de4a5` succeeded.
+- LavaBean route — **fixed 2026-10-22 (RED/GREEN)**: the model id `meta/muse-spark-1.3`
+  resolved to a provider block without an `apiKey`, so the run failed with
+  `ProviderAuthError` / "OpenAI API key is missing" (run `de3bc5ef`, `adapter_failed`), and
+  the route itself answers `billing_not_configured` at the local gateway — a paid route that
+  is not provisioned. It now uses the free route already proven in this runtime
+  (`kilo/dots-studio/dots-3-note-preview:free`); run `82436b61` succeeded with the
+  `EMPIRE_OPENCODE_GO_OK` marker and 0 cost. The Hermes route was probed the same way
+  (run `67a12f7a`, succeeded) and left unchanged.
 - Two-task orchestration / tenant isolation acceptance — **exercised 2026-10-21 (M1
   acceptance pass)**: in a throwaway clone two parallel branches with disjoint paths merge
   conflict-free (`Merge made by the 'ort' strategy`, 0 unmerged paths), and a red test
@@ -88,10 +96,23 @@ functionally pinned. Recorded so nobody re-derives the wrong conclusion.
 
 ## 4. Blockers for this heartbeat
 
-1. **No GitHub authentication (board-owned).** `gh auth status` reports "not logged into any
-   GitHub hosts" and the runtime logs `Paperclip: GitHub capability_missing`. Any write that
-   requires GitHub (PR, issue update via the managed-credentials path) cannot complete.
-   Unblock action: inject a GitHub token for `calligentai/bussiness-empire`.
+1. **GitHub authentication — root cause found 2026-10-22, no external token needed.** The
+   runtime logs `Paperclip: GitHub capability_missing`, and every earlier heartbeat
+   attributed that to a missing personal token. The actual cause is local: the Paperclip
+   server process has **no signing secret**. `server/src/runtime-tools-token.ts`
+   `createRuntimeToolsToken()` returns `null` when neither `PAPERCLIP_AGENT_JWT_SECRET` nor
+   `BETTER_AUTH_SECRET` is set, so `prepareHeartbeatGitHubLaunchers()` mints an empty broker
+   token and `packages/adapter-utils/src/github-launcher.ts` reports `capability_missing`.
+   The instance **already holds a working managed GitHub identity**: tool connection
+   `5a75fd48-c3a5-4f9f-b866-a6513424dfec` ("GitHub", `mcp_remote`, `healthStatus: ok`,
+   "GitHub account, installation, and repository access are available", company-scoped
+   install, grant `aa10fb5e` for user `local-board`, app `paperclip-for-github`,
+   installation `173560379`, repositories include the private `calligentai/bussiness-empire`).
+   Fix: `scripts/paperclip_config.py agent_jwt_secret()` writes a persistent `0600` instance
+   secret and `server_env()` exports it; `scripts/paperclip-local.py start` uses it.
+   Test: RED `ImportError` → GREEN 7/7 (`python -m unittest discover -s tests -v`).
+   The live instance gets the same value through the LaunchAgent
+   `EnvironmentVariables`; a service restart activates it.
 2. **No CI runner (board-owned).** `act` is not installed and there is no Docker daemon, so
    the `startup_failure` cannot be reproduced here. Fix pass 2026-10-21 ruled out a
    workflow-file defect (both files parse, 4/4 tests and 5/5 hashes pass locally, both

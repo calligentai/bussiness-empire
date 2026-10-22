@@ -1,6 +1,34 @@
 from datetime import datetime, timezone
 import json
+import os
+import secrets
+from pathlib import Path
 from urllib.parse import urlsplit
+
+def agent_jwt_secret(root):
+    """Persistent instance signing secret for run JWTs and GitHub broker tokens.
+
+    The server refuses to mint agent run credentials or the runtime-tools
+    broker token without it, so every run loses the managed GitHub identity
+    and the git/gh launchers report capability_missing.
+    """
+    path=Path(root).resolve()/'agent-jwt-secret'
+    if path.exists():
+        value=path.read_text().strip()
+        if value: return value
+    path.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
+    value=secrets.token_urlsafe(32)
+    path.write_text(value+'\n')
+    os.chmod(path,0o600)
+    return value
+
+def server_env(root, base=None):
+    root=Path(root).resolve()
+    env=dict(base if base is not None else os.environ)
+    env.pop('DATABASE_URL',None)
+    env.update(PAPERCLIP_HOME=str(root),PAPERCLIP_CONFIG=str(root/'config.json'),PAPERCLIP_INSTANCE_ID='business-empire',PORT='3110',HOST='127.0.0.1',PAPERCLIP_MIGRATION_AUTO_APPLY='true',PAPERCLIP_MIGRATION_PROMPT='never',PAPERCLIP_UI_DEV_MIDDLEWARE='true')
+    env['PAPERCLIP_AGENT_JWT_SECRET']=agent_jwt_secret(root)
+    return env
 
 def instance_config(root, port=3110):
     root=root.resolve()

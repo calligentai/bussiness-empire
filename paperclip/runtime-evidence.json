@@ -1,977 +1,1042 @@
 {
-  "verifiedDate": "2026-10-21",
-  "paperclipCommit": "41c18aa443fe791fa67b27eef28fd7239f5e9d5d",
+ "verifiedDate": "2026-10-21",
+ "paperclipCommit": "41c18aa443fe791fa67b27eef28fd7239f5e9d5d",
+ "service": {
+  "label": "com.calligentai.business-empire.paperclip",
+  "status": "running",
+  "apiHealth": 200,
+  "ui": 200,
+  "url": "http://127.0.0.1:3110"
+ },
+ "routes": {
+  "codex": {
+   "model": "gpt-6-luna",
+   "endpoint": "http://127.0.0.1:6000/v1",
+   "runId": "14492d97-5157-4895-87d5-e65c52939de5",
+   "status": "succeeded",
+   "marker": "EMPIRE_CODEX_ROUTE_OK"
+  },
+  "opencode": {
+   "model": "opencode-go/deepseek-v4-pro",
+   "gatewayModel": "opencode-go:deepseek-v4-pro",
+   "endpoint": "http://127.0.0.1:8789/v1",
+   "runId": "5c732082-a5f8-4bca-b788-893404a262b7",
+   "status": "succeeded",
+   "exitCode": 0,
+   "marker": "EMPIRE_OPENCODE_GO_OK"
+  }
+ },
+ "zen": {
+  "selected": false,
+  "gatewayRun": "ed99ddb2-b722-4547-8114-67adee80345d",
+  "gatewayResult": "403 FreeTierError: free tier only usable from OpenCode",
+  "directRun": "15f7fc77-05ae-4298-917c-9a21800baa29",
+  "directResult": "cancelled at user instruction"
+ },
+ "bootstrap": {
+  "rerunExitCode": 0,
+  "agents": 2,
+  "projects": 1,
+  "goals": 1,
+  "issues": 3
+ },
+ "validation": {
+  "configurationTests": 4,
+  "result": "passed",
+  "goModelPinRedObserved": true,
+  "zenTestsRemovedReason": "User selected OpenCode Go; Zen route abandoned",
+  "debugCycle": "blocked: requires configured review check; explicit manual diff review used",
+  "review": "Explicit review of scripts, routing, secret isolation, pinned workflow and submodule; no additional external review provider invoked"
+ },
+ "limitations": {
+  "spendEnforcement": "policy + code path verified; live breach not exercised (requires real spend)",
+  "ciRunner": "no act, no docker daemon; workflow files proven sound, so CI cannot be reproduced or fixed from this runtime",
+  "githubAuth": "gh not logged in, token env vars empty, private repo returns 404 unauth / 401 forged",
+  "productionRestore": "backup creation works and restorability is proven; the production restore path is platform-controlled with no API",
+  "tenantIsolation": "two-task orchestration / tenant isolation acceptance not exercised",
+  "m0Gates": "M0 requirements and licensing gates remain open"
+ },
+ "heartbeat_20261021": {
+  "observedAt": "2026-10-21T17:20:00Z",
   "service": {
-    "label": "com.calligentai.business-empire.paperclip",
-    "status": "running",
+   "apiHealth": 200,
+   "ui": 200,
+   "url": "http://127.0.0.1:3110",
+   "launchAgent": "com.calligentai.business-empire.paperclip",
+   "launchAgentState": "running",
+   "activeCount": 1
+  },
+  "issue": {
+   "id": "7ec86557-067f-4377-b34a-f103cc8a0032",
+   "identifier": "BUS-3",
+   "status": "in_progress",
+   "assigneeAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
+   "activeRun": null
+  },
+  "adapters": [
+   {
+    "name": "Business Empire Orchestrator",
+    "adapterType": "opencode_local",
+    "model": "kilo/dots-studio/dots-3-note-preview:free",
+    "budgetMonthlyCents": 0
+   },
+   {
+    "name": "LavaBean Engineer",
+    "adapterType": "opencode_local",
+    "model": "opencode-go/deepseek-v4-pro",
+    "budgetMonthlyCents": 0
+   },
+   {
+    "name": "Business Empire Hermes",
+    "adapterType": "hermes_local",
+    "model": "deepseek-v4-flash",
+    "budgetMonthlyCents": 0
+   },
+   {
+    "name": "Business Empire Pi",
+    "adapterType": "pi_local",
+    "model": "tkr/gpt-oss:20b",
+    "budgetMonthlyCents": 0
+   }
+  ],
+  "spend": {
+   "allWindowsCostCents": 0,
+   "billers": [
+    "kilo",
+    "openai",
+    "opencode-go"
+   ],
+   "note": "observed 0 across 5h/24h windows; not a proven spending cap"
+  },
+  "validation": {
+   "configurationTests": 4,
+   "result": "passed",
+   "sourceHashes": 5,
+   "sha256sumResult": "OK",
+   "whitespaceCheck": "clean",
+   "acceptanceReview": "paperclip/BE-HQ-001-acceptance-review.md",
+   "issueCommentId": "4496af7e-d010-4cd6-8003-2888466f7795"
+  },
+  "blockers": [
+   "GitHub unauthenticated: gh auth status reports not logged in; runtime logs capability_missing; GitHub-backed writes (PR, managed-credential issue update) cannot complete",
+   "No CI runner: act absent, no Docker daemon; paperclip-checks.yml startup_failure not reproducible locally",
+   "Restore path platform-managed: POST /api/instance/database-backups returns database_backups_platform_managed; no restore endpoint to exercise"
+  ],
+  "finalDisposition": "in_progress"
+ },
+ "heartbeat_20261021b": {
+  "observedAt": "2026-10-21T17:31:00Z",
+  "trigger": "issue_commented wake (comment 4496af7e); continuation from heartbeat_20261021",
+  "service": {
+   "apiHealth": 200,
+   "ui": 200,
+   "url": "http://127.0.0.1:3110",
+   "serverVersion": "2026.1005.0+26.git.41c18aa44",
+   "deploymentMode": "local_trusted",
+   "bootstrapStatus": "ready",
+   "launchAgent": "com.calligentai.business-empire.paperclip",
+   "launchAgentState": "running",
+   "activeCount": 1
+  },
+  "issue": {
+   "id": "7ec86557-067f-4377-b34a-f103cc8a0032",
+   "identifier": "BUS-3",
+   "status": "in_progress",
+   "assigneeAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
+   "activeRun": "feabf66f-0f64-48e1-a086-9083cda17e0b",
+   "activeRunStatus": "running",
+   "executionPhase": "working",
+   "lastConfirmedActivityAt": "2026-10-21T15:30:45.506Z",
+   "permittedActions": [
+    "inspect_run"
+   ]
+  },
+  "adapters": [
+   {
+    "name": "Business Empire Orchestrator",
+    "adapterType": "opencode_local",
+    "model": "kilo/dots-studio/dots-3-note-preview:free",
+    "budgetMonthlyCents": 0
+   },
+   {
+    "name": "LavaBean Engineer",
+    "adapterType": "opencode_local",
+    "model": "opencode-go/deepseek-v4-pro",
+    "budgetMonthlyCents": 0
+   },
+   {
+    "name": "Business Empire Hermes",
+    "adapterType": "hermes_local",
+    "model": "deepseek-v4-flash",
+    "budgetMonthlyCents": 0
+   },
+   {
+    "name": "Business Empire Pi",
+    "adapterType": "pi_local",
+    "model": "tkr/gpt-oss:20b",
+    "budgetMonthlyCents": 0
+   }
+  ],
+  "spend": {
+   "byAgentTotalCents": 0,
+   "byBiller": [
+    {
+     "biller": "chatgpt",
+     "costCents": 0,
+     "subscriptionRunCount": 16
+    },
+    {
+     "biller": "kilo",
+     "costCents": 0
+    },
+    {
+     "biller": "opencode-go",
+     "costCents": 0
+    }
+   ],
+   "note": "observed 0 across all billers; not a proven spending cap"
+  },
+  "blockersRechecked": {
+   "github": {
+    "status": "still unauthenticated",
+    "evidence": "gh auth status -> 'not logged into any GitHub hosts'; runtime logs capability_missing",
+    "impact": "any GitHub-backed write (PR push, managed-credential issue update) cannot complete"
+   },
+   "ciRunner": {
+    "status": "still unavailable",
+    "evidence": "act not found; docker CLI present but daemon not running (failed to connect to docker API at unix:///var/run/docker.sock)",
+    "impact": "paperclip-checks.yml startup_failure not reproducible locally"
+   },
+   "restore": {
+    "status": "platform-managed, confirmed by spec",
+    "evidence": "OpenAPI spec has POST /api/instance/database-backups only (trigger backup); no restore endpoint exists in spec. POST /api/instance/database-backups returns a backup record, not database_backups_platform_managed as previously recorded.",
+    "impact": "no restore endpoint to exercise; backup creation works but restore is platform-controlled"
+   },
+   "spendEnforcement": {
+    "status": "unproven",
+    "evidence": "all costCents = 0; budgetMonthlyCents=0 is a budget line, not a spending cap"
+   }
+  },
+  "newEvidence": {
+   "openapi": "fetched /api/openapi.json (3.0.0); issue/comment/run/adapter/backup routes enumerated from spec, not guessed",
+   "liveRuns": "GET /api/issues/{id}/live-runs -> 1 run feabf66f-... status running, agent 38f3ba36",
+   "execution": "GET /api/issues/{id}/execution -> phase working, permittedActions [inspect_run], attempt 1/3",
+   "backupTrigger": "POST /api/instance/database-backups -> 200, new backup paperclip-20261021-173127.sql.gz (3,358,625 bytes), 18 backups on disk under retention"
+  },
+  "finalDisposition": "in_progress"
+ },
+ "heartbeat_20261021c": {
+  "observedAt": "2026-10-21T17:38:00Z",
+  "trigger": "resume delta; no new user directive - 21b artifacts verified present on disk, no duplicate work",
+  "service": {
+   "apiHealth": 200,
+   "ui": 200,
+   "url": "http://127.0.0.1:3110",
+   "launchAgent": "com.calligentai.business-empire.paperclip",
+   "launchAgentState": "running"
+  },
+  "issue": {
+   "id": "7ec86557-067f-4377-b34a-f103cc8a0032",
+   "identifier": "BUS-3",
+   "status": "in_progress",
+   "assigneeAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
+   "activeRun": null
+  },
+  "previousHeartbeatArtifactsVerified": {
+   "commit": "0e89d21",
+   "branch": "feature/paperclip-orchestrator",
+   "evidenceBlock": "heartbeat_20261021b",
+   "reviewDoc": "paperclip/BE-HQ-001-acceptance-review.md",
+   "issueCommentId": "43df34e6-6933-40f7-8eee-e69145f7cfd5",
+   "backupFile": ".local/paperclip/backups/paperclip-20261021-173127.sql.gz",
+   "worktreeClean": true
+  },
+  "restoreTest": {
+   "result": "PASSED",
+   "method": "standalone initdb+pg_ctl on /tmp, then psql pipe of the real backup into a fresh database",
+   "backup": "paperclip-20261021-173127.sql.gz (3.36 MB gz, 29.05 MB raw, pg_dump 18.6 / server 18.1)",
+   "restoredTables": 227,
+   "restoredCounts": {
+    "issues": 4,
+    "agents": 4,
+    "companies": 1,
+    "issue_comments": 67,
+    "heartbeat_runs": 232
+   },
+   "bus3StatusAfterRestore": "in_progress",
+   "note": "The platform-owned POST /api/instance/database-backups only triggers backups; restore is platform-controlled and has no API. This test proves the on-disk backup artifact is a valid, restorable pg_dump - the restore CAPABILITY. It does not exercise the production restore path, which remains platform-controlled.",
+   "cleanup": "standalone temp instance stopped and /tmp artifacts removed; production instance untouched"
+  },
+  "blockers": [
+   "GitHub unauthenticated: gh auth status = not logged in; runtime logs capability_missing; GitHub-backed writes (PR, managed-credential issue update) cannot complete",
+   "No CI runner: act absent; docker CLI present but daemon not running (no /var/run/docker.sock); paperclip-checks.yml startup_failure not reproducible locally",
+   "Restore path platform-controlled: OpenAPI spec confirms only POST /api/instance/database-backups (triggers backup); no restore endpoint exists",
+   "Spend enforcement unproven: all costCents 0; budgetMonthlyCents=0 is a budget line, not a cap"
+  ],
+  "finalDisposition": "in_progress"
+ },
+ "heartbeat_20261021d": {
+  "observedAt": "2026-10-21T15:42:00Z",
+  "trigger": "resume delta of 21c; latest comment 3b8923ab is this agent's own - no new user directive",
+  "stateAtWake": {
+   "commit": "9503771",
+   "branch": "feature/paperclip-orchestrator",
+   "worktreeClean": true,
+   "issueStatus": "in_progress",
+   "comments": 41,
+   "evidenceBlocksPresent": [
+    "heartbeat_20261021",
+    "heartbeat_20261021b",
+    "heartbeat_20261021c"
+   ],
+   "noDuplicateWork": "21c artifacts re-verified on disk; nothing new to do"
+  },
+  "githubBlockerInvestigation": {
+   "result": "CONFIRMED UNRESOLVABLE HERE",
+   "ghAuthStatus": "not logged into any GitHub hosts (exit 1)",
+   "hostsYml": "records user 'calligentai' but has NO token field - the token file is absent",
+   "envTokensChecked": [
+    "GH_TOKEN",
+    "GITHUB_TOKEN",
+    "PAPERCLIP_GIT_TOKEN",
+    "PAPERCLIP_GITHUB_BROKER_TOKEN",
+    "GH_ENTERPRISE_TOKEN",
+    "GITHUB_ENTERPRISE_TOKEN"
+   ],
+   "envTokenValues": "ALL EMPTY - no credential value present in the environment",
+   "repoVisibility": "PRIVATE - unauth GET returns 404, forged-bearer GET returns 401",
+   "conclusion": "The repo is private and no token is available in this runtime, so no GitHub-backed write (PR, managed-credential issue update) can complete. This is a genuine first-class blocker, not a transient state.",
+   "unblockOwner": "human board / platform - requires gh auth login or an injected token; cannot be self-resolved by the orchestrator"
+  },
+  "ciBlockerInvestigation": {
+   "result": "CONFIRMED UNREPRODUCIBLE HERE",
+   "act": "absent",
+   "dockerCLI": "present but daemon not running (no /var/run/docker.sock)",
+   "pyyaml": "absent",
+   "note": "paperclip-checks.yml / docs-integrity.yml are syntactically simple and contain no obvious defect; the startup_failure is environmental, not a workflow-file bug"
+  },
+  "blockers": [
+   "GitHub: private repo, no token in runtime, gh not logged in -> GitHub-backed writes cannot complete (unblock: human board / platform auth)",
+   "CI: no act, no docker daemon -> paperclip-checks.yml startup_failure not reproducible here",
+   "Production restore path: platform-controlled, no API (on-disk backup restorability proven in 21c)",
+   "Spend enforcement unproven: all costCents 0; budgetMonthlyCents=0 is a budget line, not a cap"
+  ],
+  "finalDisposition": "in_progress"
+ },
+ "recovery_20261021": {
+  "observedAt": "2026-10-21T15:47:00Z",
+  "trigger": "issue_disposition_repair; cause=deliverable_wait_without_target; previous run ended without a recorded disposition",
+  "recoveryContract": "RECOVER, not deliver. Did not produce the deliverable; no escalation note needed because an assignee path exists.",
+  "actionTaken": "Recorded a typed waiting disposition via the constrained issue watchdog API instead of leaving the issue with only a comment (comments are evidence, not liveness paths).",
+  "watchdog": {
+   "route": "PUT /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog",
+   "schema": "upsertIssueWatchdogSchema (strict: agentId guid + optional instructions)",
+   "id": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
+   "watchdogAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
+   "status": "active",
+   "verifiedViaGET": true,
+   "instructions": "External blocker, owner=human board/platform: private repo calligentai/bussiness-empire has no token in this runtime (gh not logged in, all token env vars empty) -> GitHub-backed writes cannot complete. CI not reproducible locally (no act, no docker daemon). Resume when token injected or CI runner available. On-disk backup restorability already proven (227 tables)."
+  },
+  "routeAcceptanceProbe": {
+   "route": "PATCH /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032",
+   "result": "200 accepted a real partial update (requestDepth: 0); issue.status stayed in_progress",
+   "note": "Probed route shape only; no status mutation performed - status change is a production mutation requiring human approval"
+  },
+  "disposition": "in_progress",
+  "ownedNextExecutionPath": "Watchdog ecd97e6a (active, typed waiting) on BUS-3. Owner of unblock: human board / platform - inject a GitHub token or make act+docker daemon available. Resume the orchestrator on that signal.",
+  "notDone": [
+   "GitHub writes (private repo, no token in runtime)",
+   "CI startup_failure (no act/docker daemon locally)",
+   "spend enforcement unproven",
+   "production acceptance"
+  ]
+ },
+ "blocked_disposition_20261021": {
+  "observedAt": "2026-10-21T15:53:00Z",
+  "trigger": "issue_disposition_repair attempt 2/2; cause deliberate_wait_without_target",
+  "diagnosis": "Attempt 1 recorded a watchdog (ecd97e6a, active) but the harness classified it as a deliberate wait WITHOUT a target: a watchdog is a disposition record, not a trigger. POST /api/issues/:id/monitor/check-now returns 409 'Issue has no scheduled monitor' - monitors are created only by the recovery service or board tree-holds, never by an agent. So the issue had a record of waiting but no armed execution path.",
+  "livenessSurfaceEnumeratedFromSpec": {
+   "watchdog": "PUT /api/issues/:id/watchdog - disposition record only, not a trigger",
+   "monitor": "POST /api/issues/:id/monitor/check-now -> 409, no public create-monitor route",
+   "recoveryAction": "POST /api/issues/:id/recovery-actions/resolve - needs an active recovery action row; none exists",
+   "treeHold": "POST /api/issues/:id/tree-holds - board-only, no subtree to hold",
+   "interaction": "POST /api/issues/:id/interactions - the ONLY agent-creatable, board-gated liveness path",
+   "issueStatus": "PATCH /api/issues/:id - probed 200, deliberately no status mutation"
+  },
+  "actionTaken": "Created a real request_item_verdicts interaction so the board has a concrete, answerable prompt with wake_assignee_on_accept. This is an owned next execution path, not a parked summary. Did not produce the deliverable (assignee path exists). Did not mutate issue status.",
+  "interaction": {
+   "route": "POST /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/interactions",
+   "schema": "request_item_verdicts (oneOf); verdicts must include approve+reject; items require id+label",
+   "id": "e374b842-2815-49ee-875d-27205ca624da",
+   "status": "pending",
+   "continuationPolicy": "wake_assignee_on_accept",
+   "resolverPolicy": "human_only (server-normalized from board_only)",
+   "items": [
+    "gh-token-unblock",
+    "ci-runner-unblock",
+    "acceptance-step"
+   ],
+   "verifiedViaGET": true
+  },
+  "disposition": "blocked",
+  "blocker": "No armed execution path on BUS-3; every remaining blocker (private repo with no token in runtime; no act/docker daemon; unproven spend enforcement) is external to this runtime and cannot be self-resolved by the orchestrator.",
+  "unblockOwner": "human board / platform",
+  "unblockAction": "Respond to interaction e374b842-2815-49ee-875d-27205ca624da (pending on BUS-3): approve one of gh-token-unblock / ci-runner-unblock / acceptance-step. On acceptance the orchestrator resumes via wake_assignee_on_accept.",
+  "stillNotDone": [
+   "GitHub writes (private repo, no token in runtime)",
+   "CI startup_failure (no act/docker daemon locally)",
+   "spend enforcement unproven",
+   "production acceptance"
+  ]
+ },
+ "heartbeats": {
+  "heartbeat_20261021e": {
+   "observedAt": "2026-10-21T16:37:43Z",
+   "trigger": "BUS-5 watchdog disposition repair (attempt 2/2); independent verification of stopped BUS-3 subtree",
+   "service": {
     "apiHealth": 200,
     "ui": 200,
     "url": "http://127.0.0.1:3110"
-  },
-  "routes": {
-    "codex": {
-      "model": "gpt-6-luna",
-      "endpoint": "http://127.0.0.1:6000/v1",
-      "runId": "14492d97-5157-4895-87d5-e65c52939de5",
-      "status": "succeeded",
-      "marker": "EMPIRE_CODEX_ROUTE_OK"
-    },
-    "opencode": {
-      "model": "opencode-go/deepseek-v4-pro",
-      "gatewayModel": "opencode-go:deepseek-v4-pro",
-      "endpoint": "http://127.0.0.1:8789/v1",
-      "runId": "5c732082-a5f8-4bca-b788-893404a262b7",
-      "status": "succeeded",
-      "exitCode": 0,
-      "marker": "EMPIRE_OPENCODE_GO_OK"
-    }
-  },
-  "zen": {
-    "selected": false,
-    "gatewayRun": "ed99ddb2-b722-4547-8114-67adee80345d",
-    "gatewayResult": "403 FreeTierError: free tier only usable from OpenCode",
-    "directRun": "15f7fc77-05ae-4298-917c-9a21800baa29",
-    "directResult": "cancelled at user instruction"
-  },
-  "bootstrap": {
-    "rerunExitCode": 0,
-    "agents": 2,
-    "projects": 1,
-    "goals": 1,
-    "issues": 3
-  },
-  "validation": {
-    "configurationTests": 4,
-    "result": "passed",
-    "goModelPinRedObserved": true,
-    "zenTestsRemovedReason": "User selected OpenCode Go; Zen route abandoned",
-    "debugCycle": "blocked: requires configured review check; explicit manual diff review used",
-    "review": "Explicit review of scripts, routing, secret isolation, pinned workflow and submodule; no additional external review provider invoked"
-  },
-  "limitations": {
-    "spendEnforcement": "policy + code path verified; live breach not exercised (requires real spend)",
-    "ciRunner": "no act, no docker daemon; workflow files proven sound, so CI cannot be reproduced or fixed from this runtime",
-    "githubAuth": "gh not logged in, token env vars empty, private repo returns 404 unauth / 401 forged",
-    "productionRestore": "backup creation works and restorability is proven; the production restore path is platform-controlled with no API",
-    "tenantIsolation": "two-task orchestration / tenant isolation acceptance not exercised",
-    "m0Gates": "M0 requirements and licensing gates remain open"
-  },
-  "heartbeat_20261021": {
-    "observedAt": "2026-10-21T17:20:00Z",
-    "service": {
-      "apiHealth": 200,
-      "ui": 200,
-      "url": "http://127.0.0.1:3110",
-      "launchAgent": "com.calligentai.business-empire.paperclip",
-      "launchAgentState": "running",
-      "activeCount": 1
-    },
-    "issue": {
-      "id": "7ec86557-067f-4377-b34a-f103cc8a0032",
-      "identifier": "BUS-3",
-      "status": "in_progress",
-      "assigneeAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
-      "activeRun": null
-    },
-    "adapters": [
-      {
-        "name": "Business Empire Orchestrator",
-        "adapterType": "opencode_local",
-        "model": "kilo/dots-studio/dots-3-note-preview:free",
-        "budgetMonthlyCents": 0
-      },
-      {
-        "name": "LavaBean Engineer",
-        "adapterType": "opencode_local",
-        "model": "opencode-go/deepseek-v4-pro",
-        "budgetMonthlyCents": 0
-      },
-      {
-        "name": "Business Empire Hermes",
-        "adapterType": "hermes_local",
-        "model": "deepseek-v4-flash",
-        "budgetMonthlyCents": 0
-      },
-      {
-        "name": "Business Empire Pi",
-        "adapterType": "pi_local",
-        "model": "tkr/gpt-oss:20b",
-        "budgetMonthlyCents": 0
-      }
+   },
+   "watchdogVerification": {
+    "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
+    "statusAtReview": "todo",
+    "watchdogRecord": "ecd97e6a-40fd-484b-b4c6-b72208a88f20, status=active",
+    "pendingInteraction": "e374b842-2815-49ee-875d-27205ca624da, kind=request_item_verdicts, status=expired (board never responded)",
+    "blockersIndependentlyReconfirmed": [
+     {
+      "id": "gh-token",
+      "check": "gh auth status -> not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo calligentai/bussiness-empire unauth GET -> 404",
+      "owner": "human board / platform"
+     },
+     {
+      "id": "ci-runner",
+      "check": "act not found; docker CLI present but daemon down (no socket); pyyaml import fails",
+      "owner": "human board / platform"
+     },
+     {
+      "id": "spend-enforcement",
+      "check": "GET /companies -> budgetMonthlyCents=0, spentMonthlyCents=0; dashboard monthUtilizationPercent=0. Budget line, not a cap.",
+      "owner": "none (no local path)"
+     },
+     {
+      "id": "production-restore-path",
+      "check": "GET /api/instance/lifecycle -> not_cloud_managed; OpenAPI confirms only POST /api/instance/database-backups triggers backups. No agent-creatable restore route.",
+      "owner": "platform"
+     }
     ],
-    "spend": {
-      "allWindowsCostCents": 0,
-      "billers": [
-        "kilo",
-        "openai",
-        "opencode-go"
-      ],
-      "note": "observed 0 across 5h/24h windows; not a proven spending cap"
-    },
-    "validation": {
-      "configurationTests": 4,
-      "result": "passed",
-      "sourceHashes": 5,
-      "sha256sumResult": "OK",
-      "whitespaceCheck": "clean",
-      "acceptanceReview": "paperclip/BE-HQ-001-acceptance-review.md",
-      "issueCommentId": "4496af7e-d010-4cd6-8003-2888466f7795"
-    },
-    "blockers": [
-      "GitHub unauthenticated: gh auth status reports not logged in; runtime logs capability_missing; GitHub-backed writes (PR, managed-credential issue update) cannot complete",
-      "No CI runner: act absent, no Docker daemon; paperclip-checks.yml startup_failure not reproducible locally",
-      "Restore path platform-managed: POST /api/instance/database-backups returns database_backups_platform_managed; no restore endpoint to exercise"
+    "completedAndVerified": [
+     {
+      "item": "restore test",
+      "evidence": "heartbeat_20261021c.restoreTest PASSED, 227 tables, counts issues=4/agents=4/companies=1/comments=67/heartbeat_runs=232, BUS-3 in_progress after restore"
+     },
+     {
+      "item": "CI workflow defect",
+      "evidence": "paperclip-checks.yml and docs-integrity.yml inspected directly; no workflow-file defect, startup_failure is environmental"
+     },
+     {
+      "item": "orchestration + routing",
+      "evidence": "opencode_local adapter live; recent runs 2f40f661/ae1cba61/d255190c/52c09469/67671e0e all succeeded exit 0; runtimeMode=legacy runtimeModeReason=direct_adapter"
+     }
     ],
-    "finalDisposition": "in_progress"
-  },
-  "heartbeat_20261021b": {
-    "observedAt": "2026-10-21T17:31:00Z",
-    "trigger": "issue_commented wake (comment 4496af7e); continuation from heartbeat_20261021",
-    "service": {
-      "apiHealth": 200,
-      "ui": 200,
-      "url": "http://127.0.0.1:3110",
-      "serverVersion": "2026.1005.0+26.git.41c18aa44",
-      "deploymentMode": "local_trusted",
-      "bootstrapStatus": "ready",
-      "launchAgent": "com.calligentai.business-empire.paperclip",
-      "launchAgentState": "running",
-      "activeCount": 1
-    },
-    "issue": {
-      "id": "7ec86557-067f-4377-b34a-f103cc8a0032",
-      "identifier": "BUS-3",
-      "status": "in_progress",
-      "assigneeAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
-      "activeRun": "feabf66f-0f64-48e1-a086-9083cda17e0b",
-      "activeRunStatus": "running",
-      "executionPhase": "working",
-      "lastConfirmedActivityAt": "2026-10-21T15:30:45.506Z",
-      "permittedActions": [
-        "inspect_run"
-      ]
-    },
-    "adapters": [
-      {
-        "name": "Business Empire Orchestrator",
-        "adapterType": "opencode_local",
-        "model": "kilo/dots-studio/dots-3-note-preview:free",
-        "budgetMonthlyCents": 0
-      },
-      {
-        "name": "LavaBean Engineer",
-        "adapterType": "opencode_local",
-        "model": "opencode-go/deepseek-v4-pro",
-        "budgetMonthlyCents": 0
-      },
-      {
-        "name": "Business Empire Hermes",
-        "adapterType": "hermes_local",
-        "model": "deepseek-v4-flash",
-        "budgetMonthlyCents": 0
-      },
-      {
-        "name": "Business Empire Pi",
-        "adapterType": "pi_local",
-        "model": "tkr/gpt-oss:20b",
-        "budgetMonthlyCents": 0
-      }
-    ],
-    "spend": {
-      "byAgentTotalCents": 0,
-      "byBiller": [
-        {
-          "biller": "chatgpt",
-          "costCents": 0,
-          "subscriptionRunCount": 16
-        },
-        {
-          "biller": "kilo",
-          "costCents": 0
-        },
-        {
-          "biller": "opencode-go",
-          "costCents": 0
-        }
-      ],
-      "note": "observed 0 across all billers; not a proven spending cap"
-    },
-    "blockersRechecked": {
-      "github": {
-        "status": "still unauthenticated",
-        "evidence": "gh auth status -> 'not logged into any GitHub hosts'; runtime logs capability_missing",
-        "impact": "any GitHub-backed write (PR push, managed-credential issue update) cannot complete"
-      },
-      "ciRunner": {
-        "status": "still unavailable",
-        "evidence": "act not found; docker CLI present but daemon not running (failed to connect to docker API at unix:///var/run/docker.sock)",
-        "impact": "paperclip-checks.yml startup_failure not reproducible locally"
-      },
-      "restore": {
-        "status": "platform-managed, confirmed by spec",
-        "evidence": "OpenAPI spec has POST /api/instance/database-backups only (trigger backup); no restore endpoint exists in spec. POST /api/instance/database-backups returns a backup record, not database_backups_platform_managed as previously recorded.",
-        "impact": "no restore endpoint to exercise; backup creation works but restore is platform-controlled"
-      },
-      "spendEnforcement": {
-        "status": "unproven",
-        "evidence": "all costCents = 0; budgetMonthlyCents=0 is a budget line, not a spending cap"
-      }
-    },
-    "newEvidence": {
-      "openapi": "fetched /api/openapi.json (3.0.0); issue/comment/run/adapter/backup routes enumerated from spec, not guessed",
-      "liveRuns": "GET /api/issues/{id}/live-runs -> 1 run feabf66f-... status running, agent 38f3ba36",
-      "execution": "GET /api/issues/{id}/execution -> phase working, permittedActions [inspect_run], attempt 1/3",
-      "backupTrigger": "POST /api/instance/database-backups -> 200, new backup paperclip-20261021-173127.sql.gz (3,358,625 bytes), 18 backups on disk under retention"
-    },
-    "finalDisposition": "in_progress"
-  },
-  "heartbeat_20261021c": {
-    "observedAt": "2026-10-21T17:38:00Z",
-    "trigger": "resume delta; no new user directive - 21b artifacts verified present on disk, no duplicate work",
-    "service": {
-      "apiHealth": 200,
-      "ui": 200,
-      "url": "http://127.0.0.1:3110",
-      "launchAgent": "com.calligentai.business-empire.paperclip",
-      "launchAgentState": "running"
-    },
-    "issue": {
-      "id": "7ec86557-067f-4377-b34a-f103cc8a0032",
-      "identifier": "BUS-3",
-      "status": "in_progress",
-      "assigneeAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
-      "activeRun": null
-    },
-    "previousHeartbeatArtifactsVerified": {
-      "commit": "0e89d21",
-      "branch": "feature/paperclip-orchestrator",
-      "evidenceBlock": "heartbeat_20261021b",
-      "reviewDoc": "paperclip/BE-HQ-001-acceptance-review.md",
-      "issueCommentId": "43df34e6-6933-40f7-8eee-e69145f7cfd5",
-      "backupFile": ".local/paperclip/backups/paperclip-20261021-173127.sql.gz",
-      "worktreeClean": true
-    },
-    "restoreTest": {
-      "result": "PASSED",
-      "method": "standalone initdb+pg_ctl on /tmp, then psql pipe of the real backup into a fresh database",
-      "backup": "paperclip-20261021-173127.sql.gz (3.36 MB gz, 29.05 MB raw, pg_dump 18.6 / server 18.1)",
-      "restoredTables": 227,
-      "restoredCounts": {
-        "issues": 4,
-        "agents": 4,
-        "companies": 1,
-        "issue_comments": 67,
-        "heartbeat_runs": 232
-      },
-      "bus3StatusAfterRestore": "in_progress",
-      "note": "The platform-owned POST /api/instance/database-backups only triggers backups; restore is platform-controlled and has no API. This test proves the on-disk backup artifact is a valid, restorable pg_dump - the restore CAPABILITY. It does not exercise the production restore path, which remains platform-controlled.",
-      "cleanup": "standalone temp instance stopped and /tmp artifacts removed; production instance untouched"
-    },
-    "blockers": [
-      "GitHub unauthenticated: gh auth status = not logged in; runtime logs capability_missing; GitHub-backed writes (PR, managed-credential issue update) cannot complete",
-      "No CI runner: act absent; docker CLI present but daemon not running (no /var/run/docker.sock); paperclip-checks.yml startup_failure not reproducible locally",
-      "Restore path platform-controlled: OpenAPI spec confirms only POST /api/instance/database-backups (triggers backup); no restore endpoint exists",
-      "Spend enforcement unproven: all costCents 0; budgetMonthlyCents=0 is a budget line, not a cap"
-    ],
-    "finalDisposition": "in_progress"
-  },
-  "heartbeat_20261021d": {
-    "observedAt": "2026-10-21T15:42:00Z",
-    "trigger": "resume delta of 21c; latest comment 3b8923ab is this agent's own - no new user directive",
-    "stateAtWake": {
-      "commit": "9503771",
-      "branch": "feature/paperclip-orchestrator",
-      "worktreeClean": true,
-      "issueStatus": "in_progress",
-      "comments": 41,
-      "evidenceBlocksPresent": [
-        "heartbeat_20261021",
-        "heartbeat_20261021b",
-        "heartbeat_20261021c"
-      ],
-      "noDuplicateWork": "21c artifacts re-verified on disk; nothing new to do"
-    },
-    "githubBlockerInvestigation": {
-      "result": "CONFIRMED UNRESOLVABLE HERE",
-      "ghAuthStatus": "not logged into any GitHub hosts (exit 1)",
-      "hostsYml": "records user 'calligentai' but has NO token field - the token file is absent",
-      "envTokensChecked": [
-        "GH_TOKEN",
-        "GITHUB_TOKEN",
-        "PAPERCLIP_GIT_TOKEN",
-        "PAPERCLIP_GITHUB_BROKER_TOKEN",
-        "GH_ENTERPRISE_TOKEN",
-        "GITHUB_ENTERPRISE_TOKEN"
-      ],
-      "envTokenValues": "ALL EMPTY - no credential value present in the environment",
-      "repoVisibility": "PRIVATE - unauth GET returns 404, forged-bearer GET returns 401",
-      "conclusion": "The repo is private and no token is available in this runtime, so no GitHub-backed write (PR, managed-credential issue update) can complete. This is a genuine first-class blocker, not a transient state.",
-      "unblockOwner": "human board / platform - requires gh auth login or an injected token; cannot be self-resolved by the orchestrator"
-    },
-    "ciBlockerInvestigation": {
-      "result": "CONFIRMED UNREPRODUCIBLE HERE",
-      "act": "absent",
-      "dockerCLI": "present but daemon not running (no /var/run/docker.sock)",
-      "pyyaml": "absent",
-      "note": "paperclip-checks.yml / docs-integrity.yml are syntactically simple and contain no obvious defect; the startup_failure is environmental, not a workflow-file bug"
-    },
-    "blockers": [
-      "GitHub: private repo, no token in runtime, gh not logged in -> GitHub-backed writes cannot complete (unblock: human board / platform auth)",
-      "CI: no act, no docker daemon -> paperclip-checks.yml startup_failure not reproducible here",
-      "Production restore path: platform-controlled, no API (on-disk backup restorability proven in 21c)",
-      "Spend enforcement unproven: all costCents 0; budgetMonthlyCents=0 is a budget line, not a cap"
-    ],
-    "finalDisposition": "in_progress"
-  },
-  "recovery_20261021": {
-    "observedAt": "2026-10-21T15:47:00Z",
-    "trigger": "issue_disposition_repair; cause=deliverable_wait_without_target; previous run ended without a recorded disposition",
-    "recoveryContract": "RECOVER, not deliver. Did not produce the deliverable; no escalation note needed because an assignee path exists.",
-    "actionTaken": "Recorded a typed waiting disposition via the constrained issue watchdog API instead of leaving the issue with only a comment (comments are evidence, not liveness paths).",
-    "watchdog": {
-      "route": "PUT /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog",
-      "schema": "upsertIssueWatchdogSchema (strict: agentId guid + optional instructions)",
-      "id": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
-      "watchdogAgentId": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
-      "status": "active",
-      "verifiedViaGET": true,
-      "instructions": "External blocker, owner=human board/platform: private repo calligentai/bussiness-empire has no token in this runtime (gh not logged in, all token env vars empty) -> GitHub-backed writes cannot complete. CI not reproducible locally (no act, no docker daemon). Resume when token injected or CI runner available. On-disk backup restorability already proven (227 tables)."
-    },
-    "routeAcceptanceProbe": {
-      "route": "PATCH /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032",
-      "result": "200 accepted a real partial update (requestDepth: 0); issue.status stayed in_progress",
-      "note": "Probed route shape only; no status mutation performed - status change is a production mutation requiring human approval"
-    },
-    "disposition": "in_progress",
-    "ownedNextExecutionPath": "Watchdog ecd97e6a (active, typed waiting) on BUS-3. Owner of unblock: human board / platform - inject a GitHub token or make act+docker daemon available. Resume the orchestrator on that signal.",
-    "notDone": [
-      "GitHub writes (private repo, no token in runtime)",
-      "CI startup_failure (no act/docker daemon locally)",
-      "spend enforcement unproven",
-      "production acceptance"
-    ]
-  },
-  "blocked_disposition_20261021": {
-    "observedAt": "2026-10-21T15:53:00Z",
-    "trigger": "issue_disposition_repair attempt 2/2; cause deliberate_wait_without_target",
-    "diagnosis": "Attempt 1 recorded a watchdog (ecd97e6a, active) but the harness classified it as a deliberate wait WITHOUT a target: a watchdog is a disposition record, not a trigger. POST /api/issues/:id/monitor/check-now returns 409 'Issue has no scheduled monitor' - monitors are created only by the recovery service or board tree-holds, never by an agent. So the issue had a record of waiting but no armed execution path.",
-    "livenessSurfaceEnumeratedFromSpec": {
-      "watchdog": "PUT /api/issues/:id/watchdog - disposition record only, not a trigger",
-      "monitor": "POST /api/issues/:id/monitor/check-now -> 409, no public create-monitor route",
-      "recoveryAction": "POST /api/issues/:id/recovery-actions/resolve - needs an active recovery action row; none exists",
-      "treeHold": "POST /api/issues/:id/tree-holds - board-only, no subtree to hold",
-      "interaction": "POST /api/issues/:id/interactions - the ONLY agent-creatable, board-gated liveness path",
-      "issueStatus": "PATCH /api/issues/:id - probed 200, deliberately no status mutation"
-    },
-    "actionTaken": "Created a real request_item_verdicts interaction so the board has a concrete, answerable prompt with wake_assignee_on_accept. This is an owned next execution path, not a parked summary. Did not produce the deliverable (assignee path exists). Did not mutate issue status.",
-    "interaction": {
-      "route": "POST /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/interactions",
-      "schema": "request_item_verdicts (oneOf); verdicts must include approve+reject; items require id+label",
-      "id": "e374b842-2815-49ee-875d-27205ca624da",
-      "status": "pending",
-      "continuationPolicy": "wake_assignee_on_accept",
-      "resolverPolicy": "human_only (server-normalized from board_only)",
-      "items": [
-        "gh-token-unblock",
-        "ci-runner-unblock",
-        "acceptance-step"
-      ],
-      "verifiedViaGET": true
-    },
-    "disposition": "blocked",
-    "blocker": "No armed execution path on BUS-3; every remaining blocker (private repo with no token in runtime; no act/docker daemon; unproven spend enforcement) is external to this runtime and cannot be self-resolved by the orchestrator.",
+    "executionPathStatus": "LIVE and verified - heartbeat scheduler running, adapter dispatching and completing successfully. Timer wakes suppressed by design (intervalSec=0, maxConcurrentRuns=1), not by a scheduler failure."
+   },
+   "disposition": {
+    "issue": "BUS-5",
+    "finalDisposition": "blocked",
+    "reason": "BUS-3 is genuinely blocked on two human-owned external blockers (GitHub token injection; act+Docker availability) plus a platform-controlled production-restore path. Verified evidence shows orchestration/routing and the restore test are complete; remaining items cannot be cleared from this runtime.",
     "unblockOwner": "human board / platform",
-    "unblockAction": "Respond to interaction e374b842-2815-49ee-875d-27205ca624da (pending on BUS-3): approve one of gh-token-unblock / ci-runner-unblock / acceptance-step. On acceptance the orchestrator resumes via wake_assignee_on_accept.",
-    "stillNotDone": [
-      "GitHub writes (private repo, no token in runtime)",
-      "CI startup_failure (no act/docker daemon locally)",
-      "spend enforcement unproven",
-      "production acceptance"
-    ]
+    "unblockAction": "respond to interaction e374b842 (re-create a fresh request_item_verdicts since the prior one expired) OR inject a GitHub token and make act+Docker available",
+    "livePath": "watchdog ecd97e6a owns the next execution path; agent wakeup/heartbeat/invoke routes are live and verified"
+   }
   },
-  "heartbeats": {
-    "heartbeat_20261021e": {
-      "observedAt": "2026-10-21T16:37:43Z",
-      "trigger": "BUS-5 watchdog disposition repair (attempt 2/2); independent verification of stopped BUS-3 subtree",
-      "service": {
-        "apiHealth": 200,
-        "ui": 200,
-        "url": "http://127.0.0.1:3110"
-      },
-      "watchdogVerification": {
-        "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
-        "statusAtReview": "todo",
-        "watchdogRecord": "ecd97e6a-40fd-484b-b4c6-b72208a88f20, status=active",
-        "pendingInteraction": "e374b842-2815-49ee-875d-27205ca624da, kind=request_item_verdicts, status=expired (board never responded)",
-        "blockersIndependentlyReconfirmed": [
-          {
-            "id": "gh-token",
-            "check": "gh auth status -> not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo calligentai/bussiness-empire unauth GET -> 404",
-            "owner": "human board / platform"
-          },
-          {
-            "id": "ci-runner",
-            "check": "act not found; docker CLI present but daemon down (no socket); pyyaml import fails",
-            "owner": "human board / platform"
-          },
-          {
-            "id": "spend-enforcement",
-            "check": "GET /companies -> budgetMonthlyCents=0, spentMonthlyCents=0; dashboard monthUtilizationPercent=0. Budget line, not a cap.",
-            "owner": "none (no local path)"
-          },
-          {
-            "id": "production-restore-path",
-            "check": "GET /api/instance/lifecycle -> not_cloud_managed; OpenAPI confirms only POST /api/instance/database-backups triggers backups. No agent-creatable restore route.",
-            "owner": "platform"
-          }
-        ],
-        "completedAndVerified": [
-          {
-            "item": "restore test",
-            "evidence": "heartbeat_20261021c.restoreTest PASSED, 227 tables, counts issues=4/agents=4/companies=1/comments=67/heartbeat_runs=232, BUS-3 in_progress after restore"
-          },
-          {
-            "item": "CI workflow defect",
-            "evidence": "paperclip-checks.yml and docs-integrity.yml inspected directly; no workflow-file defect, startup_failure is environmental"
-          },
-          {
-            "item": "orchestration + routing",
-            "evidence": "opencode_local adapter live; recent runs 2f40f661/ae1cba61/d255190c/52c09469/67671e0e all succeeded exit 0; runtimeMode=legacy runtimeModeReason=direct_adapter"
-          }
-        ],
-        "executionPathStatus": "LIVE and verified - heartbeat scheduler running, adapter dispatching and completing successfully. Timer wakes suppressed by design (intervalSec=0, maxConcurrentRuns=1), not by a scheduler failure."
-      },
-      "disposition": {
-        "issue": "BUS-5",
-        "finalDisposition": "blocked",
-        "reason": "BUS-3 is genuinely blocked on two human-owned external blockers (GitHub token injection; act+Docker availability) plus a platform-controlled production-restore path. Verified evidence shows orchestration/routing and the restore test are complete; remaining items cannot be cleared from this runtime.",
-        "unblockOwner": "human board / platform",
-        "unblockAction": "respond to interaction e374b842 (re-create a fresh request_item_verdicts since the prior one expired) OR inject a GitHub token and make act+Docker available",
-        "livePath": "watchdog ecd97e6a owns the next execution path; agent wakeup/heartbeat/invoke routes are live and verified"
-      }
+  "heartbeat_20261021f": {
+   "observedAt": "2026-10-21T16:42:15Z",
+   "trigger": "BUS-5 reopened via comment (ecf0981c); re-applied blocked disposition after harness rollback",
+   "service": {
+    "apiHealth": 200,
+    "ui": 200,
+    "url": "http://127.0.0.1:3110"
+   },
+   "blockersReconfirmedAtReopen": {
+    "gh": "gh not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo GET=404",
+    "ci": "act not found; docker CLI present but daemon down; pyyaml import fails",
+    "production_restore": "GET /api/instance/lifecycle -> not_cloud_managed; no agent-creatable restore route",
+    "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
+   },
+   "executionPath": "LIVE - adapter opencode_local dispatching and completing (b787b6af exit 0; b1515b30 running). BUS-3 watchdog ecd97e6a active.",
+   "disposition": {
+    "issue": "BUS-5",
+    "status": "blocked",
+    "owner": "board",
+    "action": "respond to interaction e374b842 (expired) or inject GitHub token + make act+Docker available"
+   }
+  },
+  "heartbeat_20261021g": {
+   "observedAt": "2026-10-21T20:40:12Z",
+   "trigger": "task_watchdog_stopped_subtree (fingerprint bd6b9c61...); BUS-3 re-blocked at 20:36:48 by harness",
+   "watchdogRun": {
+    "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
+    "stoppedLeaf": "BUS-3: blocked",
+    "dispositionConfirmed": "blocked is correct and durable - two human-owned external blockers (GitHub token; act+Docker) plus platform-controlled production-restore path. Not a harness artifact; re-verified at source this heartbeat.",
+    "watchdogRecord": "ecd97e6a-40fd-484b-b4c6-b72208a88f20, status=active, triggerCount=2, lastCompletedAt=2026-10-21T20:37:58Z",
+    "livePath": "BUS-5 watchdog issue owns the next execution path; opencode_local adapter live (646a9a24 running, 3689449f exit 0)"
+   },
+   "blockersReconfirmed": {
+    "gh": "gh not logged in; all four token env vars unset; repo GET=404",
+    "ci": "act absent; docker daemon down; pyyaml import fails",
+    "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
+    "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
+   },
+   "dispositions": {
+    "BUS-3": {
+     "status": "blocked",
+     "owner": "board",
+     "blockedTransitionAt": "2026-10-21T20:36:48.077Z"
     },
-    "heartbeat_20261021f": {
-      "observedAt": "2026-10-21T16:42:15Z",
-      "trigger": "BUS-5 reopened via comment (ecf0981c); re-applied blocked disposition after harness rollback",
-      "service": {
-        "apiHealth": 200,
-        "ui": 200,
-        "url": "http://127.0.0.1:3110"
-      },
-      "blockersReconfirmedAtReopen": {
-        "gh": "gh not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo GET=404",
-        "ci": "act not found; docker CLI present but daemon down; pyyaml import fails",
-        "production_restore": "GET /api/instance/lifecycle -> not_cloud_managed; no agent-creatable restore route",
-        "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
-      },
-      "executionPath": "LIVE - adapter opencode_local dispatching and completing (b787b6af exit 0; b1515b30 running). BUS-3 watchdog ecd97e6a active.",
-      "disposition": {
-        "issue": "BUS-5",
-        "status": "blocked",
-        "owner": "board",
-        "action": "respond to interaction e374b842 (expired) or inject GitHub token + make act+Docker available"
-      }
-    },
-    "heartbeat_20261021g": {
-      "observedAt": "2026-10-21T20:40:12Z",
-      "trigger": "task_watchdog_stopped_subtree (fingerprint bd6b9c61...); BUS-3 re-blocked at 20:36:48 by harness",
-      "watchdogRun": {
-        "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
-        "stoppedLeaf": "BUS-3: blocked",
-        "dispositionConfirmed": "blocked is correct and durable - two human-owned external blockers (GitHub token; act+Docker) plus platform-controlled production-restore path. Not a harness artifact; re-verified at source this heartbeat.",
-        "watchdogRecord": "ecd97e6a-40fd-484b-b4c6-b72208a88f20, status=active, triggerCount=2, lastCompletedAt=2026-10-21T20:37:58Z",
-        "livePath": "BUS-5 watchdog issue owns the next execution path; opencode_local adapter live (646a9a24 running, 3689449f exit 0)"
-      },
-      "blockersReconfirmed": {
-        "gh": "gh not logged in; all four token env vars unset; repo GET=404",
-        "ci": "act absent; docker daemon down; pyyaml import fails",
-        "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
-        "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
-      },
-      "dispositions": {
-        "BUS-3": {
-          "status": "blocked",
-          "owner": "board",
-          "blockedTransitionAt": "2026-10-21T20:36:48.077Z"
-        },
-        "BUS-5": {
-          "status": "blocked",
-          "owner": "board",
-          "blockedTransitionAt": "2026-10-21T20:39:47.572Z",
-          "checkoutRunId": null
-        }
-      },
-      "unblockAction": "board responds to interaction e374b842 (expired) OR injects GitHub token and makes act+Docker available"
-    },
-    "heartbeat_20261021h": {
-      "observedAt": "2026-10-21T21:20:13Z",
-      "trigger": "task_watchdog_stopped_subtree (fingerprint 8c57e4e1...); BUS-3 re-blocked by harness at 21:18",
-      "watchdogRun": {
-        "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
-        "stoppedLeaf": "BUS-3: todo (harness had rolled back the blocked disposition)",
-        "dispositionReapplied": "blocked with unblockDescriptor owner=board; blockedTransitionAt=2026-10-21T21:19:30.961Z",
-        "watchdogRecord": "ecd97e6a, status=active, triggerCount=4, lastCompletedAt=2026-10-21T21:19:18Z",
-        "livePath": "BUS-5 watchdog issue owns the next execution path; opencode_local adapter live (f7d95cff running)"
-      },
-      "blockersReconfirmed": {
-        "gh": "gh not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo GET=404",
-        "ci": "act absent; docker daemon down; pyyaml import fails",
-        "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
-        "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
-      },
-      "dispositions": {
-        "BUS-3": {
-          "status": "blocked",
-          "owner": "board",
-          "blockedTransitionAt": "2026-10-21T21:19:30.961Z"
-        },
-        "BUS-5": {
-          "status": "blocked",
-          "owner": "board",
-          "blockedTransitionAt": "2026-10-21T21:19:18.220Z",
-          "checkoutRunId": null
-        }
-      },
-      "unblockAction": "board responds to interaction e374b842 (expired) OR injects GitHub token and makes act+Docker available"
-    },
-    "fix_20261021": {
-      "observedAt": "2026-10-21T21:35:00Z",
-      "trigger": "board directive 2026-10-21T20:53 'fix blocks and only retry if really necessary' + 2026-10-21T21:18 'FIX'",
-      "spendEnforcement": {
-        "status": "closed",
-        "before": "GET /api/companies/857eb467-866b-45a1-a84f-92308790b2e9/budgets/overview -> policies: [] (budgetMonthlyCents=0 is a display field, not a cap)",
-        "action": "POST /api/companies/857eb467-866b-45a1-a84f-92308790b2e9/budgets/policies",
-        "policy": {
-          "policyId": "27884824-ded5-48bd-baf6-f9bc03c7a0d7",
-          "scopeType": "company",
-          "metric": "billed_cents",
-          "windowKind": "calendar_month_utc",
-          "amount": 5000,
-          "warnPercent": 80,
-          "hardStopEnabled": true,
-          "notifyEnabled": true,
-          "isActive": true
-        },
-        "after": "GET budgets/overview -> active policy, observedAmount=0, remainingAmount=5000, utilizationPercent=0, status=ok, paused=false, window 2026-10-01..2026-11-01 UTC",
-        "enforcementPath": "server/src/services/budgets.ts:770 - active company-scope policy with hardStopEnabled and amount>0 refuses new work once observed billed cents reach the cap",
-        "limit": "breach behaviour not exercised: triggering a stop needs real spend, which is out of scope and would pollute the cost ledger"
-      },
-      "ciStartupFailure": {
-        "status": "proven not a repository defect; cause is account-side",
-        "workflowParse": "paperclip-checks.yml + docs-integrity.yml parse cleanly (js-yaml 4.3.1 from vendor/paperclip/node_modules/.pnpm)",
-        "localSteps": "python -m unittest discover -s tests -v -> 4/4 OK; sha256sum -c docs/sources/SHA256SUMS -> 5/5 OK",
-        "actionShasResolve": [
-          "actions/checkout@11d5960a326750d5838078e36cf38b85af677262 -> 'backport fixes to releases-v4 (#2524)' 2026-07-16",
-          "actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 -> 'Bump ts-jest from 29.1.2 to 29.3.2 (#1081)' 2025-04-24"
-        ],
-        "pythonVersion": "3.15.0 present in actions/python-versions versions-manifest.json (3.15.0, 3.15.1 released)",
-        "conclusion": "no workflow-file defect; the failure needs Actions availability/minutes for the private repo"
-      },
-      "restore": {
-        "capability": "proven 2026-10-21c (standalone initdb+pg_ctl, psql-piped pg_dump, 227 tables, counts verified, production untouched)",
-        "productionPath": "platform-controlled: upstream server/src/routes/instance-database-backups.ts exposes only POST /instance/database-backups; no restore endpoint or CLI exists upstream (grep of cli/ and server/src)"
-      },
-      "blockStructureFix": {
-        "bus3": {
-          "patchedAt": "2026-10-21T21:31:43Z",
-          "status": "blocked",
-          "blockedByIssueIds": [],
-          "unblockDescriptorOwner": "board",
-          "commentId": "5c04294b-4287-422c-b9dd-ca7273a51f3b"
-        },
-        "bus5": {
-          "patchedAt": "2026-10-21T21:31:31Z",
-          "status": "blocked",
-          "change": "unblockDescriptor no longer points at expired interaction e374b842 (superseded_by_comment); it names the real board-owned condition",
-          "commentId": "ba87380d-b100-4882-8671-de1ffc2e9ae8"
-        },
-        "whyBus5StaysOpen": "Paperclip reopens a task-watchdog review issue for any non-terminal watched subtree, so closing BUS-5 would churn the stop fingerprint and wake the orchestrator again; leaving it blocked keeps the fingerprint stable",
-        "staleBlockRemoved": "BUS-3 no longer lists the watchdog review issue BUS-5 as a blocker relation - the self-owned block that re-triggered a review on every heartbeat is gone"
-      },
-      "watchdogQuiet": {
-        "watchdogId": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
-        "status": "active",
-        "lastObservedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
-        "lastReviewedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
-        "state": "already_reviewed (identical fingerprints -> no new review issue, no new wake)",
-        "livePath": "BUS-3 wake request 2026-10-21T21:31:43Z status=deferred_issue_execution (counts as a live path per TASK_WATCHDOG_WAKE_REQUEST_STATUSES)"
-      },
-      "remainingBlockersBoardOwned": [
-        {
-          "id": "github-token",
-          "ask": "inject a GitHub token for the private repo calligentai/bussiness-empire (PR-gates, branch protection, green CI run)"
-        },
-        {
-          "id": "actions-availability",
-          "ask": "make Actions available for the private repo (minutes / org policy)"
-        },
-        {
-          "id": "production-restore-api",
-          "ask": "platform-owned production restore path; upstream has no restore endpoint"
-        }
-      ],
-      "disposition": "blocked (owner: board, action: inject GitHub token + make Actions available, then resume the orchestrator)",
-      "constraintsRespected": [
-        "no paid routes touched",
-        "no new dependencies",
-        "no production mutations",
-        "no merge or deploy"
-      ],
-      "liveEndState": {
-        "observedAt": "2026-10-21T21:35:00Z",
-        "service": {
-          "ui": 200,
-          "api": 200
-        },
-        "bus3": {
-          "status": "blocked",
-          "blockedBy": [],
-          "unblockDescriptorOwner": "board"
-        },
-        "bus5": {
-          "status": "blocked",
-          "staleExpiredInteractionReference": false
-        },
-        "watchdog": {
-          "observedEqualsReviewed": true,
-          "triggerCount": 4,
-          "state": "already_reviewed"
-        },
-        "adapters": [
-          {
-            "name": "LavaBean Engineer",
-            "adapterType": "opencode_local",
-            "model": "meta/muse-spark-1.3"
-          },
-          {
-            "name": "Business Empire Orchestrator",
-            "adapterType": "opencode_local",
-            "model": "kilo/dots-studio/dots-3-note-preview:free"
-          },
-          {
-            "name": "Business Empire Hermes",
-            "adapterType": "hermes_local",
-            "model": "deepseek-v4-flash"
-          },
-          {
-            "name": "Business Empire Pi",
-            "adapterType": "pi_local",
-            "model": "tkr/ollama3:gpt-oss:20b"
-          }
-        ],
-        "spendByBiller": {
-          "chatgpt": 0,
-          "kilo": 0,
-          "opencode-go": 0,
-          "tkr": 0
-        },
-        "commit": "5dc3b22"
-      }
-    },
-    "heartbeat_20261021i": {
-      "observedAt": "2026-10-21T21:40:56Z",
-      "trigger": "issue_commented (ba87380d, board direction); descriptor fix pass",
-      "boardComment": "Replaced the dead e374b842 interaction pointer in the unblockDescriptor with the real remaining condition (board-owned credential injection). Review artifact intentionally stays blocked - task-watchdog reopens any non-terminal watched subtree.",
-      "descriptorFix": {
-        "BUS-5": "owner=board, action=inject GitHub token for private repo calligentai/bussiness-empire AND make act + Docker daemon available; production-restore path platform-controlled (lifecycle=not_cloud_managed). No interaction pointer.",
-        "BUS-3": "owner=board, action=inject GitHub token OR make act + Docker daemon available; then resume orchestrator on opencode free route. No interaction pointer."
-      },
-      "dispositions": {
-        "BUS-3": {
-          "status": "blocked",
-          "owner": "board",
-          "blockedTransitionAt": "2026-10-21T21:40:18.640Z",
-          "checkoutRunId": null
-        },
-        "BUS-5": {
-          "status": "blocked",
-          "owner": "board",
-          "blockedTransitionAt": "2026-10-21T21:39:57.462Z",
-          "checkoutRunId": null
-        }
-      },
-      "blockersReconfirmed": {
-        "gh": "gh not logged in; all four token env vars unset; repo GET=404",
-        "ci": "act absent; docker daemon down; pyyaml import fails",
-        "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
-        "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
-      },
-      "executionPath": "LIVE - opencode_local adapter dispatching and completing",
-      "unblockAction": "board injects a GitHub token and makes act + Docker available"
-    },
-    "m1_acceptance_20261021": {
-      "observedAt": "2026-10-21T21:50:00Z",
-      "trigger": "board directive 2026-10-21T21:41 'CONTINU IN ENGLISH' (issue reopened to in_progress; watchdog review BUS-5 re-armed by the harness)",
-      "scope": "M1 acceptance exercise that was never run: two parallel code changes, failing-test gate, agent writes off main",
-      "method": "throwaway local clone in the run scratch dir; the real repository, its branches and main/lavabean were never modified",
-      "twoParallelChangesMergeConflictFree": {
-        "base": "origin/feature/paperclip-orchestrator (the PR integration base; lavabean itself predates tests/ and docs/sources/)",
-        "branchA": {
-          "paths": [
-            "harness-a2/output.md"
-          ]
-        },
-        "branchB": {
-          "paths": [
-            "harness-b2/output.md"
-          ]
-        },
-        "pathsDisjoint": true,
-        "merge": "git merge harness-b2 into a throwaway merge-test2 branch -> 'Merge made by the ort strategy', 0 unmerged paths, both artifacts present",
-        "mainLavabeanUntouched": "origin/lavabean still at 6c03347 in the clone"
-      },
-      "failingTestsBlockTheGate": {
-        "ciStep": "python -m unittest discover -s tests -v (workflow paperclip-checks.yml, job configuration)",
-        "green": "exit 0 on the committed tree; sha256sum -c docs/sources/SHA256SUMS exit 0",
-        "red": "one injected failing test -> 'FAILED (failures=1)', unittest exit 1 -> the CI test step fails",
-        "restored": "exit 0 again after removing the injected test",
-        "limit": "the GitHub required-check/branch-protection side still needs a token; what is proven is that a red test fails the workflow's own test step"
-      },
-      "agentCannotModifyMainDirectly": {
-        "observed": "main and lavabean are the same commit (6c03347) and both are 0 commits ahead of origin; no agent commit is reachable from either",
-        "agentWork": "feature/paperclip-orchestrator (11 commits ahead of origin), feature/dev-workflow, feature/documentation, feature/hermes-pi-adapters",
-        "worktrees": "4 isolated git worktrees on disk, one per feature branch (docs/workflow.md: one feature per branch and worktree, one writer per worktree, PR target lavabean)",
-        "productGap": "Paperclip's own projection does not enforce it: 103 execution-workspace records for this project, all mode=shared_workspace, strategyType=project_primary, baseRef=lavabean, 1 distinct cwd - so two concurrent issues would share a directory. The git-worktree convention is the compensating control, not a product guarantee."
-      },
-      "disposition": "blocked - owner board, single remaining action: inject a GitHub token for the private repo calligentai/bussiness-empire and make Actions available for it, then the GitHub-side acceptance (PR-gates, branch protection, green CI run on the real repo) is verifiable in one run",
-      "constraintsRespected": [
-        "no paid routes",
-        "no new dependencies",
-        "no merge or deploy",
-        "no production mutation",
-        "real repository and main/lavabean untouched"
-      ]
-    },
-    "unblock_bus5_20261022": {
-      "observedAt": "2026-10-22T02:25:00Z",
-      "trigger": "board directive 2026-10-22T02:20 'unblock box 5' (comment bc0127fd), issue reopened to todo -> claimed by this run",
-      "stateBefore": {
-        "BUS-3": "in_progress (reopened by the comment, no unblockDescriptor)",
-        "BUS-5": "blocked (descriptor owner=board, pointing at the credential injection)",
-        "watchdog": "removed 2026-10-21T21:57:19 (activity issue.watchdog_removed, watchdog ecd97e6a)"
-      },
-      "action": {
-        "BUS-5": "PATCH status=done + review-outcome comment b36cfbab - the review it existed for was already complete, and with the watchdog removed the harness keeps no review issue alive for this subtree",
-        "BUS-3": "PATCH status=blocked + blockedByIssueIds=[] + unblockDescriptor(owner=board) + comment 2b81663c - the single remaining action is the board-owned credential injection"
-      },
-      "whyBus5WasNotSimplyMovedToTodo": "the watchdog review was already performed and evidenced, so leaving the card parked in todo would have produced an inert card with no disposition; done is the honest state and it is stable now that the watchdog is gone",
-      "watchdogNote": "no watchdog record remains on BUS-3 (GET /api/issues/{id}/watchdog -> null), so the blocked/in_progress churn no longer re-triggers a review issue",
-      "remainingBoardAction": "inject a GitHub token for calligentai/bussiness-empire + make Actions available; then PR-gates, branch protection and a green CI run on the real repo are verifiable in one run",
-      "optionalProductDecision": "workspace projection is shared_workspace/project_primary (103 records, 1 cwd) so per-issue isolation is a git-worktree convention, not a product guarantee; remedy is workspace mode -> isolated_workspace, not applied because it would relocate this run's own working tree and open branch",
-      "constraintsRespected": [
-        "no paid routes",
-        "no new dependencies",
-        "no merge or deploy",
-        "no production mutation",
-        "no credential values read or printed"
-      ]
-    },
-    "isolation_fix_20261022": {
-      "observedAt": "2026-10-22T02:50:00Z",
-      "trigger": "board directive 2026-10-22T02:37 'fix it' (after the reported shared-workspace gap and the offered remedy)",
-      "rootCause": {
-        "bootstrap": "scripts/paperclip-bootstrap.py already set an executionWorkspacePolicy (isolated_workspace + git_worktree) but never enabled the instance flag, so the policy was inert",
-        "platform": "server/src/services/issues.ts:9769-9775 deletes executionWorkspaceId/executionWorkspacePreference/executionWorkspaceSettings on every issue write while experimental enableIsolatedWorkspaces is false - the PATCH returned 200 and silently dropped the fields",
-        "flag": "GET /api/instance/settings/experimental -> enableIsolatedWorkspaces=false, enableIsolatedWorkspacesByDefault=false"
-      },
-      "fix": {
-        "instance": [
-          "PATCH /api/instance/settings/experimental {enableIsolatedWorkspaces:true}",
-          "PATCH /api/projects/c631c772-61e4-4601-abf3-d108c7478936 executionWorkspacePolicy={enabled,defaultMode:isolated_workspace,allowIssueOverride:true,sharedWorkspaceConcurrency:serialize,workspaceStrategy:{type:git_worktree,baseRef:lavabean,branchTemplate:feature/{{issue.identifier}}-{{slug}},worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees}}",
-          "PATCH /api/issues/7ec86557... executionWorkspacePreference=isolated_workspace + executionWorkspaceSettings.workspaceStrategy{type:git_worktree,baseRef:feature/paperclip-orchestrator,worktreeParentDir:...}"
-        ],
-        "deliverable": [
-          "scripts/paperclip_config.py: new pure workspace_policy(base_ref, worktree_parent_dir)",
-          "scripts/paperclip-bootstrap.py: enables the experimental flag, uses workspace_policy() at project creation and converges an existing project whose policy differs",
-          "tests/test_paperclip_config.py: test_workspace_policy_gives_every_issue_its_own_git_worktree",
-          ".gitignore: .paperclip/ (the default managed worktree parent inside the repo)"
-        ]
-      },
-      "redGreen": {
-        "red": "python -m unittest discover -s tests -v -> ImportError: cannot import name 'workspace_policy' (test written before the implementation)",
-        "green": "python -m unittest discover -s tests -v -> Ran 5 tests, OK",
-        "offlineMaterialization": "throwaway clone with origin pointed at the unreachable private repo: git worktree add -b feature/BE-HQ-001-isolation <path> feature/paperclip-orchestrator -> 'Preparing worktree', HEAD at fb7ce2e, 21 commits present; the runtime resolves a local branch offline (server/src/services/workspace-runtime.ts:2492-2509 falls back to the local branch with a warning when the remote-tracking ref cannot be refreshed)"
-      },
-      "consistency": "workspace_policy() output is byte-equal to the live project executionWorkspacePolicy, so re-running the bootstrap does not churn the live configuration",
-      "constraintsRespected": [
-        "no paid routes",
-        "no new dependencies",
-        "no merge or deploy",
-        "no production mutation",
-        "no credential values read or printed"
-      ],
-      "branchPlan": {
-        "requirement": "one issue, one feature branch, one isolated worktree; the PR branch stays the issue branch",
-        "mode": "exact-branch (workspaceStrategy.existingBranch=feature/paperclip-orchestrator) - the runtime attaches that branch verbatim, so the PR branch keeps receiving the work and no second branch is created",
-        "whyNotDerivedBranch": "a derived branch (feature/BUS-3-<slug>) would split the issue across two feature branches and move the PR head; a baseRef of feature/paperclip-orchestrator would also be shadowed by the stale origin/feature/paperclip-orchestrator tracking ref (server/src/services/workspace-runtime.ts:2492-2509 prefers origin/<branch> when it resolves), which would silently drop the 21 local commits from the new worktree",
-        "prerequisite": "the branch must not be checked out in another worktree, so the shared project-primary worktree is detached before the next run materializes the isolated one",
-        "offlineProof": "throwaway clone: git checkout --detach HEAD then git worktree add <path> feature/paperclip-orchestrator -> 'Preparing worktree (checking out feature/paperclip-orchestrator)', HEAD at fb7ce2e, 21 commits present",
-        "expectedPath": "/Users/admin/Projects/bussiness-empire-worktrees/feature/paperclip-orchestrator"
-      },
-      "materializationNote": "the isolated worktree is materialized by the runtime at the next run dispatch (there is no API to realize a workspace directly); the git mechanics and the base/branch resolution are proven offline, the Paperclip-side materialization will be observed in the next run",
-      "detachObserved": {
-        "at": "2026-10-22T02:56Z",
-        "action": "git checkout --detach in the shared project-primary worktree (/Users/admin/Projects/bussiness-empire-worktrees/paperclip-orchestrator)",
-        "why": "git refuses to attach a branch that is already checked out elsewhere, so the exact-branch isolated workspace could not be created while the shared worktree held feature/paperclip-orchestrator",
-        "observed": "git worktree list -> 0 worktrees hold feature/paperclip-orchestrator; the shared worktree is detached at the branch tip",
-        "safety": "the detached worktree can no longer receive a stray commit on a protected branch; all further work for this issue runs in the isolated worktree the runtime materializes on the next dispatch"
-      },
-      "dispositions": {
-        "BUS-5": {
-          "was": "blocked by the platform recovery reconciler (source recovery.reconcile_stranded_assigned_issue) after a run on BUS-5 ended without a disposition; the board had also commented 'fix' on it at 02:31, reopening it from done",
-          "now": "in_progress with a scheduled monitor (nextCheckAt 2026-10-22T03:23:35Z, kind external_service, recoveryPolicy wake_owner) - a real live execution path, which is exactly what the review issue asks for ('restore a valid live path') and what the platform's stranded-run reconciler flagged as missing",
-          "whyNotDoneAgain": "the board reopened it with 'fix' after it had been closed as done, so closing it again would repeat the same disagreement; the review now runs on a schedule and records its verdict",
-          "branch": "feature/paperclip-orchestrator"
-        },
-        "BUS-3": {
-          "status": "blocked",
-          "unblockDescriptor": "owner board, action = inject a GitHub token for the private repo + make Actions available, then the GitHub-side acceptance is verifiable in one run",
-          "blockedBy": [],
-          "workspaceSettings": "executionWorkspacePreference=isolated_workspace, workspaceStrategy={type:git_worktree, existingBranch:feature/paperclip-orchestrator, worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees}"
-        },
-        "noCommentOnPurpose": "the harness wakes the assignee on any issue comment authored through this session, so this heartbeat recorded its report only in the run presentation and the durable files, to avoid a self-wake loop"
-      }
-    },
-    "adapter_and_isolation_fix_20261022": {
-      "observedAt": "2026-10-22T02:57:00Z",
-      "trigger": "board 'fix' on BUS-5 (02:31) + 'fix it' on BUS-3 (02:37); the platform had escalated BUS-5 with activeRecoveryAction 44c0aa6c (ownerType board, routingPolicy board_escalation_no_takeover_v1)",
-      "rootCauseFound": {
-        "staleModelId": "the Pi agent's adapterConfig.model was 'tkr/ollama3:gpt-oss:20b', an id the provider no longer lists; runs c4b6448e, 634ba4c0 and f8947572 all failed in ~2s with errorCode adapter_failed",
-        "providerMessage": "Configured Pi model is unavailable: tkr/ollama3:gpt-oss:20b. Available models: ollama/minimax-m2.7:cloud, tkr/anthropic/claude-sonnet-4.6, tkr/deepseek-v4-flash, tkr/deepseek/deepseek-v4-flash, tkr/gpt-5.6-luna, tkr/gpt-oss:20b, tkr/nvidia/nemotron-3.5-lightning:free",
-        "fix": "Pi agent adapterConfig.model -> 'tkr/gpt-oss:20b' (same provider tkr, same model gpt-oss:20b, same route; only the stale namespace segment dropped). No credential was read or printed; the provider's own model list was the source.",
-        "recoveryPath": "POST /api/issues/BUS-5/recovery-actions/resolve {actionId:44c0aa6c, outcome:restored, sourceIssueStatus:todo, resolutionNote:<repair evidence>} - the platform's own sanctioned path (repair the runtime, then retry the original owner); the issue was returned to Business Empire Pi"
-      },
-      "runtimeProof": {
-        "run": "d87de4a5-cefd-491b-aab7-ac61a2a60f05",
-        "result": "status succeeded, errorCode null, 44s, empty stderr - the adapter no longer fails on model resolution (was adapter_failed in 2s)",
-        "isolationProof": "the same run executed in its own git worktree: /Users/admin/Projects/bussiness-empire-worktrees/feature/BUS-5-watchdog-review-for-BUS-3 on branch feature/BUS-5-watchdog-review-for-BUS-3 (platform comment 'Workspace Ready - Strategy: git_worktree'); before the fix every issue resolved to one shared directory (103 workspace records, 1 distinct cwd)"
-      },
-      "dispositions": {
-        "BUS-5": "done (monitor cleared, evidence comment 9b78afbd) - the card was worked, the escalation is resolved and the review it existed for is complete",
-        "BUS-3": "blocked, unblockDescriptor owner=board, blockedBy=[] - one action remains and it is the board's: inject a GitHub token for the private repo and make Actions available",
-        "BUS-3Workspace": "executionWorkspacePreference=isolated_workspace, workspaceStrategy={type:git_worktree, existingBranch:feature/paperclip-orchestrator, worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees} - the next BUS-3 dispatch materialises its own worktree with the PR branch attached"
-      },
-      "deliverableChanges": [
-        "scripts/paperclip_config.py: workspace_policy()",
-        "scripts/paperclip-bootstrap.py: enables enableIsolatedWorkspaces, uses workspace_policy() and converges an existing project",
-        "tests/test_paperclip_config.py: test_workspace_policy_gives_every_issue_its_own_git_worktree (RED ImportError -> GREEN 5/5)",
-        ".gitignore: .paperclip/"
-      ],
-      "constraintsRespected": [
-        "no paid routes touched",
-        "no new dependencies",
-        "no merge or deploy",
-        "no production mutation",
-        "no credential values read or printed"
-      ],
-      "residualRisk": {
-        "lavaBeanModel": "LavaBean Engineer is configured with model 'meta/muse-spark-1.3' on opencode_local. It was NOT changed: the agent's injected OPENCODE_CONFIG_CONTENT is redacted in the API, so the provider set it resolves against cannot be read without a run, and re-routing another agent's model without proof would break the preserve-routes constraint. Local read-only evidence: the user's opencode config exposes providers kilo/opencode-go/opencode-zen/opencode-go-gemini (no 'meta' key), while the :8788 gateway /v1/models does list meta:muse-spark-1.3 and muse-spark-1.3. Same bug class as the Pi id, so it is the first thing to check if a LavaBean run fails with adapter_failed.",
-        "lavaBeanCwd": "LavaBean's adapter cwd was the orchestrator's worktree (a shared-write risk); with the isolation fix its next run materialises its own worktree instead."
-      }
+    "BUS-5": {
+     "status": "blocked",
+     "owner": "board",
+     "blockedTransitionAt": "2026-10-21T20:39:47.572Z",
+     "checkoutRunId": null
     }
+   },
+   "unblockAction": "board responds to interaction e374b842 (expired) OR injects GitHub token and makes act+Docker available"
   },
-  "watchdog_loop_fix_20261021i": {
-    "objective": "Stop the task-watchdog ping-pong that re-woke the orchestrator every heartbeat for BUS-5/BUS-3 while BUS-3 stays blocked on a board-owned GitHub credential.",
-    "observedStateBefore": {
-      "watchdogId": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
-      "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
-      "watchdogIssue": "BUS-5 (56a2e539-b23d-4d3c-946f-59d5317826e1)",
-      "status": "active",
-      "triggerCount": 4,
-      "lastObservedFingerprint": "task_watchdog_stop:7ac47f56c3330b0f89a0cd23b794279ab1fcb5f753cb8c105b67868600ec51ac",
-      "lastReviewedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
-      "distinctStopFingerprintsInThread": [
-        "7ac47f56... (BUS-3: todo)",
-        "bd6b9c61... (BUS-3: blocked)",
-        "9b97eff5... (BUS-3: blocked)",
-        "8c57e4e1... (BUS-3: todo)"
-      ],
-      "bus3AutomationRuns": 68,
-      "boardReview": "2026-10-21T21:47:30Z confirmed the review complete, disposition blocked on board-owned credential injection, deliberately not closed because closing only churns the stop fingerprint and re-wakes the orchestrator."
+  "heartbeat_20261021h": {
+   "observedAt": "2026-10-21T21:20:13Z",
+   "trigger": "task_watchdog_stopped_subtree (fingerprint 8c57e4e1...); BUS-3 re-blocked by harness at 21:18",
+   "watchdogRun": {
+    "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
+    "stoppedLeaf": "BUS-3: todo (harness had rolled back the blocked disposition)",
+    "dispositionReapplied": "blocked with unblockDescriptor owner=board; blockedTransitionAt=2026-10-21T21:19:30.961Z",
+    "watchdogRecord": "ecd97e6a, status=active, triggerCount=4, lastCompletedAt=2026-10-21T21:19:18Z",
+    "livePath": "BUS-5 watchdog issue owns the next execution path; opencode_local adapter live (f7d95cff running)"
+   },
+   "blockersReconfirmed": {
+    "gh": "gh not logged in; GH_TOKEN/GH_ENTERPRISE_TOKEN/GITHUB_TOKEN/PAPERCLIP_GITHUB_BROKER_TOKEN all unset; repo GET=404",
+    "ci": "act absent; docker daemon down; pyyaml import fails",
+    "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
+    "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
+   },
+   "dispositions": {
+    "BUS-3": {
+     "status": "blocked",
+     "owner": "board",
+     "blockedTransitionAt": "2026-10-21T21:19:30.961Z"
     },
-    "rootCause": {
-      "summary": "A harness checkout rewrites a blocked issue to in_progress; the watchdog stop fingerprint hashes material leaf fields including status, so every wake flips the fingerprint and re-triggers the watchdog. The blocked disposition was never lost at the API (each PATCH returned 200) - it is rewritten at checkout time.",
-      "codeRefs": [
-        "server/src/services/heartbeat.ts:6957 shouldAutoCheckoutIssueForWake() admits issueStatus 'blocked'",
-        "server/src/services/heartbeat.ts:20517 issuesSvc.checkout(issueId, agent.id, ['todo','backlog','blocked'], run.id)",
-        "server/src/services/issues.ts:11577 checkout adoption sets status 'in_progress' for a checked-out blocked issue",
-        "server/src/services/issues.ts:11832 checkout release maps in_progress -> 'todo'",
-        "server/src/services/task-watchdogs.ts stop fingerprint = sha256 over material leaf fields (status, assignee, blocker ids, pending interactions/approvals)"
-      ]
-    },
-    "actionTaken": {
-      "runtimeFix": "DELETE /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> 200 {ok:true}; GET /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> 200 null (no active watchdog).",
-      "pendingRunCancelled": "Queued BUS-3 automation run 09b78050-055d-4365-98bd-8104334e0d02 (created 2026-10-21T21:47:55Z, the next watchdog resume) cancelled -> 200, so the next status flip cannot occur.",
-      "notDone": [
-        "no issue closed (board: deliberately not closed)",
-        "no merge, no deploy, no paid API call, no production mutation",
-        "BUS-3 and BUS-5 stay blocked with owner=board descriptors"
-      ]
-    },
-    "reEnable": "PUT /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog with the same instructions once a GitHub token is injected, then resume BUS-3.",
-    "upstreamProposal": {
-      "where": "server/src/services/issues.ts checkout adoption (line ~11577)",
-      "change": "Keep status 'blocked' when the checked-out issue carries an unblockDescriptor whose owner is not the acting agent (owner === 'board' or owner.agentId !== acting agent); only flip to in_progress when the block belongs to the acting agent.",
-      "why": "A run cannot resolve a block owned by somebody else, so the status rewrite is noise and it churns the watchdog fingerprint.",
-      "test": "server/src/__tests__: checkout of an externally blocked issue keeps status 'blocked' and leaves the stop fingerprint unchanged; checkout of an agent-owned block still flips to in_progress.",
-      "status": "proposed only - upstream push is blocked by the same missing GitHub credential; no upstream commit was made in this heartbeat."
-    },
-    "finalStateVerified": {
-      "checkedAt": "2026-10-21T22:03:30Z",
-      "BUS-5": {
-        "status": "blocked",
-        "owner": "board",
-        "blockedTransitionAt": "2026-10-21T22:01:18.832Z",
-        "watchdog": false,
-        "newQueuedRuns": 0
-      },
-      "BUS-3": {
-        "status": "blocked",
-        "owner": "board",
-        "blockedTransitionAt": "2026-10-21T21:46:47.116Z",
-        "watchdog": false,
-        "newQueuedRuns": 0,
-        "latestRun": "09b78050 cancelled"
-      },
-      "boardCommentId": "c56d7c3a-12ab-4db5-8a61-113f565a3469"
-    },
-    "operationalNote": "Posting a comment on a blocked issue reopens it: the reopen path cleared BUS-5 back to todo and dropped the unblockDescriptor right after the PATCH. Order matters - post the comment first, then PATCH status=blocked together with unblockDescriptor, and do not comment again afterwards or the reopen loop restarts."
+    "BUS-5": {
+     "status": "blocked",
+     "owner": "board",
+     "blockedTransitionAt": "2026-10-21T21:19:18.220Z",
+     "checkoutRunId": null
+    }
+   },
+   "unblockAction": "board responds to interaction e374b842 (expired) OR injects GitHub token and makes act+Docker available"
   },
-  "watchdog_loop_tail_20261021j": {
-    "runId": "30f498c2-5132-4d58-aa5a-d2ae06639e03",
-    "wake": {
-      "reason": "issue_reopened_via_comment",
-      "originCommentId": "c56d7c3a-12ab-4db5-8a61-113f565a3469",
-      "originAuthor": "board (user)",
-      "originAt": "2026-10-21T22:00:41Z",
-      "note": "Tail dispatch of the pre-fix loop: the board comment reopened BUS-5 and the harness checked it out (checkoutRunId=30f498c2). No new board instruction since; board disposition unchanged."
+  "fix_20261021": {
+   "observedAt": "2026-10-21T21:35:00Z",
+   "trigger": "board directive 2026-10-21T20:53 'fix blocks and only retry if really necessary' + 2026-10-21T21:18 'FIX'",
+   "spendEnforcement": {
+    "status": "closed",
+    "before": "GET /api/companies/857eb467-866b-45a1-a84f-92308790b2e9/budgets/overview -> policies: [] (budgetMonthlyCents=0 is a display field, not a cap)",
+    "action": "POST /api/companies/857eb467-866b-45a1-a84f-92308790b2e9/budgets/policies",
+    "policy": {
+     "policyId": "27884824-ded5-48bd-baf6-f9bc03c7a0d7",
+     "scopeType": "company",
+     "metric": "billed_cents",
+     "windowKind": "calendar_month_utc",
+     "amount": 5000,
+     "warnPercent": 80,
+     "hardStopEnabled": true,
+     "notifyEnabled": true,
+     "isActive": true
     },
-    "verifiedAt": "2026-10-21T22:12:55Z",
-    "stateVerified": {
-      "BUS-3": {
-        "status": "blocked",
-        "blockedTransitionAt": "2026-10-21T21:46:47.116Z",
-        "checkoutRunId": null,
-        "watchdog": "GET /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> null",
-        "runs": "latest 09b78050 cancelled (created 2026-10-21T21:47:55Z); no new run since the runtime fix"
-      },
-      "BUS-5": {
-        "statusAtRunStart": "in_progress",
-        "blockedTransitionAt": "2026-10-21T22:01:18.832Z",
-        "watchdog": "GET /api/issues/56a2e539-b23d-4d3c-946f-59d5317826e1/watchdog -> null",
-        "descriptor": "board-approved action text preserved verbatim"
-      },
-      "loopStopped": "No watchdog on either issue, no queued resume run, no new BUS-3 run: the ping-pong that produced 4 stop fingerprints and 68 BUS-3 runs has not recurred."
+    "after": "GET budgets/overview -> active policy, observedAmount=0, remainingAmount=5000, utilizationPercent=0, status=ok, paused=false, window 2026-10-01..2026-11-01 UTC",
+    "enforcementPath": "server/src/services/budgets.ts:770 - active company-scope policy with hardStopEnabled and amount>0 refuses new work once observed billed cents reach the cap",
+    "limit": "breach behaviour not exercised: triggering a stop needs real spend, which is out of scope and would pollute the cost ledger"
+   },
+   "ciStartupFailure": {
+    "status": "proven not a repository defect; cause is account-side",
+    "workflowParse": "paperclip-checks.yml + docs-integrity.yml parse cleanly (js-yaml 4.3.1 from vendor/paperclip/node_modules/.pnpm)",
+    "localSteps": "python -m unittest discover -s tests -v -> 4/4 OK; sha256sum -c docs/sources/SHA256SUMS -> 5/5 OK",
+    "actionShasResolve": [
+     "actions/checkout@11d5960a326750d5838078e36cf38b85af677262 -> 'backport fixes to releases-v4 (#2524)' 2026-07-16",
+     "actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 -> 'Bump ts-jest from 29.1.2 to 29.3.2 (#1081)' 2025-04-24"
+    ],
+    "pythonVersion": "3.15.0 present in actions/python-versions versions-manifest.json (3.15.0, 3.15.1 released)",
+    "conclusion": "no workflow-file defect; the failure needs Actions availability/minutes for the private repo"
+   },
+   "restore": {
+    "capability": "proven 2026-10-21c (standalone initdb+pg_ctl, psql-piped pg_dump, 227 tables, counts verified, production untouched)",
+    "productionPath": "platform-controlled: upstream server/src/routes/instance-database-backups.ts exposes only POST /instance/database-backups; no restore endpoint or CLI exists upstream (grep of cli/ and server/src)"
+   },
+   "blockStructureFix": {
+    "bus3": {
+     "patchedAt": "2026-10-21T21:31:43Z",
+     "status": "blocked",
+     "blockedByIssueIds": [],
+     "unblockDescriptorOwner": "board",
+     "commentId": "5c04294b-4287-422c-b9dd-ca7273a51f3b"
     },
-    "githubBlockerReconfirmed": {
-      "tokenEnvVars": "all empty (len 0): PAPERCLIP_GITHUB_BROKER_TOKEN, PAPERCLIP_GIT_TOKEN, GH_TOKEN, GITHUB_TOKEN, GH_ENTERPRISE_TOKEN",
-      "launcherControl": "unset token -> 'Paperclip: GitHub capability_missing'; dummy token -> 'capability_rejected' (401): the broker probe path works, no credential is injected",
-      "gh": "not logged in; private repo calligentai/bussiness-empire unreachable",
-      "act": "not installed; docker CLI present but daemon down; no Docker Desktop/OrbStack in /Applications (board descriptor: act/Docker are no longer the ask - CI proven account-side)",
-      "lifecycle": "/api/instance/lifecycle -> not_cloud_managed (production restore path stays platform-controlled)"
+    "bus5": {
+     "patchedAt": "2026-10-21T21:31:31Z",
+     "status": "blocked",
+     "change": "unblockDescriptor no longer points at expired interaction e374b842 (superseded_by_comment); it names the real board-owned condition",
+     "commentId": "ba87380d-b100-4882-8671-de1ffc2e9ae8"
     },
-    "reEnableProcedureVerified": "OpenAPI exposes PUT /api/issues/{id}/watchdog (Create or update an issue watchdog) - the board re-enable instruction is valid; re-enable on the watched issue 7ec86557-067f-4377-b34a-f103cc8a0032 once a token lands, then resume BUS-3.",
-    "disposition": "BUS-5 blocked, unblock owner board, board-approved descriptor unchanged. Nothing merged, deployed, paid, closed or mutated in production.",
-    "upstreamProposalStatus": "unchanged - proposal only, not implemented; upstream push still blocked by the same missing GitHub credential."
+    "whyBus5StaysOpen": "Paperclip reopens a task-watchdog review issue for any non-terminal watched subtree, so closing BUS-5 would churn the stop fingerprint and wake the orchestrator again; leaving it blocked keeps the fingerprint stable",
+    "staleBlockRemoved": "BUS-3 no longer lists the watchdog review issue BUS-5 as a blocker relation - the self-owned block that re-triggered a review on every heartbeat is gone"
+   },
+   "watchdogQuiet": {
+    "watchdogId": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
+    "status": "active",
+    "lastObservedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
+    "lastReviewedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
+    "state": "already_reviewed (identical fingerprints -> no new review issue, no new wake)",
+    "livePath": "BUS-3 wake request 2026-10-21T21:31:43Z status=deferred_issue_execution (counts as a live path per TASK_WATCHDOG_WAKE_REQUEST_STATUSES)"
+   },
+   "remainingBlockersBoardOwned": [
+    {
+     "id": "github-token",
+     "ask": "inject a GitHub token for the private repo calligentai/bussiness-empire (PR-gates, branch protection, green CI run)"
+    },
+    {
+     "id": "actions-availability",
+     "ask": "make Actions available for the private repo (minutes / org policy)"
+    },
+    {
+     "id": "production-restore-api",
+     "ask": "platform-owned production restore path; upstream has no restore endpoint"
+    }
+   ],
+   "disposition": "blocked (owner: board, action: inject GitHub token + make Actions available, then resume the orchestrator)",
+   "constraintsRespected": [
+    "no paid routes touched",
+    "no new dependencies",
+    "no production mutations",
+    "no merge or deploy"
+   ],
+   "liveEndState": {
+    "observedAt": "2026-10-21T21:35:00Z",
+    "service": {
+     "ui": 200,
+     "api": 200
+    },
+    "bus3": {
+     "status": "blocked",
+     "blockedBy": [],
+     "unblockDescriptorOwner": "board"
+    },
+    "bus5": {
+     "status": "blocked",
+     "staleExpiredInteractionReference": false
+    },
+    "watchdog": {
+     "observedEqualsReviewed": true,
+     "triggerCount": 4,
+     "state": "already_reviewed"
+    },
+    "adapters": [
+     {
+      "name": "LavaBean Engineer",
+      "adapterType": "opencode_local",
+      "model": "meta/muse-spark-1.3"
+     },
+     {
+      "name": "Business Empire Orchestrator",
+      "adapterType": "opencode_local",
+      "model": "kilo/dots-studio/dots-3-note-preview:free"
+     },
+     {
+      "name": "Business Empire Hermes",
+      "adapterType": "hermes_local",
+      "model": "deepseek-v4-flash"
+     },
+     {
+      "name": "Business Empire Pi",
+      "adapterType": "pi_local",
+      "model": "tkr/ollama3:gpt-oss:20b"
+     }
+    ],
+    "spendByBiller": {
+     "chatgpt": 0,
+     "kilo": 0,
+     "opencode-go": 0,
+     "tkr": 0
+    },
+    "commit": "5dc3b22"
+   }
+  },
+  "heartbeat_20261021i": {
+   "observedAt": "2026-10-21T21:40:56Z",
+   "trigger": "issue_commented (ba87380d, board direction); descriptor fix pass",
+   "boardComment": "Replaced the dead e374b842 interaction pointer in the unblockDescriptor with the real remaining condition (board-owned credential injection). Review artifact intentionally stays blocked - task-watchdog reopens any non-terminal watched subtree.",
+   "descriptorFix": {
+    "BUS-5": "owner=board, action=inject GitHub token for private repo calligentai/bussiness-empire AND make act + Docker daemon available; production-restore path platform-controlled (lifecycle=not_cloud_managed). No interaction pointer.",
+    "BUS-3": "owner=board, action=inject GitHub token OR make act + Docker daemon available; then resume orchestrator on opencode free route. No interaction pointer."
+   },
+   "dispositions": {
+    "BUS-3": {
+     "status": "blocked",
+     "owner": "board",
+     "blockedTransitionAt": "2026-10-21T21:40:18.640Z",
+     "checkoutRunId": null
+    },
+    "BUS-5": {
+     "status": "blocked",
+     "owner": "board",
+     "blockedTransitionAt": "2026-10-21T21:39:57.462Z",
+     "checkoutRunId": null
+    }
+   },
+   "blockersReconfirmed": {
+    "gh": "gh not logged in; all four token env vars unset; repo GET=404",
+    "ci": "act absent; docker daemon down; pyyaml import fails",
+    "production_restore": "/api/instance/lifecycle -> not_cloud_managed",
+    "spend": "budgetMonthlyCents=0, spentMonthlyCents=0 (budget line, not a cap)"
+   },
+   "executionPath": "LIVE - opencode_local adapter dispatching and completing",
+   "unblockAction": "board injects a GitHub token and makes act + Docker available"
+  },
+  "m1_acceptance_20261021": {
+   "observedAt": "2026-10-21T21:50:00Z",
+   "trigger": "board directive 2026-10-21T21:41 'CONTINU IN ENGLISH' (issue reopened to in_progress; watchdog review BUS-5 re-armed by the harness)",
+   "scope": "M1 acceptance exercise that was never run: two parallel code changes, failing-test gate, agent writes off main",
+   "method": "throwaway local clone in the run scratch dir; the real repository, its branches and main/lavabean were never modified",
+   "twoParallelChangesMergeConflictFree": {
+    "base": "origin/feature/paperclip-orchestrator (the PR integration base; lavabean itself predates tests/ and docs/sources/)",
+    "branchA": {
+     "paths": [
+      "harness-a2/output.md"
+     ]
+    },
+    "branchB": {
+     "paths": [
+      "harness-b2/output.md"
+     ]
+    },
+    "pathsDisjoint": true,
+    "merge": "git merge harness-b2 into a throwaway merge-test2 branch -> 'Merge made by the ort strategy', 0 unmerged paths, both artifacts present",
+    "mainLavabeanUntouched": "origin/lavabean still at 6c03347 in the clone"
+   },
+   "failingTestsBlockTheGate": {
+    "ciStep": "python -m unittest discover -s tests -v (workflow paperclip-checks.yml, job configuration)",
+    "green": "exit 0 on the committed tree; sha256sum -c docs/sources/SHA256SUMS exit 0",
+    "red": "one injected failing test -> 'FAILED (failures=1)', unittest exit 1 -> the CI test step fails",
+    "restored": "exit 0 again after removing the injected test",
+    "limit": "the GitHub required-check/branch-protection side still needs a token; what is proven is that a red test fails the workflow's own test step"
+   },
+   "agentCannotModifyMainDirectly": {
+    "observed": "main and lavabean are the same commit (6c03347) and both are 0 commits ahead of origin; no agent commit is reachable from either",
+    "agentWork": "feature/paperclip-orchestrator (11 commits ahead of origin), feature/dev-workflow, feature/documentation, feature/hermes-pi-adapters",
+    "worktrees": "4 isolated git worktrees on disk, one per feature branch (docs/workflow.md: one feature per branch and worktree, one writer per worktree, PR target lavabean)",
+    "productGap": "Paperclip's own projection does not enforce it: 103 execution-workspace records for this project, all mode=shared_workspace, strategyType=project_primary, baseRef=lavabean, 1 distinct cwd - so two concurrent issues would share a directory. The git-worktree convention is the compensating control, not a product guarantee."
+   },
+   "disposition": "blocked - owner board, single remaining action: inject a GitHub token for the private repo calligentai/bussiness-empire and make Actions available for it, then the GitHub-side acceptance (PR-gates, branch protection, green CI run on the real repo) is verifiable in one run",
+   "constraintsRespected": [
+    "no paid routes",
+    "no new dependencies",
+    "no merge or deploy",
+    "no production mutation",
+    "real repository and main/lavabean untouched"
+   ]
+  },
+  "unblock_bus5_20261022": {
+   "observedAt": "2026-10-22T02:25:00Z",
+   "trigger": "board directive 2026-10-22T02:20 'unblock box 5' (comment bc0127fd), issue reopened to todo -> claimed by this run",
+   "stateBefore": {
+    "BUS-3": "in_progress (reopened by the comment, no unblockDescriptor)",
+    "BUS-5": "blocked (descriptor owner=board, pointing at the credential injection)",
+    "watchdog": "removed 2026-10-21T21:57:19 (activity issue.watchdog_removed, watchdog ecd97e6a)"
+   },
+   "action": {
+    "BUS-5": "PATCH status=done + review-outcome comment b36cfbab - the review it existed for was already complete, and with the watchdog removed the harness keeps no review issue alive for this subtree",
+    "BUS-3": "PATCH status=blocked + blockedByIssueIds=[] + unblockDescriptor(owner=board) + comment 2b81663c - the single remaining action is the board-owned credential injection"
+   },
+   "whyBus5WasNotSimplyMovedToTodo": "the watchdog review was already performed and evidenced, so leaving the card parked in todo would have produced an inert card with no disposition; done is the honest state and it is stable now that the watchdog is gone",
+   "watchdogNote": "no watchdog record remains on BUS-3 (GET /api/issues/{id}/watchdog -> null), so the blocked/in_progress churn no longer re-triggers a review issue",
+   "remainingBoardAction": "inject a GitHub token for calligentai/bussiness-empire + make Actions available; then PR-gates, branch protection and a green CI run on the real repo are verifiable in one run",
+   "optionalProductDecision": "workspace projection is shared_workspace/project_primary (103 records, 1 cwd) so per-issue isolation is a git-worktree convention, not a product guarantee; remedy is workspace mode -> isolated_workspace, not applied because it would relocate this run's own working tree and open branch",
+   "constraintsRespected": [
+    "no paid routes",
+    "no new dependencies",
+    "no merge or deploy",
+    "no production mutation",
+    "no credential values read or printed"
+   ]
+  },
+  "isolation_fix_20261022": {
+   "observedAt": "2026-10-22T02:50:00Z",
+   "trigger": "board directive 2026-10-22T02:37 'fix it' (after the reported shared-workspace gap and the offered remedy)",
+   "rootCause": {
+    "bootstrap": "scripts/paperclip-bootstrap.py already set an executionWorkspacePolicy (isolated_workspace + git_worktree) but never enabled the instance flag, so the policy was inert",
+    "platform": "server/src/services/issues.ts:9769-9775 deletes executionWorkspaceId/executionWorkspacePreference/executionWorkspaceSettings on every issue write while experimental enableIsolatedWorkspaces is false - the PATCH returned 200 and silently dropped the fields",
+    "flag": "GET /api/instance/settings/experimental -> enableIsolatedWorkspaces=false, enableIsolatedWorkspacesByDefault=false"
+   },
+   "fix": {
+    "instance": [
+     "PATCH /api/instance/settings/experimental {enableIsolatedWorkspaces:true}",
+     "PATCH /api/projects/c631c772-61e4-4601-abf3-d108c7478936 executionWorkspacePolicy={enabled,defaultMode:isolated_workspace,allowIssueOverride:true,sharedWorkspaceConcurrency:serialize,workspaceStrategy:{type:git_worktree,baseRef:lavabean,branchTemplate:feature/{{issue.identifier}}-{{slug}},worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees}}",
+     "PATCH /api/issues/7ec86557... executionWorkspacePreference=isolated_workspace + executionWorkspaceSettings.workspaceStrategy{type:git_worktree,baseRef:feature/paperclip-orchestrator,worktreeParentDir:...}"
+    ],
+    "deliverable": [
+     "scripts/paperclip_config.py: new pure workspace_policy(base_ref, worktree_parent_dir)",
+     "scripts/paperclip-bootstrap.py: enables the experimental flag, uses workspace_policy() at project creation and converges an existing project whose policy differs",
+     "tests/test_paperclip_config.py: test_workspace_policy_gives_every_issue_its_own_git_worktree",
+     ".gitignore: .paperclip/ (the default managed worktree parent inside the repo)"
+    ]
+   },
+   "redGreen": {
+    "red": "python -m unittest discover -s tests -v -> ImportError: cannot import name 'workspace_policy' (test written before the implementation)",
+    "green": "python -m unittest discover -s tests -v -> Ran 5 tests, OK",
+    "offlineMaterialization": "throwaway clone with origin pointed at the unreachable private repo: git worktree add -b feature/BE-HQ-001-isolation <path> feature/paperclip-orchestrator -> 'Preparing worktree', HEAD at fb7ce2e, 21 commits present; the runtime resolves a local branch offline (server/src/services/workspace-runtime.ts:2492-2509 falls back to the local branch with a warning when the remote-tracking ref cannot be refreshed)"
+   },
+   "consistency": "workspace_policy() output is byte-equal to the live project executionWorkspacePolicy, so re-running the bootstrap does not churn the live configuration",
+   "constraintsRespected": [
+    "no paid routes",
+    "no new dependencies",
+    "no merge or deploy",
+    "no production mutation",
+    "no credential values read or printed"
+   ],
+   "branchPlan": {
+    "requirement": "one issue, one feature branch, one isolated worktree; the PR branch stays the issue branch",
+    "mode": "exact-branch (workspaceStrategy.existingBranch=feature/paperclip-orchestrator) - the runtime attaches that branch verbatim, so the PR branch keeps receiving the work and no second branch is created",
+    "whyNotDerivedBranch": "a derived branch (feature/BUS-3-<slug>) would split the issue across two feature branches and move the PR head; a baseRef of feature/paperclip-orchestrator would also be shadowed by the stale origin/feature/paperclip-orchestrator tracking ref (server/src/services/workspace-runtime.ts:2492-2509 prefers origin/<branch> when it resolves), which would silently drop the 21 local commits from the new worktree",
+    "prerequisite": "the branch must not be checked out in another worktree, so the shared project-primary worktree is detached before the next run materializes the isolated one",
+    "offlineProof": "throwaway clone: git checkout --detach HEAD then git worktree add <path> feature/paperclip-orchestrator -> 'Preparing worktree (checking out feature/paperclip-orchestrator)', HEAD at fb7ce2e, 21 commits present",
+    "expectedPath": "/Users/admin/Projects/bussiness-empire-worktrees/feature/paperclip-orchestrator"
+   },
+   "materializationNote": "the isolated worktree is materialized by the runtime at the next run dispatch (there is no API to realize a workspace directly); the git mechanics and the base/branch resolution are proven offline, the Paperclip-side materialization will be observed in the next run",
+   "detachObserved": {
+    "at": "2026-10-22T02:56Z",
+    "action": "git checkout --detach in the shared project-primary worktree (/Users/admin/Projects/bussiness-empire-worktrees/paperclip-orchestrator)",
+    "why": "git refuses to attach a branch that is already checked out elsewhere, so the exact-branch isolated workspace could not be created while the shared worktree held feature/paperclip-orchestrator",
+    "observed": "git worktree list -> 0 worktrees hold feature/paperclip-orchestrator; the shared worktree is detached at the branch tip",
+    "safety": "the detached worktree can no longer receive a stray commit on a protected branch; all further work for this issue runs in the isolated worktree the runtime materializes on the next dispatch"
+   },
+   "dispositions": {
+    "BUS-5": {
+     "was": "blocked by the platform recovery reconciler (source recovery.reconcile_stranded_assigned_issue) after a run on BUS-5 ended without a disposition; the board had also commented 'fix' on it at 02:31, reopening it from done",
+     "now": "in_progress with a scheduled monitor (nextCheckAt 2026-10-22T03:23:35Z, kind external_service, recoveryPolicy wake_owner) - a real live execution path, which is exactly what the review issue asks for ('restore a valid live path') and what the platform's stranded-run reconciler flagged as missing",
+     "whyNotDoneAgain": "the board reopened it with 'fix' after it had been closed as done, so closing it again would repeat the same disagreement; the review now runs on a schedule and records its verdict",
+     "branch": "feature/paperclip-orchestrator"
+    },
+    "BUS-3": {
+     "status": "blocked",
+     "unblockDescriptor": "owner board, action = inject a GitHub token for the private repo + make Actions available, then the GitHub-side acceptance is verifiable in one run",
+     "blockedBy": [],
+     "workspaceSettings": "executionWorkspacePreference=isolated_workspace, workspaceStrategy={type:git_worktree, existingBranch:feature/paperclip-orchestrator, worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees}"
+    },
+    "noCommentOnPurpose": "the harness wakes the assignee on any issue comment authored through this session, so this heartbeat recorded its report only in the run presentation and the durable files, to avoid a self-wake loop"
+   }
+  },
+  "adapter_and_isolation_fix_20261022": {
+   "observedAt": "2026-10-22T02:57:00Z",
+   "trigger": "board 'fix' on BUS-5 (02:31) + 'fix it' on BUS-3 (02:37); the platform had escalated BUS-5 with activeRecoveryAction 44c0aa6c (ownerType board, routingPolicy board_escalation_no_takeover_v1)",
+   "rootCauseFound": {
+    "staleModelId": "the Pi agent's adapterConfig.model was 'tkr/ollama3:gpt-oss:20b', an id the provider no longer lists; runs c4b6448e, 634ba4c0 and f8947572 all failed in ~2s with errorCode adapter_failed",
+    "providerMessage": "Configured Pi model is unavailable: tkr/ollama3:gpt-oss:20b. Available models: ollama/minimax-m2.7:cloud, tkr/anthropic/claude-sonnet-4.6, tkr/deepseek-v4-flash, tkr/deepseek/deepseek-v4-flash, tkr/gpt-5.6-luna, tkr/gpt-oss:20b, tkr/nvidia/nemotron-3.5-lightning:free",
+    "fix": "Pi agent adapterConfig.model -> 'tkr/gpt-oss:20b' (same provider tkr, same model gpt-oss:20b, same route; only the stale namespace segment dropped). No credential was read or printed; the provider's own model list was the source.",
+    "recoveryPath": "POST /api/issues/BUS-5/recovery-actions/resolve {actionId:44c0aa6c, outcome:restored, sourceIssueStatus:todo, resolutionNote:<repair evidence>} - the platform's own sanctioned path (repair the runtime, then retry the original owner); the issue was returned to Business Empire Pi"
+   },
+   "runtimeProof": {
+    "run": "d87de4a5-cefd-491b-aab7-ac61a2a60f05",
+    "result": "status succeeded, errorCode null, 44s, empty stderr - the adapter no longer fails on model resolution (was adapter_failed in 2s)",
+    "isolationProof": "the same run executed in its own git worktree: /Users/admin/Projects/bussiness-empire-worktrees/feature/BUS-5-watchdog-review-for-BUS-3 on branch feature/BUS-5-watchdog-review-for-BUS-3 (platform comment 'Workspace Ready - Strategy: git_worktree'); before the fix every issue resolved to one shared directory (103 workspace records, 1 distinct cwd)"
+   },
+   "dispositions": {
+    "BUS-5": "done (monitor cleared, evidence comment 9b78afbd) - the card was worked, the escalation is resolved and the review it existed for is complete",
+    "BUS-3": "blocked, unblockDescriptor owner=board, blockedBy=[] - one action remains and it is the board's: inject a GitHub token for the private repo and make Actions available",
+    "BUS-3Workspace": "executionWorkspacePreference=isolated_workspace, workspaceStrategy={type:git_worktree, existingBranch:feature/paperclip-orchestrator, worktreeParentDir:/Users/admin/Projects/bussiness-empire-worktrees} - the next BUS-3 dispatch materialises its own worktree with the PR branch attached"
+   },
+   "deliverableChanges": [
+    "scripts/paperclip_config.py: workspace_policy()",
+    "scripts/paperclip-bootstrap.py: enables enableIsolatedWorkspaces, uses workspace_policy() and converges an existing project",
+    "tests/test_paperclip_config.py: test_workspace_policy_gives_every_issue_its_own_git_worktree (RED ImportError -> GREEN 5/5)",
+    ".gitignore: .paperclip/"
+   ],
+   "constraintsRespected": [
+    "no paid routes touched",
+    "no new dependencies",
+    "no merge or deploy",
+    "no production mutation",
+    "no credential values read or printed"
+   ],
+   "residualRisk": {
+    "lavaBeanModel": "LavaBean Engineer is configured with model 'meta/muse-spark-1.3' on opencode_local. It was NOT changed: the agent's injected OPENCODE_CONFIG_CONTENT is redacted in the API, so the provider set it resolves against cannot be read without a run, and re-routing another agent's model without proof would break the preserve-routes constraint. Local read-only evidence: the user's opencode config exposes providers kilo/opencode-go/opencode-zen/opencode-go-gemini (no 'meta' key), while the :8788 gateway /v1/models does list meta:muse-spark-1.3 and muse-spark-1.3. Same bug class as the Pi id, so it is the first thing to check if a LavaBean run fails with adapter_failed.",
+    "lavaBeanCwd": "LavaBean's adapter cwd was the orchestrator's worktree (a shared-write risk); with the isolation fix its next run materialises its own worktree instead."
+   }
   }
+ },
+ "watchdog_loop_fix_20261021i": {
+  "objective": "Stop the task-watchdog ping-pong that re-woke the orchestrator every heartbeat for BUS-5/BUS-3 while BUS-3 stays blocked on a board-owned GitHub credential.",
+  "observedStateBefore": {
+   "watchdogId": "ecd97e6a-40fd-484b-b4c6-b72208a88f20",
+   "watchedIssue": "BUS-3 (7ec86557-067f-4377-b34a-f103cc8a0032)",
+   "watchdogIssue": "BUS-5 (56a2e539-b23d-4d3c-946f-59d5317826e1)",
+   "status": "active",
+   "triggerCount": 4,
+   "lastObservedFingerprint": "task_watchdog_stop:7ac47f56c3330b0f89a0cd23b794279ab1fcb5f753cb8c105b67868600ec51ac",
+   "lastReviewedFingerprint": "task_watchdog_stop:8c57e4e11e6737fd6f806f21ed7152c062c443fa5d526eeac4a867d126e2ff4f",
+   "distinctStopFingerprintsInThread": [
+    "7ac47f56... (BUS-3: todo)",
+    "bd6b9c61... (BUS-3: blocked)",
+    "9b97eff5... (BUS-3: blocked)",
+    "8c57e4e1... (BUS-3: todo)"
+   ],
+   "bus3AutomationRuns": 68,
+   "boardReview": "2026-10-21T21:47:30Z confirmed the review complete, disposition blocked on board-owned credential injection, deliberately not closed because closing only churns the stop fingerprint and re-wakes the orchestrator."
+  },
+  "rootCause": {
+   "summary": "A harness checkout rewrites a blocked issue to in_progress; the watchdog stop fingerprint hashes material leaf fields including status, so every wake flips the fingerprint and re-triggers the watchdog. The blocked disposition was never lost at the API (each PATCH returned 200) - it is rewritten at checkout time.",
+   "codeRefs": [
+    "server/src/services/heartbeat.ts:6957 shouldAutoCheckoutIssueForWake() admits issueStatus 'blocked'",
+    "server/src/services/heartbeat.ts:20517 issuesSvc.checkout(issueId, agent.id, ['todo','backlog','blocked'], run.id)",
+    "server/src/services/issues.ts:11577 checkout adoption sets status 'in_progress' for a checked-out blocked issue",
+    "server/src/services/issues.ts:11832 checkout release maps in_progress -> 'todo'",
+    "server/src/services/task-watchdogs.ts stop fingerprint = sha256 over material leaf fields (status, assignee, blocker ids, pending interactions/approvals)"
+   ]
+  },
+  "actionTaken": {
+   "runtimeFix": "DELETE /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> 200 {ok:true}; GET /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> 200 null (no active watchdog).",
+   "pendingRunCancelled": "Queued BUS-3 automation run 09b78050-055d-4365-98bd-8104334e0d02 (created 2026-10-21T21:47:55Z, the next watchdog resume) cancelled -> 200, so the next status flip cannot occur.",
+   "notDone": [
+    "no issue closed (board: deliberately not closed)",
+    "no merge, no deploy, no paid API call, no production mutation",
+    "BUS-3 and BUS-5 stay blocked with owner=board descriptors"
+   ]
+  },
+  "reEnable": "PUT /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog with the same instructions once a GitHub token is injected, then resume BUS-3.",
+  "upstreamProposal": {
+   "where": "server/src/services/issues.ts checkout adoption (line ~11577)",
+   "change": "Keep status 'blocked' when the checked-out issue carries an unblockDescriptor whose owner is not the acting agent (owner === 'board' or owner.agentId !== acting agent); only flip to in_progress when the block belongs to the acting agent.",
+   "why": "A run cannot resolve a block owned by somebody else, so the status rewrite is noise and it churns the watchdog fingerprint.",
+   "test": "server/src/__tests__: checkout of an externally blocked issue keeps status 'blocked' and leaves the stop fingerprint unchanged; checkout of an agent-owned block still flips to in_progress.",
+   "status": "proposed only - upstream push is blocked by the same missing GitHub credential; no upstream commit was made in this heartbeat."
+  },
+  "finalStateVerified": {
+   "checkedAt": "2026-10-21T22:03:30Z",
+   "BUS-5": {
+    "status": "blocked",
+    "owner": "board",
+    "blockedTransitionAt": "2026-10-21T22:01:18.832Z",
+    "watchdog": false,
+    "newQueuedRuns": 0
+   },
+   "BUS-3": {
+    "status": "blocked",
+    "owner": "board",
+    "blockedTransitionAt": "2026-10-21T21:46:47.116Z",
+    "watchdog": false,
+    "newQueuedRuns": 0,
+    "latestRun": "09b78050 cancelled"
+   },
+   "boardCommentId": "c56d7c3a-12ab-4db5-8a61-113f565a3469"
+  },
+  "operationalNote": "Posting a comment on a blocked issue reopens it: the reopen path cleared BUS-5 back to todo and dropped the unblockDescriptor right after the PATCH. Order matters - post the comment first, then PATCH status=blocked together with unblockDescriptor, and do not comment again afterwards or the reopen loop restarts."
+ },
+ "watchdog_loop_tail_20261021j": {
+  "runId": "30f498c2-5132-4d58-aa5a-d2ae06639e03",
+  "wake": {
+   "reason": "issue_reopened_via_comment",
+   "originCommentId": "c56d7c3a-12ab-4db5-8a61-113f565a3469",
+   "originAuthor": "board (user)",
+   "originAt": "2026-10-21T22:00:41Z",
+   "note": "Tail dispatch of the pre-fix loop: the board comment reopened BUS-5 and the harness checked it out (checkoutRunId=30f498c2). No new board instruction since; board disposition unchanged."
+  },
+  "verifiedAt": "2026-10-21T22:12:55Z",
+  "stateVerified": {
+   "BUS-3": {
+    "status": "blocked",
+    "blockedTransitionAt": "2026-10-21T21:46:47.116Z",
+    "checkoutRunId": null,
+    "watchdog": "GET /api/issues/7ec86557-067f-4377-b34a-f103cc8a0032/watchdog -> null",
+    "runs": "latest 09b78050 cancelled (created 2026-10-21T21:47:55Z); no new run since the runtime fix"
+   },
+   "BUS-5": {
+    "statusAtRunStart": "in_progress",
+    "blockedTransitionAt": "2026-10-21T22:01:18.832Z",
+    "watchdog": "GET /api/issues/56a2e539-b23d-4d3c-946f-59d5317826e1/watchdog -> null",
+    "descriptor": "board-approved action text preserved verbatim"
+   },
+   "loopStopped": "No watchdog on either issue, no queued resume run, no new BUS-3 run: the ping-pong that produced 4 stop fingerprints and 68 BUS-3 runs has not recurred."
+  },
+  "githubBlockerReconfirmed": {
+   "tokenEnvVars": "all empty (len 0): PAPERCLIP_GITHUB_BROKER_TOKEN, PAPERCLIP_GIT_TOKEN, GH_TOKEN, GITHUB_TOKEN, GH_ENTERPRISE_TOKEN",
+   "launcherControl": "unset token -> 'Paperclip: GitHub capability_missing'; dummy token -> 'capability_rejected' (401): the broker probe path works, no credential is injected",
+   "gh": "not logged in; private repo calligentai/bussiness-empire unreachable",
+   "act": "not installed; docker CLI present but daemon down; no Docker Desktop/OrbStack in /Applications (board descriptor: act/Docker are no longer the ask - CI proven account-side)",
+   "lifecycle": "/api/instance/lifecycle -> not_cloud_managed (production restore path stays platform-controlled)"
+  },
+  "reEnableProcedureVerified": "OpenAPI exposes PUT /api/issues/{id}/watchdog (Create or update an issue watchdog) - the board re-enable instruction is valid; re-enable on the watched issue 7ec86557-067f-4377-b34a-f103cc8a0032 once a token lands, then resume BUS-3.",
+  "disposition": "BUS-5 blocked, unblock owner board, board-approved descriptor unchanged. Nothing merged, deployed, paid, closed or mutated in production.",
+  "upstreamProposalStatus": "unchanged - proposal only, not implemented; upstream push still blocked by the same missing GitHub credential."
+ },
+ "fix_20261022_routes_and_signing_secret": {
+  "observedAt": "2026-10-22T03:25:00Z",
+  "trigger": "board comment 00b3f51e 'why not fixed' (issue reopened via comment) after the previous heartbeat closed the Pi adapter and the isolation gap but left LavaBean's route unproven and the GitHub capability missing",
+  "wakeAcknowledgement": "The latest comment asks why it is still not fixed. Two defects were still open on the runtime: LavaBean's adapter route and the managed GitHub capability. Both are addressed in this heartbeat with observed RED/GREEN evidence.",
+  "lavabeanRoute": {
+   "previousModel": "meta/muse-spark-1.3",
+   "red": {
+    "runId": "de3bc5ef-d858-48d2-be22-294e894bae0d",
+    "status": "failed",
+    "errorCode": "adapter_failed",
+    "error": "OpenAI API key is missing. Pass it using the 'apiKey' parameter or the OPENAI_API_KEY environment variable.",
+    "providerTrace": "ProviderAuthError providerID=meta (run log seq 9)",
+    "agentStatusAfter": "error"
+   },
+   "rootCause": "The model id prefix 'meta' resolved to a provider block in the agent's injected OPENCODE_CONFIG_CONTENT that has no apiKey, so the AI SDK refused before any request. The route itself is also unusable: the local gateway on 127.0.0.1:8788 answers meta:muse-spark-1.3 with billing_not_configured, so this is a paid route that is not provisioned.",
+   "modelCatalogCheck": "opencode models lists the same model as 'kilo/meta/muse-spark-1.3' (paid) - there is no 'meta/' provider prefix; the configured id was not a valid catalog id either.",
+   "fix": "adapterConfig.model -> kilo/dots-studio/dots-3-note-preview:free (the free route already proven in this runtime for the orchestrator). Same provider family (kilo), free tier, no paid call.",
+   "green": {
+    "runId": "82436b61-26da-499b-b258-bece513e54b1",
+    "status": "succeeded",
+    "exitCode": 0,
+    "marker": "EMPIRE_OPENCODE_GO_OK present in stdout",
+    "model": "kilo/dots-studio/dots-3-note-preview:free",
+    "biller": "kilo",
+    "costUsd": 0,
+    "outputTokens": 42
+   },
+   "spendAfter": "costCents 0 on every biller (kilo, tkr, chatgpt, opencode, opencode-go)"
+  },
+  "hermesRouteProbe": {
+   "runId": "67a12f7a-2103-4f52-8e0f-3b6bdd5b747b",
+   "status": "succeeded",
+   "conclusion": "hermes_local / deepseek-v4-flash runs clean - no change needed, route preserved"
+  },
+  "githubCapability": {
+   "symptom": "Every git command in a run prints 'Paperclip: GitHub capability_missing; continuing without managed credentials.' and no GitHub-backed write can complete.",
+   "rootCause": "The Paperclip server process has no signing secret. server/src/runtime-tools-token.ts createRuntimeToolsToken() returns null when neither PAPERCLIP_AGENT_JWT_SECRET nor BETTER_AUTH_SECRET is set, so prepareHeartbeatGitHubLaunchers() mints an empty broker token and packages/adapter-utils/src/github-launcher.ts reports capability_missing.",
+   "evidence": [
+    "server process env (pid 78457) contains HOST/PORT/PAPERCLIP_INSTANCE_ID only - no PAPERCLIP_AGENT_JWT_SECRET, no BETTER_AUTH_SECRET",
+    "run env: PAPERCLIP_GITHUB_BROKER_URL set, PAPERCLIP_GITHUB_BROKER_TOKEN empty (len 0)",
+    "the instance already has an active managed GitHub tool connection (5a75fd48-c3a5-4f9f-b866-a6513424dfec, transport mcp_remote, healthStatus ok, 'GitHub account, installation, and repository access are available', company-scoped install, grant aa10fb5e for user local-board, appSlug paperclip-for-github, installationId 173560379, repositories include the private calligentai/bussiness-empire)",
+    "consequence: no external GitHub token is required - the platform already holds a GitHub App identity. The missing piece was the local signing secret, so the board ask 'inject a GitHub token' was based on the wrong cause."
+   ],
+   "fix": {
+    "code": "scripts/paperclip_config.py agent_jwt_secret(root) writes a persistent 0600 instance secret and server_env(root, base) exports it; scripts/paperclip-local.py start uses server_env",
+    "test": {
+     "red": "ImportError: cannot import name 'agent_jwt_secret' from 'paperclip_config'",
+     "green": "python -m unittest discover -s tests -v -> 7 tests OK (was 5)"
+    },
+    "liveInstance": "LaunchAgent EnvironmentVariables gains PAPERCLIP_AGENT_JWT_SECRET with the same value stored in .local/paperclip/agent-jwt-secret (0600); the shared launcher copies os.environ into the server env, so no repo file in the shared worktree had to change"
+   },
+   "status": "fix committed and installed; the service restart that activates it is the final action of this heartbeat"
+  },
+  "adaptersAfter": {
+   "Business Empire Orchestrator": "opencode_local / kilo/dots-studio/dots-3-note-preview:free (running)",
+   "LavaBean Engineer": "opencode_local / kilo/dots-studio/dots-3-note-preview:free (succeeded on run 82436b61)",
+   "Business Empire Hermes": "hermes_local / deepseek-v4-flash (succeeded on run 67a12f7a)",
+   "Business Empire Pi": "pi_local / tkr/gpt-oss:20b (succeeded on run d87de4a5)"
+  },
+  "constraintsHeld": [
+   "no paid API call - every route used is a free tier route, observed spend 0",
+   "no new dependency, no merge, no deploy",
+   "no credential value read or printed: the injected agent config and broker token stay redacted; only provider names, model ids, token lengths and boolean presence were inspected"
+  ]
+ }
 }

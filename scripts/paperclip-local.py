@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import json,os,shutil,subprocess,sys,tomllib
 from pathlib import Path
-from paperclip_config import instance_config,routed_adapters
+from paperclip_config import instance_config,routed_adapters,server_env
 
 ROOT=Path(__file__).resolve().parents[1]
 STATE=ROOT/'.local/paperclip'
@@ -41,9 +41,7 @@ def main():
         return
     if action!='start': raise SystemExit('Usage: paperclip-local.py [prepare|start]')
     source=ROOT/'vendor/paperclip'
-    env=os.environ.copy()
-    env.pop('DATABASE_URL',None)
-    env.update(PAPERCLIP_HOME=str(STATE),PAPERCLIP_CONFIG=str(STATE/'config.json'),PAPERCLIP_INSTANCE_ID='business-empire',PORT='3110',HOST='127.0.0.1',PAPERCLIP_MIGRATION_AUTO_APPLY='true',PAPERCLIP_MIGRATION_PROMPT='never',PAPERCLIP_UI_DEV_MIDDLEWARE='true')
+    env=server_env(STATE,os.environ)
     os.chdir(source)
     os.execvpe('corepack',['corepack','pnpm@9.15.4','dev:server'],env)
 if __name__=='__main__': main()

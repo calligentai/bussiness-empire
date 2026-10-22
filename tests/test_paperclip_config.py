@@ -1,9 +1,10 @@
 import sys
 import json
+import shutil
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from paperclip_config import instance_config, routed_adapters, workspace_policy
+from paperclip_config import instance_config, routed_adapters, workspace_policy, agent_jwt_secret, server_env
 
 class ConfigurationTests(unittest.TestCase):
     def test_instance_is_loopback_isolated_and_has_no_telemetry(self):
@@ -43,5 +44,22 @@ class ConfigurationTests(unittest.TestCase):
     def test_missing_provider_route_fails_closed(self):
         with self.assertRaises(ValueError):
             routed_adapters({'model':'x','model_provider':'missing'}, {'model':'missing/model'},Path('/tmp/empire-test'))
+    def test_instance_signing_secret_is_persistent_private_and_never_printed(self):
+        root=Path('/tmp/empire-secret-test')
+        shutil.rmtree(root,ignore_errors=True)
+        first=agent_jwt_secret(root)
+        second=agent_jwt_secret(root)
+        self.assertEqual(first,second)
+        self.assertGreaterEqual(len(first),32)
+        self.assertEqual((root/'agent-jwt-secret').stat().st_mode & 0o777,0o600)
+        self.assertNotIn(first,json.dumps(instance_config(root)))
+    def test_server_env_carries_the_signing_secret_the_server_needs_for_run_credentials(self):
+        root=Path('/tmp/empire-env-test')
+        shutil.rmtree(root,ignore_errors=True)
+        env=server_env(root,{'DATABASE_URL':'postgres://elsewhere/db','PATH':'/bin'})
+        self.assertNotIn('DATABASE_URL',env)
+        self.assertEqual(env['PAPERCLIP_AGENT_JWT_SECRET'],agent_jwt_secret(root))
+        self.assertEqual(env['PORT'],'3110')
+        self.assertEqual(env['PAPERCLIP_INSTANCE_ID'],'business-empire')
 
 if __name__=='__main__': unittest.main()
