@@ -799,7 +799,16 @@
         "no merge or deploy",
         "no production mutation",
         "no credential values read or printed"
-      ]
+      ],
+      "branchPlan": {
+        "requirement": "one issue, one feature branch, one isolated worktree; the PR branch stays the issue branch",
+        "mode": "exact-branch (workspaceStrategy.existingBranch=feature/paperclip-orchestrator) - the runtime attaches that branch verbatim, so the PR branch keeps receiving the work and no second branch is created",
+        "whyNotDerivedBranch": "a derived branch (feature/BUS-3-<slug>) would split the issue across two feature branches and move the PR head; a baseRef of feature/paperclip-orchestrator would also be shadowed by the stale origin/feature/paperclip-orchestrator tracking ref (server/src/services/workspace-runtime.ts:2492-2509 prefers origin/<branch> when it resolves), which would silently drop the 21 local commits from the new worktree",
+        "prerequisite": "the branch must not be checked out in another worktree, so the shared project-primary worktree is detached before the next run materializes the isolated one",
+        "offlineProof": "throwaway clone: git checkout --detach HEAD then git worktree add <path> feature/paperclip-orchestrator -> 'Preparing worktree (checking out feature/paperclip-orchestrator)', HEAD at fb7ce2e, 21 commits present",
+        "expectedPath": "/Users/admin/Projects/bussiness-empire-worktrees/feature/paperclip-orchestrator"
+      },
+      "materializationNote": "the isolated worktree is materialized by the runtime at the next run dispatch (there is no API to realize a workspace directly); the git mechanics and the base/branch resolution are proven offline, the Paperclip-side materialization will be observed in the next run"
     }
   },
   "watchdog_loop_fix_20261021i": {
