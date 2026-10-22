@@ -1,0 +1,23 @@
+name: docs-integrity
+on:
+  push:
+    branches: [main, lavabean, 'feature/**']
+  pull_request:
+    branches: [main, lavabean]
+permissions:
+  contents: read
+concurrency:
+  group: docs-integrity-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-21
+        with:
+          fetch-depth: 2
+      - name: Verify imported source documents
+        run: sha256sum -c docs/sources/SHA256SUMS
+      - name: Check whitespace
+        run: git diff --check HEAD^ HEAD
