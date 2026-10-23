@@ -12,7 +12,10 @@ Koffiefabriek documents in docs/background are background only. Their claims and
 
 ## Validation
 
-From repository root, run: shasum -a 256 -c docs/sources/SHA256SUMS
-Then run: git diff --check
+From repository root, run: ./verify.sh
+
+That script is the whole CI. GitHub Actions is deliberately not used: the calligentai account is billing-locked, and paid hosted minutes are out of scope. Any runner (local, Paperclip agent, Pi) verifies by running verify.sh and pasting the output.
+
+Also run: git diff --check
 
 Documentation bootstrap has no application dependencies. Git, authenticated GitHub CLI and SHA-256 verification are required. Runtime isolation, manifests and lockfiles remain mandatory before application implementation.
