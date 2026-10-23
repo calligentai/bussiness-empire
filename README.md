@@ -16,7 +16,7 @@ From repository root, run: ./verify.sh
 
 That script is the whole CI. GitHub Actions is deliberately not used: the calligentai account is billing-locked, and paid hosted minutes are out of scope.
 
-It runs automatically: `.githooks/pre-commit` calls it and refuses the commit if a recorded hash no longer matches. Enable on a fresh clone once:
+It runs automatically at two points: `.githooks/pre-commit` calls `verify.sh` and refuses the commit, and `.githooks/pre-push` re-checks the tree being pushed (so `--no-verify` can't get around it). Enable on a fresh clone once:
 
     git config core.hooksPath .githooks
 
