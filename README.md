@@ -14,7 +14,13 @@ Koffiefabriek documents in docs/background are background only. Their claims and
 
 From repository root, run: ./verify.sh
 
-That script is the whole CI. GitHub Actions is deliberately not used: the calligentai account is billing-locked, and paid hosted minutes are out of scope. Any runner (local, Paperclip agent, Pi) verifies by running verify.sh and pasting the output.
+That script is the whole CI. GitHub Actions is deliberately not used: the calligentai account is billing-locked, and paid hosted minutes are out of scope.
+
+It runs automatically: `.githooks/pre-commit` calls it and refuses the commit if a recorded hash no longer matches. Enable on a fresh clone once:
+
+    git config core.hooksPath .githooks
+
+Update `docs/sources/SHA256SUMS` in the same commit whenever a tracked source document changes.
 
 Also run: git diff --check
 
