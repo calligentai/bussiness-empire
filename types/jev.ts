@@ -120,6 +120,135 @@ export interface JevScore {
   insufficientReasons: InsufficientEvidenceReason[]
 }
 
+/* ------------------------------------------------------------------------- *
+ * Cohort baseline and question-level diagnosis
+ *
+ * A single JEV score is absolute. The relative layer is a labelled library that
+ * supplies per-dimension distributions and per-question prevalences, so a new
+ * creative can be placed against a cohort and told what to fix. Nothing here
+ * trains a model or collapses the result into one "virality score".
+ * ------------------------------------------------------------------------- */
+
+/** The versions that make two JEV results comparable at all. */
+export interface JevVersions {
+  extractorVersion: string
+  rubricVersion: string
+  questionSetVersion: string
+}
+
+/** One labelled creative in the reference library. */
+export interface BaselineEntry {
+  id: string
+  extractorVersion: string
+  rubricVersion: string
+  questionSetVersion: string
+  /** The score produced when this entry was analysed. */
+  score: JevScore
+  /** Per-question probabilities for this creative, used for cohort prevalence. */
+  answers?: QuestionAnswer[]
+  /**
+   * Outcome metadata. Used for cohort labelling and stratification only. It is
+   * never an input to `scoreJev` and must not reach the analysed state. Keep CTR,
+   * views and likes out of the facts and the extractor prompt.
+   */
+  outcome?: {
+    cohort?: 'viral' | 'control' | 'unknown'
+    /** Click-through rate in percent, as reported by the source. */
+    ctr?: number
+  }
+}
+
+export interface DimensionDistribution {
+  n: number
+  min: number
+  p25: number
+  median: number
+  p75: number
+  max: number
+  mean: number
+}
+
+export interface QuestionPrevalence {
+  /** Entries that answered the question. */
+  n: number
+  /** Mean probability across those entries, 0..1. */
+  prevalence: number
+}
+
+export interface JevBaseline {
+  versions: JevVersions
+  cohort: 'viral' | 'control' | 'all'
+  entryCount: number
+  dimensions: Record<string, DimensionDistribution>
+  questionPrevalence: Record<string, QuestionPrevalence>
+}
+
+export interface BaselineOptions {
+  /** Which labelled cohort to build from. Defaults to `viral`. */
+  cohort?: 'viral' | 'control' | 'all'
+  /**
+   * Minimum CTR (percent) required to accept an entry. A missing CTR fails the
+   * gate instead of silently weakening the cohort.
+   */
+  minimumCtr?: number
+}
+
+/** One frozen, atomic question about a specific part of the creative. */
+export interface JevQuestion {
+  id: string
+  /** The rubric dimension this question's answer supports. */
+  dimensionId: string
+  prompt: string
+  window: 'hook' | 'proof' | 'craft' | 'cta'
+}
+
+/**
+ * A per-asset answer to one question. `probability` is a 0..1 judgement, not a
+ * boolean. The answer only counts when it resolves to a real evidence span.
+ */
+export interface QuestionAnswer {
+  questionId: string
+  probability: number | null
+  factIds?: string[]
+  evidence?: EvidenceSpan
+}
+
+export type DiagnoseStatus = 'issue' | 'ok' | 'insufficient_evidence'
+
+export interface QuestionDiagnosis {
+  questionId: string
+  dimensionId: string
+  prompt: string
+  status: DiagnoseStatus
+  cohortPrevalence: number | null
+  assetProbability: number | null
+  gap: number | null
+  priority: number | null
+  evidence: EvidenceSpan | null
+  factIds: string[]
+  message: string
+}
+
+export interface JevIssue {
+  questionId: string
+  dimensionId: string
+  prompt: string
+  cohortPrevalence: number
+  assetProbability: number
+  gap: number
+  priority: number
+  evidence: EvidenceSpan
+  factIds: string[]
+}
+
+export interface DiagnoseResult {
+  issues: JevIssue[]
+  /** Every question in the frozen set's order, including non-issues. */
+  questions: QuestionDiagnosis[]
+  /** Quartile-anchored percentile estimate per scorable dimension. */
+  percentiles: Record<string, number | null>
+}
+
 export interface AnalyzedVideo {
   asset: AssetRef
   facts: FactsBundle

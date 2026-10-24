@@ -8,6 +8,11 @@ Code: `server/jev/scoring.ts` (`DEFAULT_JEV_RUBRIC`, `validateRubric`, `scoreJev
 Types: `types/jev.ts`. Extraction: `server/analysis/video-analyzer.ts`,
 `server/analysis/facts.ts`.
 
+The absolute score is only half the answer. `server/jev/baseline.ts` adds the cohort
+baseline, percentile estimate and ranked, evidence-backed issue list, documented in
+[`baseline-and-diagnose.md`](./baseline-and-diagnose.md). The rubric itself is unchanged;
+a baseline must be built from the same rubric version before it can be compared.
+
 ## Evidence rules
 
 1. **A fact needs a span.** `analyzeVideo` emits a `Fact` only when the observation
