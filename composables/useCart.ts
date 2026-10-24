@@ -16,6 +16,12 @@ export interface PaymentWebhookEvent {
   paymentId: string;
 }
 
+export interface RefundResult {
+  ok: boolean;
+  order?: Order;
+  error?: "order_not_found" | "not_refundable" | "already_refunded";
+}
+
 export const useCart = () => {
   const items = computed(() => cart.value);
   const itemCount = computed(() =>
@@ -67,6 +73,9 @@ export const useOrders = () => {
   const allOrders = computed(() => orders.value);
 
   const createOrder = (cartItems: CartItem[]): Order => {
+    if (cartItems.length === 0) {
+      throw new Error("Cart is empty");
+    }
     const totalCents = cartItems.reduce(
       (total, item) => total + item.priceCents * item.quantity,
       0
@@ -106,6 +115,12 @@ export const useOrders = () => {
 
   const applyPaymentWebhook = (event: PaymentWebhookEvent) => {
     const existing = getOrder(event.orderId);
+    if (!existing) {
+      return { applied: false, order: undefined, error: "order_not_found" };
+    }
+    if (existing.status === "refunded") {
+      return { applied: false, order: existing, error: "already_refunded" };
+    }
     if (processedWebhookIds.has(event.id)) {
       return { applied: false, order: existing };
     }
@@ -116,12 +131,29 @@ export const useOrders = () => {
     };
   };
 
+  const refundOrder = (id: string, reason?: string): RefundResult => {
+    const order = getOrder(id);
+    if (!order) return { ok: false, error: "order_not_found" };
+    if (order.status === "refunded") {
+      return { ok: false, order, error: "already_refunded" };
+    }
+    if (order.status !== "paid") {
+      return { ok: false, order, error: "not_refundable" };
+    }
+    order.status = "refunded";
+    order.refundedAt = new Date().toISOString();
+    if (reason !== undefined) order.refundReason = reason;
+    order.updatedAt = order.refundedAt;
+    return { ok: true, order };
+  };
+
   return {
     orders: allOrders,
     createOrder,
     getOrder,
     updateOrderStatus,
     applyPaymentWebhook,
+    refundOrder,
   };
 };
 
@@ -130,6 +162,9 @@ export const processPayment = async (
   amountCents: number,
   shouldSucceed: boolean = true
 ): Promise<PaymentResult> => {
+  if (!Number.isFinite(amountCents) || amountCents <= 0) {
+    return { success: false, paymentId: "", error: "Invalid amount" };
+  }
   // Simulate payment processing
   await new Promise((resolve) => setTimeout(resolve, 10));
   
