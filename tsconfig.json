@@ -8,6 +8,7 @@
     "types/**/*.ts",
     "tests/**/*.ts",
     "scripts/**/*.mjs",
-    "brand/**/*.mjs"
+    "brand/**/*.mjs",
+    "server/**/*.ts"
   ]
 }
