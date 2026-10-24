@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { findProduct } from "../../data/products";
+import { useCart } from "../../composables/useCart";
 
 const route = useRoute();
 const product = findProduct(String(route.params.slug));
@@ -25,6 +26,14 @@ const facts = computed(() => [
   { label: "Roast", value: product.roast },
   { label: "Reference recipe", value: product.recipe },
 ]);
+
+const { addItem } = useCart();
+const added = ref(false);
+const addToCart = () => {
+  addItem({ slug: product.slug, name: product.name, priceCents: product.priceCents });
+  added.value = true;
+  setTimeout(() => (added.value = false), 2000);
+};
 </script>
 
 <template>
@@ -49,7 +58,8 @@ const facts = computed(() => [
         <p class="lb-product__notes">{{ product.notes.join(" · ") }}</p>
         <p class="lb-product__price">{{ price }} <span>/ 250 g</span></p>
 
-        <LavaButton size="lg">Add to cart</LavaButton>
+        <LavaButton size="lg" @click="addToCart">Add to cart</LavaButton>
+        <p v-if="added" class="lb-product__added">Added to cart</p>
 
         <p class="lb-product__shipping">
           Roasted to order. Ships within two working days from the Netherlands.
