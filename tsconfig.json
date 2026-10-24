@@ -1,0 +1,13 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "include": [
+    "app.vue",
+    "components/**/*.vue",
+    "pages/**/*.vue",
+    "data/**/*.ts",
+    "types/**/*.ts",
+    "tests/**/*.ts",
+    "scripts/**/*.mjs",
+    "brand/**/*.mjs"
+  ]
+}
