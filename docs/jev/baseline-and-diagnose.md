@@ -160,3 +160,12 @@ pnpm vitest run tests/jev
   selection, CTR gate, determinism, percentile anchors.
 - `tests/jev/diagnose.test.ts` — ranking, determinism, null dimension skip,
   missing evidence, dangling fact ids, thresholds, percentiles.
+
+`server/analysis/creative-center-source.ts` accepts a browser-session transport; it
+does not create an HTTP client or access browser credentials. `scripts/harvest-top-ads.ts`
+serializes only extracted ad reference fields and provenance timestamps. Keep outcome
+metadata (`ctr`, `likes`) out of any state passed to the extractor, facts pipeline, or
+`scoreJev`. The endpoint feed can change shape without notice, so malformed or missing
+fields are rejected and should be reviewed against a fresh browser-captured fixture
+before updating the parser. The endpoint's observed permission response (`40101`) is
+reported as a typed permission failure, never an empty result.

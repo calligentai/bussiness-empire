@@ -12,3 +12,25 @@ export class AnalysisTransportError extends Error {
     this.name = 'AnalysisTransportError'
   }
 }
+
+/** Failures raised by the browser-session ad source. Provider details are omitted. */
+export class AdsInputError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'AdsInputError'
+  }
+}
+
+export class AdsTransportError extends Error {
+  constructor(message = 'Ads source transport failed') {
+    super(message)
+    this.name = 'AdsTransportError'
+  }
+}
+
+export class AdsPermissionError extends Error {
+  constructor(message = 'Ads source requires an authorized browser session') {
+    super(message)
+    this.name = 'AdsPermissionError'
+  }
+}

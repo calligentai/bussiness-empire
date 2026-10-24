@@ -15,6 +15,7 @@ export type FactKind =
   | 'on_screen_text'
   | 'product_attribute'
   | 'audio'
+  | 'soundRef'
   | 'shot'
   | 'seo_title'
   | 'seo_description'
@@ -26,6 +27,8 @@ export interface EvidenceSpan {
   assetRefId: string
   /** Offset into the video, in seconds. Zero is a valid span. */
   timestampSeconds?: number
+  /** Timestamped interval that supports an audio-derived fact. */
+  audioSpan?: { startSeconds: number; endSeconds: number }
   /** Shot or frame identifier when the analyzer works shot by shot. */
   shotId?: string
 }
@@ -39,6 +42,12 @@ export interface Fact {
   confidence: number
   /** Present on derived facts (for example SEO copy): the fact ids it quotes. */
   derivedFrom?: string[]
+}
+
+export interface AdEligibilityViolation {
+  code: 'commerce_music_ineligible'
+  soundId: string
+  message: string
 }
 
 export interface FactsBundle {

@@ -14,6 +14,12 @@ export class JevRubricError extends Error {
   }
 }
 
+/** Platform-specific sound weights remain unset until evidence supports calibration. */
+export const PLATFORM_SOUND_WEIGHT_CONFIG: Record<'tiktok' | 'youtube', number | null> = {
+  tiktok: null,
+  youtube: null,
+}
+
 /**
  * The rubric shipped with R7.3. `docs/jev/scoring-rubric.md` documents it; the two must
  * stay in sync. Weights sum to exactly 1.0 and each dimension needs real evidence.

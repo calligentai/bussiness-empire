@@ -1,0 +1,10 @@
+{
+  "code": 0,
+  "data": {
+    "materials": [
+      { "ad_title": "Morning pour", "ctr": 12.4, "like": 930, "objective_key": "traffic", "video_info": { "vid": "synthetic-ad-001", "duration": 15, "cover": "https://fixture.invalid/cover-001.jpg" } },
+      { "ad_title": "Bean ritual", "ctr": 8.1, "like": 510, "objective_key": "conversion", "video_info": { "vid": "synthetic-ad-002", "duration": 21, "cover": "https://fixture.invalid/cover-002.jpg" } },
+      { "ad_title": "First sip", "ctr": 6.7, "like": 280, "objective_key": "reach", "video_info": { "vid": "synthetic-ad-003", "duration": 9, "cover": "https://fixture.invalid/cover-003.jpg" } }
+    ]
+  }
+}

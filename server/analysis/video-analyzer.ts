@@ -14,6 +14,7 @@ export interface RawObservation {
   statement: string
   confidence?: number
   timestampSeconds?: number
+  audioSpan?: { startSeconds: number; endSeconds: number }
   shotId?: string
   assetRefId?: string
 }
@@ -69,6 +70,11 @@ const spanFor = (observation: RawObservation, assetId: string): EvidenceSpan | n
   if (!hasTimestamp && !hasShot) return null
 
   const evidence: EvidenceSpan = { assetRefId: assetId }
+    if (observation.kind === 'audio' && observation.audioSpan) {
+    const { startSeconds, endSeconds } = observation.audioSpan
+    if (!Number.isFinite(startSeconds) || !Number.isFinite(endSeconds) || startSeconds < 0 || endSeconds <= startSeconds) return null
+    evidence.audioSpan = { startSeconds, endSeconds }
+  }
   if (hasTimestamp) evidence.timestampSeconds = observation.timestampSeconds
   if (hasShot) evidence.shotId = shotId
   return evidence
@@ -110,7 +116,7 @@ export async function analyzeVideo(
     }
     const evidence = spanFor(observation, request.asset.id)
     const statement = typeof observation.statement === 'string' ? observation.statement.trim() : ''
-    if (!evidence) {
+    if (!evidence || (observation.kind === 'audio' && !evidence.audioSpan)) {
       droppedWithoutEvidence += 1
       continue
     }

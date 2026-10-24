@@ -1,0 +1,12 @@
+{
+  "transcript": [
+    { "questionId": "hook_product_or_problem", "probability": 0.8 },
+    { "questionId": "proof_product_used", "probability": 0.4 },
+    { "questionId": "cta_benefit", "probability": 0.7 }
+  ],
+  "extraction": [
+    { "questionId": "hook_product_or_problem", "probability": 0.9 },
+    { "questionId": "proof_product_used", "probability": 0.1 },
+    { "questionId": "cta_benefit", "probability": 0.7 }
+  ]
+}

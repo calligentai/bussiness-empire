@@ -80,6 +80,16 @@ describe('analyzeVideo', () => {
     expect(result.facts[1].evidence).toEqual({ assetRefId: videoAsset.id, timestampSeconds: 0 })
   })
 
+  it('requires and preserves a timestamped audio span for audio-derived facts', async () => {
+    const result = await analyzeVideo({ asset: videoAsset }, ctxFor(transportWith([
+      observation({ kind: 'audio', audioSpan: { startSeconds: 0, endSeconds: 2 } }),
+      observation({ kind: 'audio', audioSpan: undefined }),
+    ])))
+    expect(result.facts[0].evidence.audioSpan).toEqual({ startSeconds: 0, endSeconds: 2 })
+    expect(result.facts).toHaveLength(1)
+    expect(result.droppedWithoutEvidence).toBe(1)
+  })
+
   it('clamps confidence and defaults it when the observation does not provide one', async () => {
     const transport = transportWith([
       observation({ confidence: 4 }),
