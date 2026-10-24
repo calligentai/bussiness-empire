@@ -159,12 +159,30 @@ export const compare = (
   }
 
   const rowsByAsset = new Map<string, MeasurementRow[]>()
+  let droppedRows = 0
   for (const row of measurements) {
     const forAsset = rowsByAsset.get(row.assetRefId) ?? []
     for (const field of [row.impressions, row.watchTimeSeconds, row.ctr, row.conversions] as number[]) {
       if (!isFiniteNumber(field) || field < 0) {
         throw new PersonaInputError(`Measurement ${row.variantId} has a negative or non-finite value`)
       }
+    }
+    if (row.impressions === 0) {
+      droppedRows += 1
+      continue
+    }
+    if (typeof row.scrollStop !== 'boolean') {
+      throw new PersonaInputError(`Measurement ${row.variantId} has a non-boolean scrollStop`)
+    }
+    if (row.ctr > 1) {
+      throw new PersonaInputError(
+        `Measurement ${row.variantId} has ctr ${row.ctr}; the export must carry a 0-1 rate, not a percentage`,
+      )
+    }
+    if (row.conversions > row.impressions) {
+      throw new PersonaInputError(
+        `Measurement ${row.variantId} has ${row.conversions} conversions against ${row.impressions} impressions`,
+      )
     }
     forAsset.push(row)
     rowsByAsset.set(row.assetRefId, forAsset)
@@ -197,6 +215,8 @@ export const compare = (
     rankCorrelation,
     calibrationBuckets: buildBuckets(pairs, policy),
     sampleSize: pairs.length,
+    droppedRows,
+    excludedJudgements: byAsset.size - matchedAssetIds.length,
     dataSource,
     label: labelFor(dataSource),
   }

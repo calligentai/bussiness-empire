@@ -117,6 +117,8 @@ Rules:
 - Rows with `impressions = 0` are dropped, not zero-filled.
 - Any asset that appears in `AiJudgement` with no measurement row is excluded from the
   comparison, and the drop count belongs in the trial notes.
+- A row that cannot be true is rejected rather than correlated: `ctr` above 1 (a percentage
+  export), more `conversions` than `impressions`, and a non-boolean `scrollStop` all throw.
 
 ## 4. Pre-registration (fixed before data is opened)
 

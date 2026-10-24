@@ -52,6 +52,12 @@ const sections = (report: string): string[] =>
     .map((section) => section.trimEnd())
 
 describe('persona report', () => {
+  it('always prints how many rows were dropped, so a small sample cannot look complete', () => {
+    const report = renderReport(fixture('simulated'))
+
+    expect(report).toContain('- Rows dropped with impressions = 0: 0')
+    expect(report).toContain('- Judgements with no usable measurement: 0')
+  })
   it('carries the simulated disclaimer on every section, including the good-news summary', () => {
     const report = renderReport(fixture('simulated'))
 

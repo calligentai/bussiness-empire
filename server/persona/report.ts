@@ -44,6 +44,8 @@ export const renderReport = (comparison: PersonaComparison): string => {
     '',
     `- Spearman rank correlation: ${fixed(comparison.rankCorrelation)}`,
     `- n = ${comparison.sampleSize} matched asset pairs`,
+    `- Rows dropped with impressions = 0: ${comparison.droppedRows}`,
+    `- Judgements with no usable measurement: ${comparison.excludedJudgements}`,
     `- Provenance: ${label}`,
     '',
     `## Calibration - ${label}`,

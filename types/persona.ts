@@ -72,6 +72,10 @@ export interface PersonaComparison {
   calibrationBuckets: CalibrationBucket[];
   /** Matched asset pairs behind the number. Not impressions, not rows. */
   sampleSize: number;
+  /** Measurement rows rejected because `impressions` was 0, per the measurement contract. */
+  droppedRows: number;
+  /** Judgements with no usable measurement row, so excluded from this comparison. */
+  excludedJudgements: number;
   dataSource: MeasurementSource;
   /** Mandatory provenance label, rendered on every report section. */
   label: string;

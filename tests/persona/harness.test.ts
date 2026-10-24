@@ -3,6 +3,7 @@ import type { AiJudgement, ComparisonPolicy, MeasurementRow } from '../../types/
 import {
   compare,
   PersonaDuplicateJudgementError,
+  PersonaInputError,
   PersonaSampleSizeError,
   PersonaSourceMismatchError,
 } from '../../server/persona/harness'
@@ -93,6 +94,54 @@ describe('persona harness', () => {
     const mixed = [...measurements.slice(0, 4), row('e', 5, 'real')]
 
     expect(() => compare(judgements, mixed, policy)).toThrow(PersonaSourceMismatchError)
+  })
+
+  it('refuses a ctr that cannot be a rate instead of correlating impossible data', () => {
+    const { judgements, measurements } = orderingFixture()
+    const percentageExport = [...measurements.slice(0, 4), { ...row('e', 5), ctr: 21 }]
+
+    expect(() => compare(judgements, percentageExport, policy)).toThrow(PersonaInputError)
+  })
+
+  it('refuses more conversions than impressions', () => {
+    const { judgements, measurements } = orderingFixture()
+    const impossible = [...measurements.slice(0, 4), { ...row('e', 5), conversions: 1201 }]
+
+    expect(() => compare(judgements, impossible, policy)).toThrow(PersonaInputError)
+  })
+
+  it('refuses a scrollStop flag that is not a boolean', () => {
+    const { judgements, measurements } = orderingFixture()
+    const truthy = [...measurements.slice(0, 4), { ...row('e', 5), scrollStop: 'yes' as unknown as boolean }]
+
+    expect(() => compare(judgements, truthy, policy)).toThrow(PersonaInputError)
+  })
+
+  it('drops zero-impression rows instead of letting them drag the observed score down', () => {
+    const { judgements, measurements } = orderingFixture()
+    const zeroRow: MeasurementRow = {
+      ...measurements[0],
+      variantId: 'a-v0',
+      impressions: 0,
+      watchTimeSeconds: 0,
+    }
+
+    const clean = compare(judgements, measurements, policy)
+    const withZeroRow = compare(judgements, [...measurements, zeroRow], policy)
+
+    expect(withZeroRow.rankCorrelation).toBe(clean.rankCorrelation)
+    expect(withZeroRow.sampleSize).toBe(clean.sampleSize)
+    expect(withZeroRow.droppedRows).toBe(1)
+  })
+
+  it('counts judgements that never had a usable measurement row', () => {
+    const { judgements, measurements } = orderingFixture()
+    const withUnmeasuredAsset = [...judgements, judgement('f', 60)]
+
+    const result = compare(withUnmeasuredAsset, measurements, policy)
+
+    expect(result.sampleSize).toBe(5)
+    expect(result.excludedJudgements).toBe(1)
   })
 
   it('labels a real-data comparison as measured and keeps the source', () => {
