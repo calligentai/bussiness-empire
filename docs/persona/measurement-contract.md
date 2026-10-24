@@ -1,9 +1,13 @@
 # Buyer-persona measurement contract (R7.4)
 
-Status: **contract only, no real data**. The harness in `server/persona/` is proven on
-fixtures. No analytics export exists in this repository and none has been inspected, so
-every number currently produced by the harness carries
-`SIMULATED - NOT PROVEN VIEWER BEHAVIOUR`.
+Status: **shelved on 2026-10-24 - no production traffic**. The harness in `server/persona/`
+is proven on fixtures. The board confirmed that no production traffic exists, so no analytics
+export can satisfy this contract yet: every number the harness produces carries
+`SIMULATED - NOT PROVEN VIEWER BEHAVIOUR`, and the trial does not run.
+
+Revival condition: once the store serves traffic, an export covering the events in section 2
+with `source: "real"` and at least `minSampleSize` matched pairs turns the trial live. Nothing
+else in this document changes.
 
 This document says exactly what the export must contain before an AI persona judgement may
 be compared with viewer behaviour, and what result would falsify that judgement.
