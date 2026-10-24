@@ -11,6 +11,8 @@ export interface Order {
   totalCents: number;
   status: "pending" | "paid" | "failed" | "refunded";
   paymentId: string | null;
+  refundReason?: string;
+  refundedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
