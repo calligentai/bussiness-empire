@@ -46,7 +46,8 @@ This is a user login service, not a public deployment. Do not remove/archive its
 ## Existing routing
 
 - Codex orchestrator: codex_local, gpt-6-luna, existing http://127.0.0.1:6000/v1 Responses route.
-- OpenCode engineer: opencode_local, opencode-go/deepseek-v4-pro, existing http://127.0.0.1:8789/v1 route.
+- OpenCode engineer: opencode_local, deepseek/deepseek-flash, existing http://127.0.0.1:8789/deepseek/v1 route.
+  (Zen free tier is exhausted account-wide and opencode-go is paid-only; the CLI stalls silently when the upstream rejects, so verify a route with a live completion before trusting a run.)
 
 Routes are discovered from existing user config and fail closed when missing. No fallback/provider is invented. The Codex agent receives an isolated CODEX_HOME with a private config copy and a reference to the existing auth file. OpenCode reuses its existing configuration and credential store. No credential value is committed, printed or embedded in agent instructions.
 

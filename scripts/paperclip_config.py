@@ -74,7 +74,7 @@ def routed_adapters(codex, opencode, root):
         if u.scheme not in ('http','https') or not u.hostname or u.username or u.password or u.query:
             raise ValueError('Routing endpoint must not contain credentials or query parameters')
     def entry(adapter, chosen, env, endpoint):
-        return {'adapterType':adapter,'adapterConfig':{'model':chosen,'env':env,'timeoutSec':300},'runtimeConfig':{'heartbeat':{'enabled':False,'wakeOnDemand':True,'wakeOnAssignment':False,'maxConcurrentRuns':1}},'routingEvidence':{'endpoint':endpoint,'model':chosen}}
+        return {'adapterType':adapter,'adapterConfig':{'model':chosen,'env':env,'timeoutSec':1800},'runtimeConfig':{'heartbeat':{'enabled':False,'wakeOnDemand':True,'wakeOnAssignment':False,'maxConcurrentRuns':1}},'routingEvidence':{'endpoint':endpoint,'model':chosen}}
     opencode_env={}
     if other_provider=='opencode-go' and other_route.rstrip('/')=='http://127.0.0.1:8789/v1':
         key=other_model.split('/',1)[1]

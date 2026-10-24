@@ -154,3 +154,22 @@ board's "unblock box 5" directive was applied: BUS-5 (the watchdog review artifa
 `done` - its review was already complete, and the task-watchdog on BUS-3 was removed on
 2026-10-21T21:57, so the harness keeps no review issue alive for this subtree. BUS-3
 carries the single board-owned action (credential injection) and no stale blocker.
+## 7. Orchestration dispatch acceptance (2026-10-23)
+
+Board directive: dispatch a child task, confirm it lands with the right assignee, confirm
+write-back to the board, record results, close the issue when the evidence is on the board.
+No agent model was changed (orchestrator and LavaBean both ran `opencode-zen/big-pickle`).
+
+| Step | Observed evidence |
+|---|---|
+| Dispatch | `POST /api/issues/BUS-3/children` created `BUS-12` (`6c2cba58`), `parentId=BUS-3`, assignee LavaBean Engineer (`7215d6d6`) |
+| Assignment wake | run `ba996f6d`, `invocationSource=assignment`, started 16:17:28Z |
+| Child execution | run `ba996f6d` `succeeded` (52 s, no errorCode); marker comment `506bed26` |
+| Write-back | child `done`; parent wake `c1e0d8a9` queued with `source=issue.children_completed` for BUS-3 |
+
+Known finding: the child agent returned its own canned marker `EMPIRE_OPENCODE_GO_OK`
+instead of the requested `EMPIRE_CHILD_ROUTE_OK_3`. Dispatch, assignment and write-back
+are proven; canned marker fidelity is a prompt-level follow-up, not a routing failure.
+
+Disposition: **done** — the orchestration/routing acceptance this issue was reopened for
+is evidenced on the board.
