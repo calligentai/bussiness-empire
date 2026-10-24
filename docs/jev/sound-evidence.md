@@ -43,7 +43,10 @@ music-genre classification; trend precision beyond ordinal snapshots.
 Command used: `ffmpeg -hide_banner -nostats -i <local-file> -filter_complex
 ebur128=framelog=verbose -f null -`. The analyzer parses integrated LUFS from stderr;
 it returns null when the result is non-finite (such as silence) or unavailable. Voice
-separation and speech word timings are not inferred from this command.
+separation and speech word timings are not inferred from this command. When word
+timings are supplied as annotations, speech rate and pause ratio are computed from the
+timed word intervals and ffmpeg's reported duration. Missing or invalid timing data
+returns null for both values.
 
 Audio facts require `EvidenceSpan.audioSpan` with finite `startSeconds` and
 `endSeconds > startSeconds`; missing spans are dropped by the existing fact validator.
