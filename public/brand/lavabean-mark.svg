@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="lb-mark-title">
+  <title id="lb-mark-title">Lava Bean</title>
+  <rect width="64" height="64" rx="14" fill="#141210" />
+  <path d="M32 8c11 0 19 8.4 19 20.2C51 43 41.8 56 32 56S13 43 13 28.2C13 16.4 21 8 32 8Z" fill="#F4F0EA" />
+  <path d="M32 10c-2.8 6.2-1.4 10.4 2.2 13.8 3.8 3.6 4.4 7.4 1.6 12.1-2.6 4.4-2.1 8.6 1.4 12.9" fill="none" stroke="#E2481B" stroke-width="4.6" stroke-linecap="round" />
+  <circle cx="45" cy="19" r="3.2" fill="#F2A03D" />
+</svg>

@@ -4,3 +4,8 @@
 .DS_Store
 node_modules/
 .venv/
+.nuxt/
+.output/
+storybook-static/
+test-results/
+playwright-report/
