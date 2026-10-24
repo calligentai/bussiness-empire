@@ -15,7 +15,7 @@ export function assertComparableCohort(entries: SoundCohortEntry[]): void {
   // A viral ad on a rising sound gets distribution the script did not earn, so structural priors must be read within comparable trend strata.
   if (trends.has('rising') && trends.has('stale') && !entries.every((entry) => Boolean(entry.stratificationKey))) throw new SoundStratificationError('Viral cohort mixes rising and stale sound trends without an explicit stratification key')
 }
-export function stratifiedBaseline(entries: SoundCohortEntry[]): Record<SoundTrend, Baseline> {
+export function stratifiedBaseline(entries: SoundCohortEntry[]): Record<string, Baseline> {
   const groups = new Map<string, number[]>()
   for (const entry of entries) {
     const trend = classifyTrend(entry.sound)

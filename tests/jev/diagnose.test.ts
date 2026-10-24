@@ -104,9 +104,8 @@ describe('diagnose', () => {
   it('is deterministic for a fixed cohort and answer set', () => {
     const baseline = buildBaseline(cohort())
     const answers = [answer(HOOK, 0.1, ['fact-1'], 0.5), answer(PROOF, 0.2, ['fact-1'], 2)]
-    expect(diagnose(score({ hook_strength: 30, product_clarity: 30 }), baseline, answers, facts)).toEqual(
-      diagnose(score({ hook_strength: 30, product_clarity: 30 }), baseline, answers, facts),
-    )
+    expect(diagnose(score({ hook_strength: 30, product_clarity: 30 }), baseline, answers, facts).issues.map((issue) => issue.questionId))
+      .toEqual([HOOK, PROOF])
   })
 
   it('skips questions whose dimension has no score, without shifting the other issues', () => {
@@ -192,5 +191,23 @@ describe('diagnose', () => {
     expect(getJevQuestion(HOOK)?.dimensionId).toBe('hook_strength')
     expect(getJevQuestion(PROOF)?.dimensionId).toBe('product_clarity')
     expect(getJevQuestion(CTA)?.dimensionId).toBe('call_to_action')
+  })
+
+  it('keeps question ids unique, dimensions in the rubric, and question docs in sync', async () => {
+    const { readFile } = await import('node:fs/promises')
+    const { DEFAULT_JEV_RUBRIC } = await import('../../server/jev/scoring')
+    const { JEV_QUESTIONS } = await import('../../server/jev/questions')
+    const doc = await readFile(new URL('../../docs/jev/question-set-v1.md', import.meta.url), 'utf8')
+    expect(new Set(JEV_QUESTIONS.map((question) => question.id)).size).toBe(JEV_QUESTIONS.length)
+    const dimensions = new Set(DEFAULT_JEV_RUBRIC.dimensions.map((dimension) => dimension.id))
+    for (const question of JEV_QUESTIONS) {
+      expect(dimensions.has(question.dimensionId)).toBe(true)
+      expect(question.instructions.length).toBeGreaterThan(0)
+      expect(question.evidenceKind.length).toBeGreaterThan(0)
+      expect(question.prevalenceThreshold).toBeGreaterThanOrEqual(0)
+      expect(question.prevalenceThreshold).toBeLessThanOrEqual(1)
+      expect(doc).toContain(`\`${question.id}\``)
+    }
+    expect(doc.match(/^\| `[^`]+` \|/gm)).toHaveLength(JEV_QUESTIONS.length)
   })
 })

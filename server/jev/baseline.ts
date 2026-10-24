@@ -12,6 +12,10 @@ import type {
   QuestionAnswer,
   QuestionDiagnosis,
   QuestionPrevalence,
+  DimDelta,
+  PercentileBaseline,
+  PercentileDistribution,
+  PercentileLibraryEntry,
 } from '../../types/jev'
 import { JEV_QUESTIONS, JEV_QUESTION_SET_VERSION, getJevQuestion } from './questions'
 
@@ -27,7 +31,45 @@ export class JevBaselineError extends Error {
   }
 }
 
-/** A question only becomes a reported issue when the cohort does it this often. */
+/** Raised when a library cannot support a comparable percentile calculation. */
+export class BaselineVersionError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'BaselineVersionError'
+  }
+}
+
+const LIBRARY_VERSION_KEYS = ['extractorVersion', 'rubricVersion', 'questionSetVersion'] as const
+
+/** Build per-dimension distributions from the supplied labelled library. */
+export function buildBaseline(entries: PercentileLibraryEntry[]): PercentileBaseline
+export function buildBaseline(entries: BaselineEntry[], options?: BaselineOptions): JevBaseline
+export function buildBaseline(entries: Array<PercentileLibraryEntry | BaselineEntry>, options?: BaselineOptions): PercentileBaseline | JevBaseline {
+  if (entries.length > 0 && 'assetRefId' in entries[0]) {
+    const library = entries as PercentileLibraryEntry[]
+    if (library.length === 0) throw new BaselineVersionError('A baseline needs at least one library entry')
+    const reference = library[0]
+    for (const entry of library) {
+      for (const key of LIBRARY_VERSION_KEYS) {
+        if (entry[key] !== reference[key]) throw new BaselineVersionError(`Mixed ${key} in labelled library`)
+      }
+    }
+    const ids = new Set(library.flatMap((entry) => entry.score.dimensions.map((dimension) => dimension.id)))
+    const result: PercentileBaseline = {}
+    for (const id of ids) {
+      const values = library.flatMap((entry) => entry.score.dimensions
+        .filter((dimension) => dimension.id === id && typeof dimension.score === 'number' && Number.isFinite(dimension.score))
+        .map((dimension) => dimension.score as number))
+      if (!values.length) continue
+      const sorted = [...values].sort((a, b) => a - b)
+      result[id] = { n: sorted.length, p25: quantile(sorted, 0.25), median: quantile(sorted, 0.5), p75: quantile(sorted, 0.75), mean: sorted.reduce((sum, value) => sum + value, 0) / sorted.length }
+    }
+    return result
+  }
+  return buildLegacyBaseline(entries as BaselineEntry[], options)
+}
+
+/** Default question prevalence threshold; each frozen question stores the value too. */
 export const VIRAL_PREVALENCE_THRESHOLD = 0.7
 /** ... and the asset is at or below this probability. */
 export const ASSET_PROBABILITY_THRESHOLD = 0.4
@@ -102,7 +144,7 @@ function scoreValuesFor(entry: BaselineEntry, dimensionId: string): number[] {
  * - Null dimension scores are excluded from that dimension's distribution; they
  *   are never treated as zero.
  */
-export function buildBaseline(entries: BaselineEntry[], options: BaselineOptions = {}): JevBaseline {
+function buildLegacyBaseline(entries: BaselineEntry[], options: BaselineOptions = {}): JevBaseline {
   if (!Array.isArray(entries) || entries.length === 0) {
     throw new JevBaselineError('A baseline needs at least one labelled entry')
   }
@@ -197,8 +239,45 @@ export function buildBaseline(entries: BaselineEntry[], options: BaselineOptions
  * anchors and linear interpolation between them. This is a summary estimate, not
  * an exact empirical percentile: the raw sample is deliberately not kept.
  */
-export function percentileOf(value: number, distribution: DimensionDistribution): number | null {
+export function percentileOf(value: number, distribution: DimensionDistribution): number | null
+export function percentileOf(score: JevScore, baseline: PercentileBaseline): Record<string, number | null>
+export function percentileOf(valueOrScore: number | JevScore, distributionOrBaseline: DimensionDistribution | PercentileBaseline): number | null | Record<string, number | null> {
+  if (typeof valueOrScore === 'object' && valueOrScore !== null) {
+    const result: Record<string, number | null> = {}
+    for (const dimension of valueOrScore.dimensions) {
+      if (dimension.score === null) { result[dimension.id] = null; continue }
+      const baseline = (distributionOrBaseline as PercentileBaseline)[dimension.id]
+      if (!baseline) { result[dimension.id] = null; continue }
+      if (baseline.n < 5) throw new BaselineVersionError(`Dimension ${dimension.id} has n=${baseline.n}; at least 5 observations are required for percentiles`)
+      result[dimension.id] = empiricalPercentile(dimension.score, baseline)
+    }
+    return result
+  }
+  return empiricalPercentile(valueOrScore, distributionOrBaseline as DimensionDistribution)
+}
+
+/** Rank absolute dimension gaps from the 50th percentile, skipping unscorable dimensions. */
+export function diagnoseDelta(score: JevScore, baseline: PercentileBaseline): DimDelta[] {
+  const percentiles = percentileOf(score, baseline) as Record<string, number | null>
+  return Object.entries(percentiles)
+    .filter((entry): entry is [string, number] => entry[1] !== null)
+    .map(([dimension, percentile]) => ({ dimension, percentile, gap: Math.abs(percentile - 50) }))
+    .sort((a, b) => b.gap - a.gap || a.dimension.localeCompare(b.dimension))
+}
+
+function empiricalPercentile(value: number, distribution: DimensionDistribution | PercentileDistribution): number | null {
   if (typeof value !== 'number' || !Number.isFinite(value)) return null
+
+  if (!('min' in distribution)) {
+    if (distribution.n < 5) throw new BaselineVersionError(`At least 5 observations are required for percentiles; got ${distribution.n}`)
+    // Quartiles alone cannot recover the sample CDF. This approximation uses the
+    // interpolated quartile anchors and reports their empirical rank estimates.
+    const { p25, median, p75 } = distribution
+    if (value <= p25) return value === p25 ? 25 : 0
+    if (value <= median) return Math.round(25 + 25 * (value - p25) / (median - p25 || 1))
+    if (value <= p75) return Math.round(50 + 25 * (value - median) / (p75 - median || 1))
+    return 100
+  }
 
   const { min, p25, median, p75, max } = distribution
   if (max === min) return 50
@@ -397,7 +476,7 @@ export function diagnose(
 
     const cohortPrevalence = clamp(prevalence.prevalence, 0, 1)
     const gap = roundTo(cohortPrevalence - probability, 6)
-    const isIssue = cohortPrevalence >= VIRAL_PREVALENCE_THRESHOLD && probability <= ASSET_PROBABILITY_THRESHOLD
+    const isIssue = cohortPrevalence >= question.prevalenceThreshold && probability <= ASSET_PROBABILITY_THRESHOLD
 
     if (isIssue) {
       const priority = roundTo(gap * cohortPrevalence, 6)

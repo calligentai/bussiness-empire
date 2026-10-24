@@ -192,6 +192,33 @@ export interface JevBaseline {
   questionPrevalence: Record<string, QuestionPrevalence>
 }
 
+/** Version-guarded labelled library entry for dimension percentile comparisons. */
+export interface PercentileLibraryEntry {
+  assetRefId: string
+  score: JevScore
+  extractorVersion: string
+  rubricVersion: string
+  questionSetVersion: string
+  label: 'viral' | 'control'
+  evidenceRefs: string[]
+}
+
+export interface PercentileDistribution {
+  n: number
+  p25: number
+  median: number
+  p75: number
+  mean: number
+}
+
+export type PercentileBaseline = Record<string, PercentileDistribution>
+
+export interface DimDelta {
+  dimension: string
+  percentile: number
+  gap: number
+}
+
 export interface BaselineOptions {
   /** Which labelled cohort to build from. Defaults to `viral`. */
   cohort?: 'viral' | 'control' | 'all'
@@ -209,6 +236,12 @@ export interface JevQuestion {
   dimensionId: string
   prompt: string
   window: 'hook' | 'proof' | 'craft' | 'cta'
+  /** Observable cues an analyzer should cite when answering this question. */
+  instructions: string
+  /** Minimum fact/span kind required to support an answer. */
+  evidenceKind: FactKind
+  /** Cohort prevalence required before a low answer can be ranked as an issue. */
+  prevalenceThreshold: number
 }
 
 /**

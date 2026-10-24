@@ -58,7 +58,10 @@ zero-spread cohort returns `50`.
 ## Frozen atomic questions (v1.0.0)
 
 Each question is answerable from facts that carry a timestamp or shot id, returns
-a probability rather than a boolean, and is bound to one rubric dimension.
+a probability rather than a boolean, and is bound to one rubric dimension. The
+question carries analyzer instructions, an expected evidence kind and its own
+prevalence threshold. The complete evidence interpretation is documented in
+[`question-set-v1.md`](./question-set-v1.md).
 
 | id | window | dimension | prompt |
 | --- | --- | --- | --- |
@@ -82,7 +85,7 @@ The loop/visual-craft questions attach to `hook_strength` and text density to
 mapping is a judgement recorded here; adding a craft dimension would be a rubric
 change and must go through the rubric document and `DEFAULT_JEV_RUBRIC` together.
 
-Changing an id, prompt, dimension mapping, threshold or version is a question-set
+Changing an id, prompt, instructions, evidence kind, dimension mapping, threshold or version is a question-set
 change: update `JEV_QUESTION_SET_VERSION`, this table, and the tests together.
 
 ## `diagnose(score, baseline, answers, facts?)`
