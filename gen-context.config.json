@@ -1,0 +1,4 @@
+{
+  "srcDirs": ["paperclip", "scripts", "tests"],
+  "exclude": ["vendor", "__pycache__", ".local", ".venv"]
+}
