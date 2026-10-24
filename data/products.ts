@@ -1,40 +1,32 @@
 import type { Product } from "../types/product";
+import type { StoreProduct } from "../types/medusa";
+import { DEFAULT_CURRENCY, listProducts } from "./medusa-catalog";
 
-export const products: Product[] = [
-  {
-    slug: "virunga-washed",
-    name: "Virunga Washed",
-    origin: "Rwanda",
-    process: "Washed",
-    notes: ["Red apple", "Cocoa nib", "Brown sugar"],
-    roast: "Medium",
-    priceCents: 1850,
-    altitude: "1,900 m",
-    recipe: "12.4 g in · 36 g out · 28 s",
-  },
-  {
-    slug: "kivu-natural",
-    name: "Kivu Natural",
-    origin: "Rwanda",
-    process: "Natural",
-    notes: ["Strawberry", "Dark cherry", "Cane syrup"],
-    roast: "Light",
-    priceCents: 2100,
-    altitude: "1,750 m",
-    recipe: "13 g in · 39 g out · 26 s",
-  },
-  {
-    slug: "basalt-dark",
-    name: "Basalt Dark",
-    origin: "Rwanda",
-    process: "Honey",
-    notes: ["Bitter chocolate", "Hazelnut", "Molasses"],
-    roast: "Dark",
-    priceCents: 1950,
-    altitude: "1,820 m",
-    recipe: "12 g in · 34 g out · 30 s",
-  },
-];
+const text = (metadata: Record<string, unknown> | null, key: string): string =>
+  typeof metadata?.[key] === "string" ? (metadata[key] as string) : "";
+
+const toLegacyProduct = (product: StoreProduct): Product => {
+  const variant = product.variants[0];
+  const amount = variant?.calculated_price?.calculated_amount ?? 0;
+
+  return {
+    slug: product.handle,
+    name: product.title,
+    origin: text(product.metadata, "origin"),
+    process: text(product.metadata, "process"),
+    notes: Array.isArray(product.metadata?.notes)
+      ? (product.metadata.notes as string[])
+      : [],
+    roast: text(product.metadata, "roast"),
+    priceCents: Math.round(amount * 100),
+    altitude: text(product.metadata, "altitude"),
+    recipe: text(product.metadata, "recipe"),
+  };
+};
+
+export const products: Product[] = listProducts({
+  currency_code: DEFAULT_CURRENCY,
+}).products.map(toLegacyProduct);
 
 export const findProduct = (slug: string) =>
   products.find((product) => product.slug === slug);
