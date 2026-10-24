@@ -13,7 +13,7 @@ class CompanionTests(unittest.TestCase):
  def test_routes_and_isolation(self):
   a=self.build()
   self.assertEqual(set(a),{'pi','hermes'})
-  self.assertEqual(a['pi']['adapterConfig']['model'],'ollama/minimax-m2.7:cloud')
+  self.assertEqual(a['pi']['adapterConfig']['model'],'ollama/qwen3.6:latest')
   self.assertEqual(a['hermes']['adapterConfig']['extraArgs'],['--provider','custom:deepseek-direct'])
   self.assertEqual(a['hermes']['adapterConfig']['model'],'deepseek-v4-flash')
   self.assertEqual(a['pi']['routingEvidence']['endpoint'],'http://127.0.0.1:11434/v1')
