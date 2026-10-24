@@ -155,3 +155,49 @@ describe("processPayment", () => {
     expect(result.error).toBeDefined();
   });
 });
+
+describe("payment webhook", () => {
+  it("creates exactly one order for one successful payment and ignores the duplicate webhook", () => {
+    const { createOrder, applyPaymentWebhook, orders } = useOrders();
+    const cartItems: CartItem[] = [
+      { slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850, quantity: 1 },
+    ];
+    const before = orders.value.length;
+
+    const order = createOrder(cartItems);
+    const event = {
+      id: "evt_paid_1",
+      orderId: order.id,
+      status: "paid" as const,
+      paymentId: "pay_123",
+    };
+
+    const first = applyPaymentWebhook(event);
+    const duplicate = applyPaymentWebhook(event);
+
+    expect(first.applied).toBe(true);
+    expect(duplicate.applied).toBe(false);
+    expect(orders.value.length - before).toBe(1);
+    expect(order.status).toBe("paid");
+  });
+
+  it("does not complete an order when the failed payment webhook is replayed", () => {
+    const { createOrder, applyPaymentWebhook } = useOrders();
+    const order = createOrder([
+      { slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850, quantity: 1 },
+    ]);
+    const event = {
+      id: "evt_failed_1",
+      orderId: order.id,
+      status: "failed" as const,
+      paymentId: "pay_declined",
+    };
+
+    applyPaymentWebhook(event);
+    const duplicate = applyPaymentWebhook(event);
+
+    expect(duplicate.applied).toBe(false);
+    expect(order.status).toBe("failed");
+    expect(order.status).not.toBe("paid");
+  });
+});

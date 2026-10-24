@@ -7,6 +7,14 @@ export interface CartState {
 
 const cart = ref<CartItem[]>([]);
 const orders = ref<Order[]>([]);
+const processedWebhookIds = new Set<string>();
+
+export interface PaymentWebhookEvent {
+  id: string;
+  orderId: string;
+  status: "paid" | "failed";
+  paymentId: string;
+}
 
 export const useCart = () => {
   const items = computed(() => cart.value);
@@ -96,11 +104,24 @@ export const useOrders = () => {
     return order;
   };
 
+  const applyPaymentWebhook = (event: PaymentWebhookEvent) => {
+    const existing = getOrder(event.orderId);
+    if (processedWebhookIds.has(event.id)) {
+      return { applied: false, order: existing };
+    }
+    processedWebhookIds.add(event.id);
+    return {
+      applied: true,
+      order: updateOrderStatus(event.orderId, event.status, event.paymentId),
+    };
+  };
+
   return {
     orders: allOrders,
     createOrder,
     getOrder,
     updateOrderStatus,
+    applyPaymentWebhook,
   };
 };
 

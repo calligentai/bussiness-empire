@@ -3,7 +3,7 @@ import { useCart, useOrders, processPayment } from "../composables/useCart";
 import { computed, ref } from "vue";
 
 const { items, subtotalCents, itemCount, clearCart } = useCart();
-const { createOrder, updateOrderStatus } = useOrders();
+const { createOrder, applyPaymentWebhook } = useOrders();
 
 const showForm = ref(true);
 const showPaymentSandbox = ref(false);
@@ -25,13 +25,23 @@ const checkout = async () => {
   const result = await processPayment(order.id, order.totalCents, true);
 
   if (result.success) {
-    updateOrderStatus(order.id, "paid", result.paymentId);
+    applyPaymentWebhook({
+      id: `evt_${order.id}`,
+      orderId: order.id,
+      status: "paid",
+      paymentId: result.paymentId,
+    });
     paymentStatus.value = "paid";
     showPaymentSandbox.value = false;
     showSuccess.value = true;
     clearCart();
   } else {
-    updateOrderStatus(order.id, "failed", result.paymentId);
+    applyPaymentWebhook({
+      id: `evt_${order.id}`,
+      orderId: order.id,
+      status: "failed",
+      paymentId: result.paymentId,
+    });
     paymentStatus.value = "failed";
     paymentError.value = result.error ?? "Payment declined";
     showPaymentSandbox.value = false;
