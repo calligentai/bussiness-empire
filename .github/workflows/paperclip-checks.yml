@@ -1,9 +1,9 @@
 name: paperclip-checks
 on:
   push:
-    branches: ['feature/paperclip-orchestrator']
+    branches: ['feature/paperclip-orchestrator', 'feature/hermes-pi-adapters']
   pull_request:
-    branches: [lavabean, 'feature/dev-workflow']
+    branches: [lavabean, 'feature/dev-workflow', 'feature/paperclip-orchestrator']
 permissions:
   contents: read
 concurrency:
