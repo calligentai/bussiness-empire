@@ -4,3 +4,5 @@
 .DS_Store
 node_modules/
 .venv/
+# Added by code-review-graph
+.code-review-graph/
