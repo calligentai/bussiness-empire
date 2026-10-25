@@ -64,6 +64,10 @@ def routed_adapters(codex, opencode, root):
     model=codex.get('model')
     provider=codex.get('model_provider')
     route=codex.get('model_providers',{}).get(provider,{}).get('base_url')
+    if not route and provider=='openai':
+        # Codex overrides its built-in openai provider with the top-level
+        # ``openai_base_url`` key, not a [model_providers.openai] table.
+        route=codex.get('openai_base_url')
     other_model=opencode.get('model')
     other_provider=other_model.split('/',1)[0] if isinstance(other_model,str) else None
     other_route=opencode.get('provider',{}).get(other_provider,{}).get('options',{}).get('baseURL')
