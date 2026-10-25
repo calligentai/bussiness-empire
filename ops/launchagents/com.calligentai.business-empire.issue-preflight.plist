@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.calligentai.business-empire.issue-preflight</string>
+  <key>ProgramArguments</key><array>
+    <string>/opt/homebrew/opt/python@3.15/bin/python3.15</string>
+    <string>/Users/admin/Projects/bussiness-empire-worktrees/operational-guardrails/scripts/ops/issue-preflight.py</string>
+  </array>
+  <key>EnvironmentVariables</key><dict>
+    <key>PAPERCLIP_API_URL</key><string>http://127.0.0.1:3110</string>
+    <key>PAPERCLIP_COMPANY_ID</key><string>857eb467-866b-45a1-a84f-92308790b2e9</string>
+
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>StartInterval</key><integer>180</integer>
+  <key>StandardOutPath</key><string>/Users/admin/.hermes/profiles/pepperpotts/logs/issue-preflight.log</string>
+  <key>StandardErrorPath</key><string>/Users/admin/.hermes/profiles/pepperpotts/logs/issue-preflight.err.log</string>
+</dict>
+</plist>
