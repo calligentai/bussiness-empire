@@ -83,7 +83,7 @@ is the pin of record.
 | JEV guardrail plugin | `opencode-jev` 1.0.0, not under version control | unestablished | paid | unverified | `/Users/admin/Projects/opencode-jev/package.json` (license null); `opencode-token-reduction/jev/index.ts` |
 | JEV remote classifier | metered Python bridge, opt-in | unestablished | paid | unverified | `JEV_GUARDRAILS_REMOTE=1` path; `/Users/admin/Projects/ecommerce-infrastructure/jev_integration/jev_bridge.py` |
 | Headroom | no standalone installation found | unestablished | unestablished | unverified | referenced only in `opencode-token-reduction/gateway/*.md` |
-| Medusa | not installed | MIT (upstream, not read locally) | free | not in use | `grep -c '"\(nuxt\|medusa\)' package-lock.json` returns 0; absent from the baseline |
+| Medusa | not installed | MIT (upstream, not read locally) | free | not in use | `grep -c '"medusa' package-lock.json` and `grep -c '"nuxt' package-lock.json` both return 0; absent from the baseline |
 | Nuxt | not installed | MIT (upstream, not read locally) | free | not in use | `package-lock.json` of koffiefabriek-pwa shows 0 nuxt/medusa entries; the baseline is Next.js |
 | Odoo Community | 18 documented, none installed | LGPLv3 | free | verified | odoo.com/documentation/18.0/legal/licenses.html (HTTP 200, read 2026-10-25); no `odoo`/`odoo-bin` on PATH, no Homebrew formula |
 | Odoo Enterprise | 18 documented, none installed | Odoo Enterprise Edition License v1.0 | paid | unverified | odoo.com/documentation/18.0/legal/licenses.html: use requires a valid Odoo Enterprise Subscription |
