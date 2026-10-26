@@ -1,11 +1,98 @@
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { CartItem, Order, PaymentResult } from "../types/order";
 
 export interface CartState {
   items: CartItem[];
 }
 
+export const CART_STORAGE_KEY = "lavabean.cart.v1";
+
+export interface CartStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+
 const cart = ref<CartItem[]>([]);
+let storageOverride: CartStorage | null | undefined;
+let hydrating = false;
+
+const isCartItem = (value: unknown): value is CartItem => {
+  if (!value || typeof value !== "object") return false;
+  const item = value as Partial<CartItem>;
+  return (
+    typeof item.slug === "string" &&
+    item.slug.length > 0 &&
+    typeof item.name === "string" &&
+    item.name.length > 0 &&
+    typeof item.priceCents === "number" &&
+    Number.isFinite(item.priceCents) &&
+    typeof item.quantity === "number" &&
+    Number.isInteger(item.quantity) &&
+    item.quantity > 0
+  );
+};
+
+const readStoredItems = (source: CartStorage | null): CartItem[] => {
+  if (!source) return [];
+  const raw = source.getItem(CART_STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isCartItem);
+  } catch {
+    return [];
+  }
+};
+
+let detectedStorage: CartStorage | null | undefined;
+
+const defaultStorage = (): CartStorage | null => {
+  if (detectedStorage !== undefined) return detectedStorage;
+  try {
+    if (typeof localStorage === "undefined") {
+      detectedStorage = null;
+      return detectedStorage;
+    }
+    localStorage.setItem(`${CART_STORAGE_KEY}.probe`, "1");
+    localStorage.removeItem(`${CART_STORAGE_KEY}.probe`);
+    detectedStorage = localStorage;
+  } catch {
+    detectedStorage = null;
+  }
+  return detectedStorage;
+};
+
+const activeStorage = (): CartStorage | null => {
+  if (storageOverride === null) return null;
+  return storageOverride ?? defaultStorage();
+};
+
+const saveCart = () => {
+  const target = activeStorage();
+  if (!target || hydrating) return;
+  target.setItem(CART_STORAGE_KEY, JSON.stringify(cart.value));
+};
+
+watch(cart, saveCart, { deep: true, flush: "sync" });
+
+export const configureCartStorage = (next: CartStorage | null) => {
+  storageOverride = next;
+};
+
+export const unloadCart = () => {
+  hydrating = true;
+  cart.value = [];
+  hydrating = false;
+};
+
+export const hydrateCart = (source?: CartStorage | null) => {
+  const target = source === undefined ? activeStorage() : source;
+  hydrating = true;
+  cart.value = readStoredItems(target);
+  hydrating = false;
+};
+
 const orders = ref<Order[]>([]);
 const processedWebhookIds = new Set<string>();
 

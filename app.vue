@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { useCart } from "./composables/useCart";
+
 const navigation = [
   { label: "Shop", to: "/#shop" },
   { label: "Provenance", to: "/#provenance" },
   { label: "Science", to: "/#science" },
 ];
+
+const { itemCount } = useCart();
 </script>
 
 <template>
@@ -16,8 +20,16 @@ const navigation = [
       </NuxtLink>
       <nav aria-label="Primary">
         <ul class="lb-header__nav">
-          <li v-for="item in navigation" :key="item.label">
+          <li v-for="item in navigation" :key="item.label" class="lb-header__nav-section">
             <a :href="item.to">{{ item.label }}</a>
+          </li>
+          <li>
+            <NuxtLink to="/checkout" class="lb-header__checkout">
+              Checkout
+              <ClientOnly>
+                <span v-if="itemCount > 0" class="lb-header__count">{{ itemCount }}</span>
+              </ClientOnly>
+            </NuxtLink>
           </li>
         </ul>
       </nav>
@@ -84,14 +96,20 @@ const navigation = [
 }
 
 .lb-header__nav {
-  display: none;
+  display: flex;
+  align-items: center;
   gap: var(--lb-space-5);
   margin: 0;
+  margin-left: auto;
   padding: 0;
   list-style: none;
   font-size: var(--lb-text-200);
   letter-spacing: var(--lb-tracking-wide);
   text-transform: uppercase;
+}
+
+.lb-header__nav-section {
+  display: none;
 }
 
 .lb-header__nav a {
@@ -100,6 +118,25 @@ const navigation = [
 
 .lb-header__nav a:hover {
   color: var(--lb-color-lava);
+}
+
+.lb-header__checkout {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lb-space-2);
+  padding: var(--lb-space-2) var(--lb-space-4);
+  border: var(--lb-border-hairline) solid var(--lb-color-ink);
+  border-radius: var(--lb-radius-sm);
+}
+
+.lb-header__nav a.lb-header__checkout:hover {
+  background: var(--lb-color-ink);
+  color: var(--lb-color-paper);
+}
+
+.lb-header__count {
+  font-family: var(--lb-font-mono);
+  letter-spacing: 0;
 }
 
 .lb-header__cta {
@@ -149,7 +186,10 @@ const navigation = [
 }
 
 @media (min-width: 768px) {
-  .lb-header__nav,
+  .lb-header__nav-section {
+    display: list-item;
+  }
+
   .lb-header__cta {
     display: flex;
   }

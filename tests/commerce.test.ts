@@ -1,10 +1,31 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { settleSandboxPayment, useCart, useOrders, processPayment } from "../composables/useCart";
+import {
+  CART_STORAGE_KEY,
+  configureCartStorage,
+  hydrateCart,
+  settleSandboxPayment,
+  unloadCart,
+  useCart,
+  useOrders,
+  processPayment,
+  type CartStorage,
+} from "../composables/useCart";
 import type { CartItem } from "../types/order";
+
+const memoryStorage = (): CartStorage & { dump: () => string | null } => {
+  const data = new Map<string, string>();
+  return {
+    getItem: (key) => data.get(key) ?? null,
+    setItem: (key, value) => {
+      data.set(key, value);
+    },
+    dump: () => data.get(CART_STORAGE_KEY) ?? null,
+  };
+};
 
 describe("useCart", () => {
   beforeEach(() => {
-    // Reset cart state
+    configureCartStorage(null);
     const { clearCart } = useCart();
     clearCart();
   });
@@ -62,6 +83,62 @@ describe("useCart", () => {
     clearCart();
     
     expect(items.value).toHaveLength(0);
+  });
+
+  it("rehydrates the same lines after a reload", () => {
+    const storage = memoryStorage();
+    configureCartStorage(storage);
+    const { addItem, items, itemCount, subtotalCents } = useCart();
+    addItem({ slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850 });
+    addItem({ slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850 });
+
+    unloadCart();
+    expect(items.value).toHaveLength(0);
+
+    hydrateCart();
+
+    expect(items.value).toEqual([
+      { slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850, quantity: 2 },
+    ]);
+    expect(itemCount.value).toBe(2);
+    expect(subtotalCents.value).toBe(3700);
+    expect(storage.dump()).toContain("virunga-washed");
+  });
+
+  it("keeps the cart empty after clear and reload", () => {
+    const storage = memoryStorage();
+    configureCartStorage(storage);
+    const { addItem, clearCart, items } = useCart();
+    addItem({ slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850 });
+    clearCart();
+
+    unloadCart();
+    hydrateCart();
+
+    expect(items.value).toEqual([]);
+  });
+
+  it("ignores corrupt or partial storage instead of throwing", () => {
+    const storage = memoryStorage();
+    configureCartStorage(storage);
+    storage.setItem(CART_STORAGE_KEY, "{not-json");
+    unloadCart();
+    hydrateCart();
+    expect(useCart().items.value).toEqual([]);
+
+    storage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify([
+        { slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850, quantity: 1 },
+        { slug: "", name: "Broken", priceCents: 100, quantity: 1 },
+        { slug: "bad-qty", name: "Bad", priceCents: 100, quantity: 0 },
+      ]),
+    );
+    hydrateCart();
+
+    expect(useCart().items.value).toEqual([
+      { slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850, quantity: 1 },
+    ]);
   });
 });
 
