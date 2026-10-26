@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { useCart, useOrders, processPayment } from "../composables/useCart";
+import { settleSandboxPayment, useCart, useOrders, processPayment } from "../composables/useCart";
 import type { CartItem } from "../types/order";
 
 describe("useCart", () => {
@@ -153,6 +153,44 @@ describe("processPayment", () => {
     
     expect(result.success).toBe(false);
     expect(result.error).toBeDefined();
+  });
+});
+
+describe("payment sandbox", () => {
+  const oneItem = (): CartItem[] => [
+    { slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850, quantity: 1 },
+  ];
+
+  it("creates one order and marks it paid once when the sandbox payment succeeds", async () => {
+    const { createOrder, orders } = useOrders();
+    const before = orders.value.length;
+    const order = createOrder(oneItem());
+
+    const first = await settleSandboxPayment(order.id, true);
+    const again = await settleSandboxPayment(order.id, true);
+
+    expect(first.applied).toBe(true);
+    expect(first.result?.success).toBe(true);
+    expect(again.applied).toBe(false);
+    expect(orders.value.length - before).toBe(1);
+    expect(order.status).toBe("paid");
+  });
+
+  it("leaves the same order failed, then paid on a later sandbox success", async () => {
+    const { createOrder, orders } = useOrders();
+    const before = orders.value.length;
+    const order = createOrder(oneItem());
+
+    const declined = await settleSandboxPayment(order.id, false);
+    expect(declined.applied).toBe(true);
+    expect(declined.result?.success).toBe(false);
+    expect(order.status).toBe("failed");
+
+    const paid = await settleSandboxPayment(order.id, true);
+
+    expect(paid.applied).toBe(true);
+    expect(order.status).toBe("paid");
+    expect(orders.value.length - before).toBe(1);
   });
 });
 

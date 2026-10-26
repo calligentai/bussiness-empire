@@ -181,3 +181,27 @@ export const processPayment = async (
     };
   }
 };
+
+export const settleSandboxPayment = async (
+  orderId: string,
+  shouldSucceed: boolean
+) => {
+  const { getOrder, applyPaymentWebhook } = useOrders();
+  const order = getOrder(orderId);
+  if (!order) {
+    return { applied: false, order: undefined, error: "order_not_found" as const };
+  }
+  if (order.status === "paid" || order.status === "refunded") {
+    return { applied: false, order };
+  }
+
+  const result = await processPayment(order.id, order.totalCents, shouldSucceed);
+  const outcome = applyPaymentWebhook({
+    id: `evt_${order.id}_${result.paymentId}`,
+    orderId: order.id,
+    status: result.success ? "paid" : "failed",
+    paymentId: result.paymentId,
+  });
+
+  return { ...outcome, result };
+};

@@ -1,56 +1,62 @@
 <script setup lang="ts">
-import { useCart, useOrders, processPayment } from "../composables/useCart";
-import { computed, ref } from "vue";
+import { settleSandboxPayment, useCart, useOrders } from "../composables/useCart";
+import { ref } from "vue";
 
 const { items, subtotalCents, itemCount, clearCart } = useCart();
-const { createOrder, applyPaymentWebhook } = useOrders();
+const { createOrder, getOrder } = useOrders();
 
 const showForm = ref(true);
 const showPaymentSandbox = ref(false);
 const showSuccess = ref(false);
 const orderId = ref<string | null>(null);
-const paymentStatus = ref<"processing" | "paid" | "failed">("processing");
+const paymentStatus = ref<"idle" | "processing" | "paid" | "failed">("idle");
 const paymentError = ref<string | null>(null);
+const settling = ref(false);
 
-const checkout = async () => {
+const startCheckout = () => {
   if (items.value.length === 0) return;
+  if (!orderId.value) {
+    const order = createOrder(items.value);
+    orderId.value = order.id;
+  }
+  paymentError.value = null;
+  paymentStatus.value = "idle";
+  showForm.value = false;
+  showSuccess.value = false;
+  showPaymentSandbox.value = true;
+};
+
+const settlePayment = async (shouldSucceed: boolean) => {
+  if (!orderId.value || settling.value) return;
+  const order = getOrder(orderId.value);
+  if (!order || order.status === "paid") return;
+
+  settling.value = true;
   paymentError.value = null;
   paymentStatus.value = "processing";
-  showForm.value = false;
-  showPaymentSandbox.value = true;
+  showPaymentSandbox.value = false;
 
-  const order = createOrder(items.value);
-  orderId.value = order.id;
+  try {
+    const outcome = await settleSandboxPayment(orderId.value, shouldSucceed);
 
-  const result = await processPayment(order.id, order.totalCents, true);
+    if (outcome.result?.success && outcome.applied) {
+      paymentStatus.value = "paid";
+      showSuccess.value = true;
+      clearCart();
+      return;
+    }
 
-  if (result.success) {
-    applyPaymentWebhook({
-      id: `evt_${order.id}`,
-      orderId: order.id,
-      status: "paid",
-      paymentId: result.paymentId,
-    });
-    paymentStatus.value = "paid";
-    showPaymentSandbox.value = false;
-    showSuccess.value = true;
-    clearCart();
-  } else {
-    applyPaymentWebhook({
-      id: `evt_${order.id}`,
-      orderId: order.id,
-      status: "failed",
-      paymentId: result.paymentId,
-    });
     paymentStatus.value = "failed";
-    paymentError.value = result.error ?? "Payment declined";
-    showPaymentSandbox.value = false;
+    paymentError.value = outcome.result?.error ?? "Payment declined";
+  } finally {
+    settling.value = false;
   }
 };
 
 const retry = () => {
   paymentError.value = null;
-  paymentStatus.value = "processing";
+  paymentStatus.value = "idle";
+  showSuccess.value = false;
   showPaymentSandbox.value = true;
 };
 </script>
@@ -71,7 +77,7 @@ const retry = () => {
       <dd class="lb-checkout__total-value">{{ (subtotalCents / 100).toFixed(2) }} EUR</dd>
     </dl>
 
-    <form v-if="showForm" @submit.prevent="checkout" class="lb-checkout__form">
+    <form v-if="showForm" @submit.prevent="startCheckout" class="lb-checkout__form">
       <button type="submit" class="lb-button lb-button--lg">Pay now</button>
     </form>
 
@@ -79,7 +85,8 @@ const retry = () => {
       <h2>Payment sandbox</h2>
       <p>Test payment for order <strong>{{ orderId }}</strong></p>
       <div class="lb-payment-sandbox__controls">
-        <button @click="checkout" class="lb-button">Complete payment (sandbox)</button>
+        <button type="button" class="lb-button" @click="settlePayment(true)">Complete payment (sandbox)</button>
+        <button type="button" class="lb-button" @click="settlePayment(false)">Fail payment (sandbox)</button>
       </div>
       <p class="lb-payment-sandbox__note">This is a sandbox. No real money is taken.</p>
     </section>
@@ -159,6 +166,9 @@ const retry = () => {
 }
 
 .lb-payment-sandbox__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lb-space-3);
   margin-top: var(--lb-space-3);
 }
 

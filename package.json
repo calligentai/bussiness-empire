@@ -20,7 +20,9 @@
     "build-storybook": "storybook build",
     "test:e2e": "pnpm build && playwright test",
     "verify": "pnpm tokens:build && pnpm brand:check && pnpm test && pnpm build && pnpm build-storybook && playwright test",
-    "test:e2e:update": "pnpm build && playwright test --update-snapshots"
+    "test:e2e:update": "pnpm build && playwright test --update-snapshots",
+    "prepare": "nuxt prepare",
+    "pretest": "nuxt prepare"
   },
   "dependencies": {
     "nuxt": "3.15.4",
