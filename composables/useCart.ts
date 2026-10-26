@@ -6,6 +6,7 @@ export interface CartState {
 }
 
 export const CART_STORAGE_KEY = "lavabean.cart.v1";
+export const ORDER_STORAGE_KEY = "lavabean.orders.v1";
 
 export interface CartStorage {
   getItem(key: string): string | null;
@@ -93,8 +94,79 @@ export const hydrateCart = (source?: CartStorage | null) => {
   hydrating = false;
 };
 
+const ORDER_STATUSES = ["pending", "paid", "failed", "refunded"] as const;
+
+const isOrder = (value: unknown): value is Order => {
+  if (!value || typeof value !== "object") return false;
+  const order = value as Partial<Order>;
+  return (
+    typeof order.id === "string" &&
+    order.id.length > 0 &&
+    Array.isArray(order.items) &&
+    order.items.every(isCartItem) &&
+    typeof order.totalCents === "number" &&
+    Number.isFinite(order.totalCents) &&
+    typeof order.status === "string" &&
+    ORDER_STATUSES.includes(order.status as Order["status"]) &&
+    (order.paymentId === null || typeof order.paymentId === "string") &&
+    typeof order.createdAt === "string" &&
+    typeof order.updatedAt === "string"
+  );
+};
+
+const readStoredOrders = (
+  source: CartStorage | null
+): { orders: Order[]; webhookIds: string[] } => {
+  if (!source) return { orders: [], webhookIds: [] };
+  const raw = source.getItem(ORDER_STORAGE_KEY);
+  if (!raw) return { orders: [], webhookIds: [] };
+  try {
+    const parsed = JSON.parse(raw) as { orders?: unknown; webhookIds?: unknown };
+    const storedOrders = Array.isArray(parsed.orders) ? parsed.orders.filter(isOrder) : [];
+    const webhookIds = Array.isArray(parsed.webhookIds)
+      ? parsed.webhookIds.filter((id): id is string => typeof id === "string" && id.length > 0)
+      : [];
+    return { orders: storedOrders, webhookIds };
+  } catch {
+    return { orders: [], webhookIds: [] };
+  }
+};
+
 const orders = ref<Order[]>([]);
 const processedWebhookIds = new Set<string>();
+export const ordersReady = ref(false);
+
+const saveOrders = () => {
+  const target = activeStorage();
+  if (!target || hydrating) return;
+  target.setItem(
+    ORDER_STORAGE_KEY,
+    JSON.stringify({
+      orders: orders.value,
+      webhookIds: [...processedWebhookIds],
+    })
+  );
+};
+
+watch(orders, saveOrders, { deep: true, flush: "sync" });
+
+export const unloadOrders = () => {
+  hydrating = true;
+  orders.value = [];
+  processedWebhookIds.clear();
+  hydrating = false;
+};
+
+export const hydrateOrders = (source?: CartStorage | null) => {
+  const target = source === undefined ? activeStorage() : source;
+  const stored = readStoredOrders(target);
+  hydrating = true;
+  orders.value = stored.orders;
+  processedWebhookIds.clear();
+  for (const id of stored.webhookIds) processedWebhookIds.add(id);
+  hydrating = false;
+  ordersReady.value = true;
+};
 
 export interface PaymentWebhookEvent {
   id: string;
@@ -207,6 +279,9 @@ export const useOrders = () => {
     }
     if (existing.status === "refunded") {
       return { applied: false, order: existing, error: "already_refunded" };
+    }
+    if (existing.status === "paid") {
+      return { applied: false, order: existing };
     }
     if (processedWebhookIds.has(event.id)) {
       return { applied: false, order: existing };

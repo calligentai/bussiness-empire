@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { useOrders } from "../../composables/useCart";
+import { computed } from "vue";
+import { ordersReady, useOrders } from "../../composables/useCart";
 
 const route = useRoute();
 const { getOrder } = useOrders();
 
 const orderId = String(route.params.id);
-const order = getOrder(orderId);
+const order = computed(() => getOrder(orderId));
 </script>
 
 <template>
@@ -14,7 +15,9 @@ const order = getOrder(orderId);
       <h1>Order status</h1>
     </header>
 
-    <section v-if="!order" class="lb-order-status__not-found">
+    <p v-if="!ordersReady">Loading order…</p>
+
+    <section v-else-if="!order" class="lb-order-status__not-found">
       <p>Order not found.</p>
     </section>
 

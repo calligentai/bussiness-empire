@@ -1,10 +1,13 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   CART_STORAGE_KEY,
+  ORDER_STORAGE_KEY,
   configureCartStorage,
   hydrateCart,
+  hydrateOrders,
   settleSandboxPayment,
   unloadCart,
+  unloadOrders,
   useCart,
   useOrders,
   processPayment,
@@ -314,5 +317,83 @@ describe("payment webhook", () => {
     expect(duplicate.applied).toBe(false);
     expect(order.status).toBe("failed");
     expect(order.status).not.toBe("paid");
+  });
+});
+
+describe("order persistence", () => {
+  const oneItem = (): CartItem[] => [
+    { slug: "virunga-washed", name: "Virunga Washed", priceCents: 1850, quantity: 1 },
+  ];
+
+  afterEach(() => {
+    configureCartStorage(null);
+  });
+
+  it("loads a paid order by id after a reload and ignores a second success", async () => {
+    const storage = memoryStorage();
+    configureCartStorage(storage);
+    const { createOrder, getOrder } = useOrders();
+    const order = createOrder(oneItem());
+    const paid = await settleSandboxPayment(order.id, true);
+    const paymentId = order.paymentId;
+
+    expect(paid.applied).toBe(true);
+    expect(storage.getItem(ORDER_STORAGE_KEY)).toContain(order.id);
+
+    unloadOrders();
+    expect(getOrder(order.id)).toBeUndefined();
+
+    hydrateOrders();
+    const restored = getOrder(order.id);
+    expect(restored?.status).toBe("paid");
+    expect(restored?.paymentId).toBe(paymentId);
+    expect(restored?.items).toEqual(oneItem());
+
+    const again = await settleSandboxPayment(order.id, true);
+    expect(again.applied).toBe(false);
+    expect(getOrder(order.id)?.paymentId).toBe(paymentId);
+    expect(getOrder(order.id)?.status).toBe("paid");
+  });
+
+  it("keeps a failed order so retry after reload pays that same id once", async () => {
+    const storage = memoryStorage();
+    configureCartStorage(storage);
+    const { createOrder, getOrder } = useOrders();
+    const order = createOrder(oneItem());
+    await settleSandboxPayment(order.id, false);
+
+    unloadOrders();
+    hydrateOrders();
+    expect(getOrder(order.id)?.status).toBe("failed");
+
+    const paid = await settleSandboxPayment(order.id, true);
+    const second = await settleSandboxPayment(order.id, true);
+
+    expect(paid.applied).toBe(true);
+    expect(second.applied).toBe(false);
+    expect(getOrder(order.id)?.status).toBe("paid");
+  });
+
+  it("does not replay a stored webhook after reload", () => {
+    const storage = memoryStorage();
+    configureCartStorage(storage);
+    const { createOrder, applyPaymentWebhook, getOrder } = useOrders();
+    const order = createOrder(oneItem());
+    const event = {
+      id: "evt_reload_failed",
+      orderId: order.id,
+      status: "failed" as const,
+      paymentId: "pay_reload_failed",
+    };
+
+    applyPaymentWebhook(event);
+    expect(storage.getItem(ORDER_STORAGE_KEY)).toContain("evt_reload_failed");
+    unloadOrders();
+    hydrateOrders();
+
+    const duplicate = applyPaymentWebhook(event);
+    expect(duplicate.applied).toBe(false);
+    expect(getOrder(order.id)?.status).toBe("failed");
+    expect(getOrder(order.id)?.paymentId).toBe("pay_reload_failed");
   });
 });

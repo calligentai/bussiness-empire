@@ -43,6 +43,7 @@ const settlePayment = async (shouldSucceed: boolean) => {
       paymentStatus.value = "paid";
       showSuccess.value = true;
       clearCart();
+      await navigateTo(`/order/${orderId.value}`);
       return;
     }
 
@@ -98,7 +99,7 @@ const retry = () => {
     <section v-if="showSuccess" class="lb-order-success">
       <h2>Order confirmed</h2>
       <p>Your order <strong>{{ orderId }}</strong> has been paid.</p>
-      <p>Redirecting to order status...</p>
+      <p><NuxtLink :to="`/order/${orderId}`">View order status</NuxtLink></p>
     </section>
 
     <section v-if="paymentStatus === 'failed'" class="lb-payment-failed">
