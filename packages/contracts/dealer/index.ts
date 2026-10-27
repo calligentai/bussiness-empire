@@ -27,6 +27,59 @@ export interface DealerMembership {
   role: DealerRole;
 }
 
+export interface BrandTemplate {
+  templateId: string;
+  version: number;
+  values: Readonly<Record<string, string>>;
+}
+
+export interface DealerBrandOverride {
+  dealerId: string;
+  templateId: string;
+  values: Readonly<Record<string, string>>;
+}
+
+export function createBrandTemplate(input: BrandTemplate): BrandTemplate {
+  if (!input.templateId.trim() || !Number.isInteger(input.version) || input.version < 1) {
+    throw new Error("Invalid brand template identity or version");
+  }
+  return { ...input, values: { ...input.values } };
+}
+
+export function publishBrandTemplate(
+  current: BrandTemplate,
+  values: Readonly<Record<string, string>>,
+): BrandTemplate {
+  return createBrandTemplate({
+    templateId: current.templateId,
+    version: current.version + 1,
+    values: { ...current.values, ...values },
+  });
+}
+
+export function createDealerBrandOverride(
+  existing: readonly DealerBrandOverride[],
+  input: DealerBrandOverride,
+): DealerBrandOverride {
+  if (!input.dealerId.trim() || !input.templateId.trim()) throw new Error("Dealer brand override identity is required");
+  if (existing.some((entry) => entry.dealerId === input.dealerId && entry.templateId === input.templateId)) {
+    throw new Error("Dealer brand override already exists");
+  }
+  return { ...input, values: { ...input.values } };
+}
+
+export function resolveDealerBrand(
+  template: BrandTemplate,
+  overrides: readonly DealerBrandOverride[],
+  dealerId: string,
+): { templateVersion: number; values: Record<string, string> } {
+  if (!dealerId.trim()) throw new Error("Dealer context is required");
+  const matching = overrides.filter((entry) => entry.dealerId === dealerId && entry.templateId === template.templateId);
+  if (matching.length > 1) throw new Error("Dealer brand override is ambiguous");
+  const override = matching[0];
+  return { templateVersion: template.version, values: { ...template.values, ...(override?.values ?? {}) } };
+}
+
 export interface CustomerRecord {
   customerId: string;
   dealerId?: string;
