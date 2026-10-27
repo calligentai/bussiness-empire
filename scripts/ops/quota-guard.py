@@ -26,9 +26,8 @@ HEADERS = {"x-paperclip-user-id": "local-board", "Content-Type": "application/js
 TOKEN_BUDGET = int(os.environ.get("QUOTA_GUARD_TOKENS", "12000000"))
 WINDOW_HOURS = float(os.environ.get("QUOTA_GUARD_WINDOW_HOURS", "5"))
 FREE_MODEL = os.environ.get("QUOTA_GUARD_FREE_MODEL", "kilo/cohere/north-mini-code:free")
-# Agents that do not need the expensive route: they orchestrate and summarise.
+# Pi only. Orchestrator is pinned to xai/grok-4.6 — do not demote it to free.
 DEMOTABLE = {
-    "Business Empire Orchestrator": "38f3ba36-837c-49fa-9a47-56b840ba49a6",
     "Business Empire Pi": "0dccca7e-25ff-4e1b-a28a-8eb6d43594de",
 }
 DRY_RUN = os.environ.get("QUOTA_GUARD_DRY_RUN") == "1"
