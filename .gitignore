@@ -8,3 +8,6 @@ node_modules/
 .paperclip/
 __pycache__/
 *.pyc
+
+# Machine-local Hermes patch hooks (absolute paths)
+.githooks/
