@@ -6,3 +6,7 @@ node_modules/
 .venv/
 # Added by code-review-graph
 .code-review-graph/
+
+# Local agent skill installs (not project source)
+.agents/
+skills-lock.json
