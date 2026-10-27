@@ -3,13 +3,13 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 
-def profiles(root, settings, models, hermes, pi_model='ollama/qwen3.6:latest', pi_provider='ollama'):
+def profiles(root, settings, models, hermes, pi_model='freerouter/nvidia/nemotron-3-ultra-550b-a55b:free', pi_provider='freerouter'):
     """Build Paperclip adapter configs for the Hermes and Pi companions.
 
     The Hermes route is taken from the operator's live config. The Pi route is
-    pinned here: the operator's Pi default (ollama/minimax-m2.7:cloud) returns
-    HTTP 402 from the Ollama Free plan, so the adapter overrides it to a
-    locally-pulled, Free-plan model rather than mirroring a broken default.
+    pinned to the standalone free-router (:8799): the operator's Pi default
+    (ollama/minimax-m2.7:cloud) returns HTTP 402 from the Ollama Free plan, and
+    the zen/ollama providers in the Pi catalog are dead or local-only.
     """
     root = Path(root).resolve()
     state = root / '.local' / 'companions'
