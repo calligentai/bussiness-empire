@@ -1,0 +1,53 @@
+{
+  "verifiedDate": "2026-10-21",
+  "hermes": {
+    "agentId": "af68b777-9b7c-4bf8-bf62-e73f88ca4ec8",
+    "runId": "7d211e9e-fd46-4f8a-8311-f5e620241630",
+    "status": "succeeded",
+    "exitCode": 0,
+    "marker": "EMPIRE_HERMES_OK",
+    "model": "deepseek-v4-flash",
+    "endpoint": "http://127.0.0.1:6022/v1",
+    "externalMemory": "hindsight unavailable"
+  },
+  "pi": {
+    "agentId": "0dccca7e-25ff-4e1b-a28a-8eb6d43594de",
+    "runId": "82cc5d3c-c9e7-47bf-9ce3-de13c450eed9",
+    "status": "blocked",
+    "reason": "HTTP 402: selected Ollama cloud model excluded from Free plan",
+    "model": "ollama/minimax-m2.7:cloud",
+    "endpoint": "http://127.0.0.1:11434/v1",
+    "heartbeatEnabled": false
+  },
+  "piRouteRepair": {
+    "date": "2026-10-21",
+    "oldModel": "ollama/minimax-m2.7:cloud",
+    "newModel": "ollama/qwen3.6:latest",
+    "newProvider": "ollama",
+    "oldEndpoint": "http://127.0.0.1:11434/v1",
+    "newEndpoint": "http://127.0.0.1:11434/v1",
+    "oldFailure": "HTTP 402: This model is not in the Free plan. Pro is $20/month",
+    "newResult": "EMPIRE_PI_OK",
+    "newExitCode": 0,
+    "command": "/Users/admin/.local/bin/pi --provider ollama --model qwen3.6:latest --no-tools --no-skills --no-extensions --no-context-files -p \"Reply exactly: EMPIRE_PI_OK. Do not use tools.\"",
+    "selectionRationale": "qwen3.6:latest is pulled locally (present in Ollama /api/tags) and served by the same loopback Ollama endpoint at no cost. minimax-m2.7:cloud and gemma4:31b-cloud both returned 402/429 from the Free plan; the tkr gateway's deepseek-v4-flash returned Insufficient Balance. No subscription was upgraded and no paid route was selected. The Ollama cloud id qwen3.6:cloud returns 404; the correct id is qwen3.6:latest.",
+    "operatorSettingsUntouched": true,
+    "operatorSettingsNote": "The operator's ~/.pi/agent/settings.json still defaults to ollama/minimax-m2.7:cloud. That file is theirs; the Paperclip adapter config overrides the model for the Business Empire Pi agent only."
+  },
+  "piCurrentAgentRoute": {
+    "agentId": "0dccca7e-25ff-4e1b-a28a-8eb6d43594de",
+    "adapterType": "pi_local",
+    "model": "tkr/gpt-oss:20b",
+    "provider": "tkr",
+    "endpoint": "http://127.0.0.1:8788/v1",
+    "result": "EMPIRE_PI_OK",
+    "exitCode": 0,
+    "command": "/Users/admin/.local/bin/pi --provider tkr --model gpt-oss:20b --no-tools --no-skills --no-extensions --no-context-files -p \"Reply exactly: EMPIRE_PI_OK. Do not use tools.\"",
+    "note": "HISTORICAL / SUPERSEDED 2026-10-24. The tkr run above was a manual CLI verification, not a stored agent route. As of 2026-10-24 the live Pi agent record (0dccca7e-25ff-4e1b-a28a-8eb6d43594de) stores no adapterConfig at all: `paperclipai agent get 0dccca7e-... --json` returns adapterConfig {} and runtimeConfig {}, so Pi has no route until the ollama/qwen3.6:latest pin above is applied. The ollama pin was re-verified on 2026-10-24 (EMPIRE_PI_OK, exit 0; pi warns 'Model \"qwen3.6:latest\" not found for provider \"ollama\", using custom model id' but the loopback Ollama endpoint serves it)."
+  },
+  "validation": {
+    "tests": 6,
+    "behavioralRedObserved": true,
+    "review": "explicit manual review; no additional external provider"
+  }
+}
