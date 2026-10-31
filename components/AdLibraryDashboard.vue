@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { VerifiedPrincipal } from "../packages/contracts/auth";
-import { DealerAdLibrarySourceRegistry } from "../packages/contracts/dealer";
+import { DealerAdLibrarySourceRegistry } from "../packages/contracts/dealer/ad-library";
 
 const props = defineProps<{ registry: DealerAdLibrarySourceRegistry; principal: VerifiedPrincipal }>();
 const url = ref("");

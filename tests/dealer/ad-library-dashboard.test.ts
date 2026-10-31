@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createVerifiedPrincipal } from "../../packages/contracts/auth";
-import { DealerAdLibrarySourceRegistry } from "../../packages/contracts/dealer";
+import { DealerAdLibrarySourceRegistry } from "../../packages/contracts/dealer/ad-library";
 import AdLibraryDashboard from "../../components/AdLibraryDashboard.vue";
 
 const now = Math.floor(Date.now() / 1000);

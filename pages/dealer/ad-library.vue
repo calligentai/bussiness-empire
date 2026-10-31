@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createVerifiedPrincipal } from "../../packages/contracts/auth";
-import { DealerAdLibrarySourceRegistry } from "../../packages/contracts/dealer";
+import { DealerAdLibrarySourceRegistry } from "../../packages/contracts/dealer/ad-library";
 
 // Fixture identity only. This page is a local demo and is not production-authenticated.
 const now = Math.floor(Date.now() / 1000);
