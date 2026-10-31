@@ -7,6 +7,7 @@ export interface CartItem {
 
 export interface Order {
   id: string;
+  dealerId?: string;
   items: CartItem[];
   totalCents: number;
   status: "pending" | "paid" | "failed" | "refunded";
