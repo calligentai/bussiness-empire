@@ -1,4 +1,6 @@
 import { computed, ref } from "vue";
+import type { VerifiedPrincipal } from "../packages/contracts/auth";
+import { readOrderForDealer, resolveDealerFromVerifiedToken } from "../packages/contracts/dealer";
 import type { CartItem, Order, PaymentResult } from "../types/order";
 
 export interface CartState {
@@ -72,7 +74,7 @@ export const useCart = () => {
 export const useOrders = () => {
   const allOrders = computed(() => orders.value);
 
-  const createOrder = (cartItems: CartItem[]): Order => {
+  const createOrder = (cartItems: CartItem[], principal?: VerifiedPrincipal): Order => {
     if (cartItems.length === 0) {
       throw new Error("Cart is empty");
     }
@@ -83,6 +85,7 @@ export const useOrders = () => {
     const now = new Date().toISOString();
     const order: Order = {
       id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      dealerId: principal ? resolveDealerFromVerifiedToken(principal) : undefined,
       items: JSON.parse(JSON.stringify(cartItems)),
       totalCents,
       status: "pending",
@@ -96,6 +99,17 @@ export const useOrders = () => {
 
   const getOrder = (id: string): Order | undefined => {
     return orders.value.find((o) => o.id === id);
+  };
+
+  // Dashboard read: tenant-scoped through the dealer isolation contract,
+  // keyed on the verified session's dealerId (never a client parameter).
+  const getOrderForDealer = (id: string, principal: VerifiedPrincipal): Order | undefined => {
+    const dealerId = resolveDealerFromVerifiedToken(principal);
+    return readOrderForDealer(
+      orders.value.map((o) => ({ ...o, orderId: o.id })),
+      id,
+      dealerId,
+    );
   };
 
   const updateOrderStatus = (
@@ -151,6 +165,7 @@ export const useOrders = () => {
     orders: allOrders,
     createOrder,
     getOrder,
+    getOrderForDealer,
     updateOrderStatus,
     applyPaymentWebhook,
     refundOrder,
