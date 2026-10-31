@@ -1,3 +1,6 @@
+import type { VerifiedPrincipal } from "../auth";
+import { resolveDealerFromVerifiedToken } from "./index";
+
 export interface PublicAdLibrarySource {
   sourceId: string;
   dealerId: string;
@@ -28,8 +31,8 @@ export function createPublicAdLibrarySource(
 export class DealerAdLibrarySourceRegistry {
   private readonly records: PublicAdLibrarySource[] = [];
 
-  create(dealerId: string, input: PublicAdLibrarySourceInput): PublicAdLibrarySource {
-    if (!dealerId.trim()) throw new Error("Dealer context is required");
+  create(principal: VerifiedPrincipal, input: PublicAdLibrarySourceInput): PublicAdLibrarySource {
+    const dealerId = resolveDealerFromVerifiedToken(principal);
     const source = createPublicAdLibrarySource({ ...input, dealerId });
     if (this.records.some((record) => record.dealerId === dealerId && record.sourceId === source.sourceId)) {
       throw new Error("Public ad library source already exists");
@@ -38,13 +41,13 @@ export class DealerAdLibrarySourceRegistry {
     return { ...source };
   }
 
-  list(dealerId: string): PublicAdLibrarySource[] {
-    if (!dealerId.trim()) throw new Error("Dealer context is required");
+  list(principal: VerifiedPrincipal): PublicAdLibrarySource[] {
+    const dealerId = resolveDealerFromVerifiedToken(principal);
     return this.records.filter((record) => record.dealerId === dealerId).map((record) => ({ ...record }));
   }
 
-  read(dealerId: string, sourceId: string): PublicAdLibrarySource | undefined {
-    if (!dealerId.trim()) throw new Error("Dealer context is required");
+  read(principal: VerifiedPrincipal, sourceId: string): PublicAdLibrarySource | undefined {
+    const dealerId = resolveDealerFromVerifiedToken(principal);
     const record = this.records.find((item) => item.dealerId === dealerId && item.sourceId === sourceId);
     return record ? { ...record } : undefined;
   }
