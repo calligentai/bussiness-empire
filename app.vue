@@ -3,6 +3,7 @@ const navigation = [
   { label: "Shop", to: "/#shop" },
   { label: "Provenance", to: "/#provenance" },
   { label: "Science", to: "/#science" },
+  { label: "Dealer demo", to: "/dealer" },
 ];
 </script>
 
@@ -17,7 +18,7 @@ const navigation = [
       <nav aria-label="Primary">
         <ul class="lb-header__nav">
           <li v-for="item in navigation" :key="item.label">
-            <a :href="item.to">{{ item.label }}</a>
+            <NuxtLink :to="item.to">{{ item.label }}</NuxtLink>
           </li>
         </ul>
       </nav>
@@ -36,6 +37,7 @@ const navigation = [
         <p class="lb-footer__note">Volcanic precision. No noise.</p>
       </div>
       <p class="lb-footer__legal">Business Empire · LAVABEAN-PLATFORM · Rwanda → Europe</p>
+      <NuxtLink class="lb-footer__dealer" to="/dealer">Dealer demo</NuxtLink>
     </div>
   </footer>
 </template>
@@ -138,7 +140,8 @@ const navigation = [
 }
 
 .lb-footer__note,
-.lb-footer__legal {
+.lb-footer__legal,
+.lb-footer__dealer {
   color: var(--lb-color-line);
   font-size: var(--lb-text-200);
 }
@@ -146,6 +149,13 @@ const navigation = [
 .lb-footer__legal {
   font-family: var(--lb-font-mono);
   font-size: var(--lb-text-100);
+}
+
+.lb-footer__dealer {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  text-underline-offset: 0.2em;
 }
 
 @media (min-width: 768px) {
