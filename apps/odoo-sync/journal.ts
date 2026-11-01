@@ -11,7 +11,7 @@ export interface OdooJournalClient {
 
 const VAT_RATE = 0.21;
 
-function mapPaidOrder(order: Extract<OdooSyncEvent, { type: "order.paid" }>['order']): OdooInvoiceDraft {
+export function mapPaidOrder(order: Extract<OdooSyncEvent, { type: "order.paid" }>['order']): OdooInvoiceDraft {
   if (order.status !== "paid" || !order.items.length) throw new Error("Only non-empty paid orders can be invoiced");
   if (!order.id || !order.paymentId || !order.currency) throw new Error("Paid order is missing accounting identifiers");
   let totalNetCents = 0;
