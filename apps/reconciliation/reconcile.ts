@@ -4,31 +4,15 @@ import { mapPaidOrder } from "../odoo-sync/journal";
 export interface SandboxOrder extends Omit<PaidOrderEvent, "items"> {
   items: Array<PaidOrderEvent["items"][number] & { supplierSku: string }>;
 }
-
 export interface SupplierOrderRequest {
   orderId: string;
   idempotencyKey: string;
   lines: Array<{ supplierSku: string; quantity: number }>;
 }
-
-export type SupplierTransport = (
-  request: SupplierOrderRequest,
-) => Promise<{ supplierOrderId: string }>;
-
+export type SupplierTransport = (request: SupplierOrderRequest) => Promise<{ supplierOrderId: string }>;
 export type OdooTransport = (invoice: OdooInvoiceDraft) => Promise<{ id: string }>;
-
-export type ReconciliationStatus =
-  | "reconciled"
-  | "supplier_offline"
-  | "odoo_offline"
-  | "offline"
-  | "already_reconciled";
-
-export type HumanRecoveryAction =
-  | "PLACE_SUPPLIER_ORDER_MANUALLY"
-  | "VERIFY_AND_BOOK_JOURNAL"
-  | "MANUAL_RECONCILIATION";
-
+export type ReconciliationStatus = "reconciled" | "supplier_offline" | "odoo_offline" | "offline" | "already_reconciled";
+export type HumanRecoveryAction = "PLACE_SUPPLIER_ORDER_MANUALLY" | "VERIFY_AND_BOOK_JOURNAL" | "MANUAL_RECONCILIATION";
 export interface ReconciliationOutcome {
   status: ReconciliationStatus;
   supplierOrderId: string | null;
@@ -36,68 +20,68 @@ export interface ReconciliationOutcome {
   humanAction: HumanRecoveryAction | null;
 }
 
-const ALREADY_RECONCILED: ReconciliationStatus = "already_reconciled";
-
+export interface ReconciliationRecord {
+  supplierOrderId: string | null;
+  invoiceId: string | null;
+  supplierState: "pending" | "complete" | "uncertain";
+  odooState: "pending" | "complete" | "uncertain";
+}
 /**
- * Runs one reconciliation pass over a paid sandbox order.
- *
- * Duplicate protection keys on the recorded outcome: a recorded
- * supplierOrderId or invoiceId short-circuits that side effect on every
- * retry. The supplier transport always receives the stable idempotencyKey
- * (the paid order id) and Odoo receives externalId = order id, so a real
- * transport can additionally dedupe a success whose response was lost.
- * ponytail: no durable store here — recovery handoff is the returned
- * outcome record; add persistence when a runtime owns retry loops.
+ * The caller must supply storage whose atomicity and persistence match its retry
+ * lifecycle. A durable store preserves the uncertainty marker across calls and
+ * restarts; this interface alone does not make an implementation durable.
+ * Uncertain transport outcomes require a named human reconciliation before the
+ * caller resets the affected state to pending.
  */
+export interface ReconciliationStore {
+  claim(orderId: string): Promise<ReconciliationRecord>;
+  read(orderId: string): Promise<ReconciliationRecord | null>;
+  finalize(orderId: string, record: ReconciliationRecord): Promise<void>;
+}
+
 export async function runReconciliation(
   order: SandboxOrder,
   transports: { supplier: SupplierTransport; odoo: OdooTransport },
-  prior?: ReconciliationOutcome,
+  store: ReconciliationStore,
 ): Promise<ReconciliationOutcome> {
-  if (prior?.status === "reconciled" || prior?.status === ALREADY_RECONCILED) {
-    return { status: ALREADY_RECONCILED, supplierOrderId: prior.supplierOrderId, invoiceId: prior.invoiceId, humanAction: null };
-  }
-
-  // Validate and build the accounting draft before any side effect so a
-  // malformed order can never half-commit. Missing supplier SKUs equally
-  // halt procurement without contacting either transport.
   const invoiceDraft = mapPaidOrder(order);
-  const lines = order.items.map((item) => ({ supplierSku: item.supplierSku, quantity: item.quantity }));
-  if (lines.some((line) => !line.supplierSku || !line.supplierSku.trim())) {
-    throw new Error("Every order line requires a mapped supplier SKU before reconciliation");
+  const lines = order.items.map(({ supplierSku, quantity }) => ({ supplierSku, quantity }));
+  if (lines.some(({ supplierSku }) => !supplierSku?.trim())) throw new Error("Every order line requires a mapped supplier SKU before reconciliation");
+
+  const record = await store.claim(order.id);
+  const complete = await store.read(order.id);
+  if (complete?.supplierState === "complete" && complete?.odooState === "complete") {
+    return outcome("already_reconciled", complete.supplierOrderId, complete.invoiceId, null);
   }
-
-  let supplierOrderId = prior?.supplierOrderId ?? null;
-  let invoiceId = prior?.invoiceId ?? null;
-
-  if (supplierOrderId === null) {
+  let { supplierOrderId, invoiceId, supplierState, odooState } = record;
+  if (supplierState === "pending") {
     try {
       const placed = await transports.supplier({ orderId: order.id, idempotencyKey: order.id, lines });
       if (!placed?.supplierOrderId) throw new Error("Supplier transport returned no supplier order id");
       supplierOrderId = placed.supplierOrderId;
+      supplierState = "complete";
     } catch {
-      // Supplier offline or refused: the pass records it instead of retrying inline.
+      supplierState = "uncertain";
     }
+    await store.finalize(order.id, { supplierOrderId, invoiceId, supplierState, odooState });
   }
-
-  if (invoiceId === null) {
+  if (odooState === "pending") {
     try {
       const booked = await transports.odoo(invoiceDraft);
       if (!booked?.id) throw new Error("Odoo transport returned no invoice id");
       invoiceId = booked.id;
+      odooState = "complete";
     } catch {
-      // Odoo offline or refused: never fabricate a booking.
+      odooState = "uncertain";
     }
+    await store.finalize(order.id, { supplierOrderId, invoiceId, supplierState, odooState });
   }
+  if (!supplierOrderId && !invoiceId) return outcome("offline", supplierOrderId, invoiceId, "MANUAL_RECONCILIATION");
+  if (!invoiceId) return outcome("odoo_offline", supplierOrderId, invoiceId, "VERIFY_AND_BOOK_JOURNAL");
+  if (!supplierOrderId) return outcome("supplier_offline", supplierOrderId, invoiceId, "PLACE_SUPPLIER_ORDER_MANUALLY");
+  return outcome("reconciled", supplierOrderId, invoiceId, null);
+}
 
-  if (supplierOrderId === null && invoiceId === null) {
-    return { status: "offline", supplierOrderId, invoiceId, humanAction: "MANUAL_RECONCILIATION" };
-  }
-  if (invoiceId === null) {
-    return { status: "odoo_offline", supplierOrderId, invoiceId, humanAction: "VERIFY_AND_BOOK_JOURNAL" };
-  }
-  if (supplierOrderId === null) {
-    return { status: "supplier_offline", supplierOrderId, invoiceId, humanAction: "PLACE_SUPPLIER_ORDER_MANUALLY" };
-  }
-  return { status: "reconciled", supplierOrderId, invoiceId, humanAction: null };
+function outcome(status: ReconciliationStatus, supplierOrderId: string | null, invoiceId: string | null, humanAction: HumanRecoveryAction | null): ReconciliationOutcome {
+  return { status, supplierOrderId, invoiceId, humanAction };
 }
