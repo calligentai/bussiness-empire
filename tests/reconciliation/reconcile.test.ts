@@ -29,16 +29,35 @@ function failing(fn: string) {
   });
 }
 
-function store(): ReconciliationStore {
+function store(seed?: Partial<ReconciliationRecord>): ReconciliationStore {
   const records = new Map<string, ReconciliationRecord>();
+  const tokens = new Map<string, string>();
+  let sequence = 0;
+  const initial: ReconciliationRecord = {
+    supplierOrderId: null,
+    invoiceId: null,
+    supplierState: "pending",
+    odooState: "pending",
+    ...seed,
+  };
+  if (seed) records.set(order.id, initial);
+
   return {
     async claim(id) {
-      const record = records.get(id) ?? { supplierOrderId: null, invoiceId: null, supplierState: "pending", odooState: "pending" };
-      records.set(id, record);
-      return record;
+      const record = records.get(id) ?? { ...initial };
+      if (tokens.has(id)) return { status: "busy", record };
+      const token = `claim-${++sequence}`;
+      tokens.set(id, token);
+      return { status: "acquired", token, record: { ...record } };
     },
-    async read(id) { return records.get(id) ?? null; },
-    async finalize(id, record) { records.set(id, record); },
+    async finalize(id, token, record) {
+      if (tokens.get(id) !== token) throw new Error("Reconciliation claim token is not current");
+      records.set(id, { ...record });
+    },
+    async release(id, token) {
+      if (tokens.get(id) !== token) throw new Error("Reconciliation claim token is not current");
+      tokens.delete(id);
+    },
   };
 }
 
@@ -184,5 +203,48 @@ describe("offline supplier/Odoo reconciliation", () => {
       runReconciliation({ ...withoutSku, id: "order_test_2", paymentId: "pay_test_2" }, { supplier, odoo: okOdoo() }, store()),
     ).rejects.toThrow("supplier SKU");
     expect(supplier).not.toHaveBeenCalled();
+  });
+
+  it("prevents concurrent runs from duplicating supplier and Odoo side effects", async () => {
+    const persistence = store();
+    let releaseSupplier!: () => void;
+    const supplierGate = new Promise<void>((resolve) => { releaseSupplier = resolve; });
+    const supplier = vi.fn(async (request: { orderId: string }) => {
+      await supplierGate;
+      return { supplierOrderId: `supplier_${request.orderId}` };
+    });
+    const odoo = okOdoo();
+
+    const first = runReconciliation(order, { supplier, odoo }, persistence);
+    await vi.waitFor(() => expect(supplier).toHaveBeenCalledTimes(1));
+    const second = runReconciliation(order, { supplier, odoo }, persistence);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const supplierCallsWhileFirstIsInFlight = supplier.mock.calls.length;
+    const secondOutcome = await second;
+    releaseSupplier();
+    await first;
+
+    expect(secondOutcome.status).toBe("in_progress");
+    expect(supplierCallsWhileFirstIsInFlight).toBe(1);
+    expect(supplier).toHaveBeenCalledTimes(1);
+    expect(odoo).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["supplier", "odoo"] as const)("turns an abandoned %s side effect into uncertainty without replay", async (sideEffect) => {
+    const persistence = store(sideEffect === "supplier" ? { supplierState: "in_flight" } : { odooState: "in_flight" });
+    const supplier = okSupplier();
+    const odoo = okOdoo();
+
+    const result = await runReconciliation(order, { supplier, odoo }, persistence);
+
+    if (sideEffect === "supplier") {
+      expect(result).toMatchObject({ status: "supplier_offline", humanAction: "PLACE_SUPPLIER_ORDER_MANUALLY" });
+      expect(supplier).not.toHaveBeenCalled();
+      expect(odoo).toHaveBeenCalledTimes(1);
+    } else {
+      expect(result).toMatchObject({ status: "odoo_offline", humanAction: "VERIFY_AND_BOOK_JOURNAL" });
+      expect(supplier).toHaveBeenCalledTimes(1);
+      expect(odoo).not.toHaveBeenCalled();
+    }
   });
 });
