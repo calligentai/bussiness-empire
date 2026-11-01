@@ -1,4 +1,4 @@
-import type { DealerRole } from "../auth";
+import type { DealerRole, VerifiedPrincipal } from "../auth";
 
 export type DealerStatus = "active" | "suspended" | "closed";
 
@@ -46,9 +46,9 @@ export interface DealerSocialDraft {
 /** Returns only the active dealer's local disconnected setup fixtures. */
 export function readSocialSetupForDealer(
   setups: readonly DealerSocialSetup[],
-  dealerId: string,
+  principal: VerifiedPrincipal,
 ): DealerSocialSetup[] {
-  if (!dealerId.trim()) return [];
+  const dealerId = resolveDealerFromVerifiedToken(principal);
   return setups
     .filter((setup) => setup.dealerId === dealerId && setup.connectionStatus === "disconnected")
     .map((setup) => ({ ...setup }));
@@ -58,24 +58,29 @@ export function readSocialSetupForDealer(
 export function readSocialDraftForDealer(
   drafts: readonly DealerSocialDraft[],
   draftId: string,
-  dealerId: string,
+  principal: VerifiedPrincipal,
 ): DealerSocialDraft | undefined {
-  if (!draftId.trim() || !dealerId.trim()) return undefined;
+  const dealerId = resolveDealerFromVerifiedToken(principal);
+  if (!draftId.trim()) return undefined;
   const matches = drafts.filter((draft) => draft.draftId === draftId && draft.dealerId === dealerId);
   if (matches.length > 1) throw new Error("Social draft is ambiguous");
   return matches[0] ? { ...matches[0] } : undefined;
 }
 
 /** Creates a local draft without invoking a provider or scheduling a post. */
-export function createSocialDraft(input: DealerSocialDraft): DealerSocialDraft {
-  if (!input.draftId.trim() || !input.dealerId.trim() || !input.text.trim()) {
+export function createSocialDraft(
+  input: Omit<DealerSocialDraft, "dealerId">,
+  principal: VerifiedPrincipal,
+): DealerSocialDraft {
+  const dealerId = resolveDealerFromVerifiedToken(principal);
+  if (!input.draftId.trim() || !input.text.trim()) {
     throw new Error("Social draft identity and text are required");
   }
   if (!Number.isFinite(Date.parse(input.updatedAt))) throw new Error("Social draft timestamp is invalid");
   if (!["instagram", "facebook", "linkedin"].includes(input.platform)) {
     throw new Error("Social platform is invalid");
   }
-  return { ...input };
+  return { ...input, dealerId };
 }
 
 export type SeoPaidOperation = "keyword_lookup" | "serp_lookup" | "backlink_lookup";
