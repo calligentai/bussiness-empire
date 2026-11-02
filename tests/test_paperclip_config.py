@@ -41,6 +41,16 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(p['workspaceStrategy']['type'],'git_worktree')
         self.assertEqual(p['workspaceStrategy']['baseRef'],'lavabean')
         self.assertEqual(p['workspaceStrategy']['branchTemplate'],'feature/{{issue.identifier}}-{{slug}}')
+    def test_opencode_go_missing_route_uses_existing_local_gateway_without_changing_model(self):
+        c={'model':'existing-model','model_provider':'tkr','model_providers':{'tkr':{'base_url':'http://127.0.0.1:6000/v1'}}}
+        o={'model':'opencode-go/beam-free'}
+        a=routed_adapters(c,o,Path('/tmp/empire-test'))['opencode']
+        self.assertEqual(a['adapterConfig']['model'],'opencode-go/beam-free')
+        self.assertEqual(a['routingEvidence']['model'],'opencode-go/beam-free')
+        self.assertEqual(a['routingEvidence']['endpoint'],'http://127.0.0.1:8789/v1')
+        fragment=json.loads(a['adapterConfig']['env']['OPENCODE_CONFIG_CONTENT'])
+        self.assertEqual(fragment['provider']['opencode-go']['options']['baseURL'],'http://127.0.0.1:8789/v1')
+
     def test_missing_provider_route_fails_closed(self):
         with self.assertRaises(ValueError):
             routed_adapters({'model':'x','model_provider':'missing'}, {'model':'missing/model'},Path('/tmp/empire-test'))

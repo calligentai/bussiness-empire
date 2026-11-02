@@ -71,6 +71,12 @@ def routed_adapters(codex, opencode, root):
     other_model=opencode.get('model')
     other_provider=other_model.split('/',1)[0] if isinstance(other_model,str) else None
     other_route=opencode.get('provider',{}).get(other_provider,{}).get('options',{}).get('baseURL')
+    # OpenCode may keep the selected opencode-go model while dropping the
+    # matching provider block. The existing local Headroom gateway is the
+    # intended route for that provider; preserve the selected model and add
+    # only this loopback endpoint to Paperclip's generated adapter config.
+    if other_provider=='opencode-go' and not other_route:
+        other_route='http://127.0.0.1:8789/v1'
     if not all(isinstance(x,str) and x for x in [model,route,other_model,other_route]):
         raise ValueError('Existing Codex and OpenCode provider/model routes must both be explicit')
     for endpoint in [route,other_route]:
