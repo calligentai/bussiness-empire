@@ -24,7 +24,7 @@ describe("Odoo journal sync", () => {
     const invoice = createInvoice.mock.calls[0]![0];
     expect(invoice.externalId).toBe("order_test_1");
     expect(invoice.lines).toEqual([
-      { description: "Virunga Washed", quantity: 2, netCents: 3364, vatCents: 736, vatRate: 0.21 },
+      { description: "Virunga Washed", quantity: 2, netCents: 3058, vatCents: 642, vatRate: 0.21 },
       { description: "Kivu Natural", quantity: 1, netCents: 1736, vatCents: 364, vatRate: 0.21 },
     ]);
     expect(invoice.totalNetCents + invoice.totalVatCents).toBe(invoice.totalCents);
