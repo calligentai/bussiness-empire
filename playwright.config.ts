@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const deployedBaseURL = process.env.PLAYWRIGHT_BASE_URL;
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
@@ -7,7 +9,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"]],
   use: {
-    baseURL: "http://127.0.0.1:3456",
+    baseURL: deployedBaseURL || "http://127.0.0.1:3456",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -27,10 +29,10 @@ export default defineConfig({
       use: { ...devices["Pixel 7"] },
     },
   ],
-  webServer: {
+  webServer: deployedBaseURL ? undefined : {
     command: "NITRO_HOST=127.0.0.1 NITRO_PORT=3456 node .output/server/index.mjs",
     url: "http://127.0.0.1:3456",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });
