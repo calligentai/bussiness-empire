@@ -41,7 +41,7 @@ if (!$environment) {
 }
 $server=App\Models\Server::whereTeamId(0)->whereName('localhost')->firstOrFail();
 $compose=file_get_contents($argv[1] ?? '/tmp/lavabean-compose.yaml');
-if (!$compose || str_contains($compose,'@@')) { throw new RuntimeException('Rendered Compose required'); }
+if (!$compose || preg_match('/@@(?:REVISION|SOURCE_DIR|BIND_IP)@@/', $compose)) { throw new RuntimeException('Rendered Compose required'); }
 $existing=App\Models\Service::whereEnvironmentId($environment->id)->whereName('lavabean-staging')->first();
 if ($existing) {
     echo json_encode(['project_uuid'=>$project->uuid,'environment_uuid'=>$environment->uuid,
