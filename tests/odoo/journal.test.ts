@@ -109,6 +109,26 @@ describe("Odoo journal sync", () => {
     expect(createCreditNote).toHaveBeenCalledTimes(1);
   });
 
+  it("accepts multiple partial refunds within the invoice total", async () => {
+    const createInvoice = vi.fn(async (invoice) => ({ id: "invoice_1", ...invoice }));
+    const createCreditNote = vi.fn(async (creditNote) => ({ id: "credit_1", ...creditNote }));
+    const sync = createOdooJournalSync({ createInvoice, createCreditNote });
+
+    await sync.handle({ id: "evt_paid_1", type: "order.paid", order: paidOrder });
+    const first = await sync.handle({
+      id: "evt_refund_1", type: "order.refunded", orderId: paidOrder.id,
+      refundId: "refund_1", amountCents: 3000,
+    });
+    const second = await sync.handle({
+      id: "evt_refund_2", type: "order.refunded", orderId: paidOrder.id,
+      refundId: "refund_2", amountCents: 2800,
+    });
+
+    expect([first.status, second.status]).toEqual(["refunded", "refunded"]);
+    expect(createCreditNote).toHaveBeenCalledTimes(2);
+    expect(createCreditNote.mock.calls.map(([creditNote]) => creditNote.amountCents)).toEqual([3000, 2800]);
+  });
+
   it("caps concurrent partial refunds at the original invoice total", async () => {
     const createInvoice = vi.fn(async (invoice) => ({ id: "invoice_1", ...invoice }));
     let release!: () => void;
