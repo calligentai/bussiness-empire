@@ -56,6 +56,8 @@ describe("dealer-scoped social setup fixtures", () => {
       updatedAt: "2026-10-31T12:00:00.000Z",
     };
     expect(createSocialDraft(input, dealerA)).toEqual({ ...input, dealerId: "dealer-a" });
+    const conflictingInput = { ...input, dealerId: "dealer-b" };
+    expect(createSocialDraft(conflictingInput, dealerA)).toEqual({ ...input, dealerId: "dealer-a" });
     expect(() => createSocialDraft({ ...input, text: "  " }, dealerA)).toThrow(
       "Social draft identity and text are required",
     );
