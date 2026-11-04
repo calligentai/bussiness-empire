@@ -59,4 +59,82 @@ describe("Odoo journal sync", () => {
     });
     expect(createInvoice).toHaveBeenCalledTimes(1);
   });
+
+  it("serializes concurrent paid events for the same order", async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    const createInvoice = vi.fn(async (invoice) => {
+      await gate;
+      return { id: "invoice_1", ...invoice };
+    });
+    const sync = createOdooJournalSync({ createInvoice });
+    const event = { id: "evt_paid_1", type: "order.paid" as const, order: paidOrder };
+
+    const first = sync.handle(event);
+    const duplicate = sync.handle({ ...event, id: "evt_paid_2" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(createInvoice).toHaveBeenCalledTimes(1);
+    release();
+    const results = await Promise.all([first, duplicate]);
+    expect(results.map((result) => result.status).sort()).toEqual(["booked", "duplicate"]);
+  });
+
+  it("does not create the same refund credit note concurrently twice", async () => {
+    const createInvoice = vi.fn(async (invoice) => ({ id: "invoice_1", ...invoice }));
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    const createCreditNote = vi.fn(async (creditNote) => {
+      await gate;
+      return { id: "credit_1", ...creditNote };
+    });
+    const sync = createOdooJournalSync({ createInvoice, createCreditNote });
+    await sync.handle({ id: "evt_paid_1", type: "order.paid", order: paidOrder });
+
+    const refund = {
+      id: "evt_refund_1",
+      type: "order.refunded" as const,
+      orderId: paidOrder.id,
+      refundId: "refund_1",
+      amountCents: 2000,
+    };
+    const first = sync.handle(refund);
+    const duplicate = sync.handle({ ...refund, id: "evt_refund_2" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(createCreditNote).toHaveBeenCalledTimes(1);
+    release();
+    const results = await Promise.all([first, duplicate]);
+    expect(results.map((result) => result.status).sort()).toEqual(["duplicate", "refunded"]);
+    expect(createCreditNote).toHaveBeenCalledTimes(1);
+  });
+
+  it("caps concurrent partial refunds at the original invoice total", async () => {
+    const createInvoice = vi.fn(async (invoice) => ({ id: "invoice_1", ...invoice }));
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    const createCreditNote = vi.fn(async (creditNote) => {
+      await gate;
+      return { id: "credit_1", ...creditNote };
+    });
+    const sync = createOdooJournalSync({ createInvoice, createCreditNote });
+    await sync.handle({ id: "evt_paid_1", type: "order.paid", order: paidOrder });
+
+    const first = sync.handle({
+      id: "evt_refund_1", type: "order.refunded", orderId: paidOrder.id,
+      refundId: "refund_1", amountCents: 4000,
+    });
+    const excess = sync.handle({
+      id: "evt_refund_2", type: "order.refunded", orderId: paidOrder.id,
+      refundId: "refund_2", amountCents: 2500,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(createCreditNote).toHaveBeenCalledTimes(1);
+    release();
+    const results = await Promise.allSettled([first, excess]);
+    expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    expect(results.filter((result) => result.status === "rejected")).toHaveLength(1);
+    expect(createCreditNote).toHaveBeenCalledTimes(1);
+  });
 });
