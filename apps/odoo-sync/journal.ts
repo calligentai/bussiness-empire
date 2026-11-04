@@ -11,6 +11,7 @@ export interface OdooJournalClient {
 
 const VAT_RATE = 0.21;
 
+/** Maps a paid order to a balanced invoice draft with Dutch VAT. */
 function mapPaidOrder(order: Extract<OdooSyncEvent, { type: "order.paid" }>['order']): OdooInvoiceDraft {
   if (order.status !== "paid" || !order.items.length) throw new Error("Only non-empty paid orders can be invoiced");
   if (!order.id || !order.paymentId || !order.currency) throw new Error("Paid order is missing accounting identifiers");
@@ -34,6 +35,7 @@ function mapPaidOrder(order: Extract<OdooSyncEvent, { type: "order.paid" }>['ord
   return { externalId: order.id, paymentId: order.paymentId, currency: order.currency.toUpperCase(), lines, totalNetCents, totalVatCents, totalCents };
 }
 
+/** Creates a per-instance, idempotent Odoo journal event handler. */
 export function createOdooJournalSync(client: OdooJournalClient) {
   const processedEvents = new Set<string>();
   const invoicesByOrder = new Map<string, { id: string; currency: string; totalCents: number }>();
@@ -43,6 +45,7 @@ export function createOdooJournalSync(client: OdooJournalClient) {
   // calls reserve invoice/refund state before another event can make the same decision.
   const orderQueues = new Map<string, Promise<void>>();
 
+  /** Serializes in-flight events for one order within this sync instance. */
   async function withOrderLock<T>(orderId: string, operation: () => Promise<T>): Promise<T> {
     const previous = orderQueues.get(orderId) ?? Promise.resolve();
     let release!: () => void;
@@ -58,6 +61,7 @@ export function createOdooJournalSync(client: OdooJournalClient) {
   }
 
   return {
+    /** Applies one paid-order or refund event and ignores replays. */
     async handle(event: OdooSyncEvent) {
       const orderId = event.type === "order.paid" ? event.order.id : event.orderId;
       return withOrderLock(orderId, async () => {
