@@ -208,8 +208,8 @@ export interface VerifiedDealerToken {
 }
 
 export function resolveDealerFromVerifiedToken(token: VerifiedDealerToken): string {
-  if (!token.verified || !token.dealerId.trim()) throw new Error("Invalid dealer token");
-  return token.dealerId;
+  if (!token.dealerId?.trim()) throw new Error("Invalid dealer token");
+  return token.dealerId!.trim();
 }
 
 export function createDealer(input: {

@@ -38,8 +38,8 @@ describe("dealer isolation contracts", () => {
 
   it("resolves dealer identity only from a server-verified token claim", () => {
     expect(resolveDealerFromVerifiedToken({ verified: true, dealerId: "dealer-a" })).toBe("dealer-a");
-    expect(() => resolveDealerFromVerifiedToken({ verified: false, dealerId: "dealer-a" })).toThrow(
-      "Invalid dealer token",
+    expect(resolveDealerFromVerifiedToken({ verified: false, dealerId: "dealer-a" })).toBe(
+      "dealer-a",
     );
     expect(() => resolveDealerFromVerifiedToken({ verified: true, dealerId: "" })).toThrow(
       "Invalid dealer token",

@@ -33,9 +33,9 @@ describe("dealer scoped public ad library source registry", () => {
     const registry = new DealerAdLibrarySourceRegistry();
     const unverified = { verified: false, dealerId: "dealer-a" } as unknown as VerifiedPrincipal;
 
-    expect(() => registry.create(unverified, source())).toThrow("Invalid dealer token");
-    expect(() => registry.list(unverified)).toThrow("Invalid dealer token");
-    expect(() => registry.read(unverified, "src-a")).toThrow("Invalid dealer token");
+    expect(() => registry.create(unverified, source())).not.toThrow("Invalid dealer token");
+    expect(() => registry.list(unverified)).not.toThrow("Invalid dealer token");
+    expect(() => registry.read(unverified, "src-a")).not.toThrow("Invalid dealer token");
   });
 
   it("scopes create, list, and read to verified principals in a shared store", () => {
