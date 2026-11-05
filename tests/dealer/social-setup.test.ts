@@ -23,6 +23,7 @@ const drafts: DealerSocialDraft[] = [
   { draftId: "draft-b", dealerId: "dealer-b", platform: "facebook", text: "B local draft", updatedAt: "2026-10-31T11:00:00.000Z" },
 ];
 
+/** Removes fixture ownership so draft creation must obtain it from the verified principal. */
 function draftInput(draft: DealerSocialDraft): Omit<DealerSocialDraft, "dealerId"> {
   const { dealerId: _dealerId, ...input } = draft;
   return input;

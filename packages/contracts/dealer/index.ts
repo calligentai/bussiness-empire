@@ -43,6 +43,7 @@ export interface DealerSocialDraft {
   updatedAt: string;
 }
 
+/** Resolves dealer scope only from a verified principal with a non-empty user and dealer ID. */
 function resolveSocialDealerId(principal: VerifiedPrincipal): string | undefined {
   if (
     principal.verified !== true ||
