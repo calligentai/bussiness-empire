@@ -16,6 +16,7 @@
     "brand:check": "node scripts/check-brand.mjs",
     "test": "vitest run",
     "test:brand": "vitest run tests/brand-rules.test.ts",
+    "test:incident-worktree": "node --test tests/incident-worktree.test.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test:e2e": "pnpm build && playwright test",
