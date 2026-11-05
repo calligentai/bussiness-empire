@@ -3,10 +3,13 @@
 !.env.example
 .DS_Store
 node_modules/
-.venv/
-# Added by code-review-graph
-.code-review-graph/
-
-# Local agent skill installs (not project source)
 .agents/
 skills-lock.json
+.code-review-graph/
+
+# Local dev outputs
+.nuxt/
+.output/
+storybook-static/
+test-results/
+playwright-report/
