@@ -31,14 +31,28 @@ function failing(fn: string) {
 
 function store(): ReconciliationStore {
   const records = new Map<string, ReconciliationRecord>();
+  const leases = new Map<string, string>();
+  let nextLease = 0;
   return {
     async claim(id) {
       const record = records.get(id) ?? { supplierOrderId: null, invoiceId: null, supplierState: "pending", odooState: "pending" };
+      if (leases.has(id)) return { acquired: false, reason: "busy", record } as const;
+      if (record.supplierState === "complete" && record.odooState === "complete") {
+        return { acquired: false, reason: "complete", record } as const;
+      }
+      const leaseToken = `lease-${++nextLease}`;
+      leases.set(id, leaseToken);
       records.set(id, record);
-      return record;
+      return { acquired: true, leaseToken, record } as const;
     },
     async read(id) { return records.get(id) ?? null; },
-    async finalize(id, record) { records.set(id, record); },
+    async finalize(id, leaseToken, record) {
+      if (leases.get(id) !== leaseToken) throw new Error("reconciliation lease lost");
+      records.set(id, record);
+    },
+    async release(id, leaseToken) {
+      if (leases.get(id) === leaseToken) leases.delete(id);
+    },
   };
 }
 
@@ -110,9 +124,9 @@ describe("offline supplier/Odoo reconciliation", () => {
     expect(stillOffline.humanAction).toBe("MANUAL_RECONCILIATION");
   });
 
-  it("recovery after a fully offline run creates exactly one supplier order and one journal entry", async () => {
+  it("does not retry either transport automatically after a fully offline run", async () => {
     const persistence = store();
-    const offline = await runReconciliation(order, { supplier: failing("supplier"), odoo: failing("odoo") }, persistence);
+    await runReconciliation(order, { supplier: failing("supplier"), odoo: failing("odoo") }, persistence);
 
     const supplier = okSupplier();
     const odoo = okOdoo();
@@ -161,17 +175,62 @@ describe("offline supplier/Odoo reconciliation", () => {
     else expect(retryOdoo).not.toHaveBeenCalled();
   });
 
+  it("rejects writes from a released lease owner", async () => {
+    const persistence = store();
+    const previous = await persistence.claim(order.id);
+    expect(previous.acquired).toBe(true);
+    if (!previous.acquired) throw new Error("expected initial claim to acquire the order");
+
+    await persistence.release(order.id, previous.leaseToken);
+    const current = await persistence.claim(order.id);
+    expect(current.acquired).toBe(true);
+    if (!current.acquired) throw new Error("expected replacement claim to acquire the order");
+
+    const record: ReconciliationRecord = {
+      supplierOrderId: null,
+      invoiceId: null,
+      supplierState: "uncertain",
+      odooState: "pending",
+    };
+    await expect(persistence.finalize(order.id, previous.leaseToken, record)).rejects.toThrow("lease lost");
+    await persistence.finalize(order.id, current.leaseToken, record);
+    await persistence.release(order.id, current.leaseToken);
+  });
+
+  it("allows only one overlapping reconciliation to reach the transports", async () => {
+    const persistence = store();
+    let releaseSupplier!: () => void;
+    let markSupplierStarted!: () => void;
+    const supplierGate = new Promise<void>((resolve) => { releaseSupplier = resolve; });
+    const supplierStarted = new Promise<void>((resolve) => { markSupplierStarted = resolve; });
+    const firstSupplier = vi.fn(async (request: { orderId: string }) => {
+      markSupplierStarted();
+      await supplierGate;
+      return { supplierOrderId: `supplier_${request.orderId}` };
+    });
+    const firstOdoo = okOdoo();
+    const first = runReconciliation(order, { supplier: firstSupplier, odoo: firstOdoo }, persistence);
+
+    await supplierStarted;
+    const secondSupplier = okSupplier();
+    const secondOdoo = okOdoo();
+    const second = await runReconciliation(order, { supplier: secondSupplier, odoo: secondOdoo }, persistence);
+    expect(second.status).toBe("in_progress");
+    expect(secondSupplier).not.toHaveBeenCalled();
+    expect(secondOdoo).not.toHaveBeenCalled();
+
+    releaseSupplier();
+    expect((await first).status).toBe("reconciled");
+  });
+
   it.each(["supplier", "odoo"] as const)("does not replay a %s side effect if completion persistence fails after the remote call", async (side) => {
-    const records = new Map<string, ReconciliationRecord>();
+    const base = store();
     let failCompletionWrite = true;
     const persistence: ReconciliationStore = {
-      async claim(id) {
-        const record = records.get(id) ?? { supplierOrderId: null, invoiceId: null, supplierState: "pending", odooState: "pending" };
-        records.set(id, record);
-        return record;
-      },
-      async read(id) { return records.get(id) ?? null; },
-      async finalize(id, record) {
+      claim: (id) => base.claim(id),
+      read: (id) => base.read(id),
+      release: (id, leaseToken) => base.release(id, leaseToken),
+      async finalize(id, leaseToken, record) {
         const isRemoteCompletion = side === "supplier"
           ? record.supplierState === "complete"
           : record.odooState === "complete";
@@ -179,7 +238,7 @@ describe("offline supplier/Odoo reconciliation", () => {
           failCompletionWrite = false;
           throw new Error("simulated process crash before completion was persisted");
         }
-        records.set(id, record);
+        await base.finalize(id, leaseToken, record);
       },
     };
     let supplierEffects = 0;
