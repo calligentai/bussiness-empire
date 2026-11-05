@@ -1,4 +1,4 @@
-import type { DealerRole } from "../auth";
+import type { DealerRole, VerifiedPrincipal } from "../auth";
 
 export type DealerStatus = "active" | "suspended" | "closed";
 
@@ -43,39 +43,58 @@ export interface DealerSocialDraft {
   updatedAt: string;
 }
 
-/** Returns only the active dealer's local disconnected setup fixtures. */
+function resolveSocialDealerId(principal: VerifiedPrincipal): string | undefined {
+  if (
+    principal.verified !== true ||
+    typeof principal.userId !== "string" ||
+    !principal.userId.trim() ||
+    typeof principal.dealerId !== "string" ||
+    !principal.dealerId.trim()
+  ) return undefined;
+  return principal.dealerId;
+}
+
+/** Returns only the active principal's local disconnected setup fixtures. */
 export function readSocialSetupForDealer(
   setups: readonly DealerSocialSetup[],
-  dealerId: string,
+  principal: VerifiedPrincipal,
 ): DealerSocialSetup[] {
-  if (!dealerId.trim()) return [];
+  const dealerId = resolveSocialDealerId(principal);
+  if (!dealerId) return [];
   return setups
     .filter((setup) => setup.dealerId === dealerId && setup.connectionStatus === "disconnected")
     .map((setup) => ({ ...setup }));
 }
 
-/** Reads local drafts only; absent or cross-dealer ownership fails closed. */
+/** Reads local drafts for the verified principal only; absent/cross-dealer ownership fails closed. */
 export function readSocialDraftForDealer(
   drafts: readonly DealerSocialDraft[],
   draftId: string,
-  dealerId: string,
+  principal: VerifiedPrincipal,
 ): DealerSocialDraft | undefined {
-  if (!draftId.trim() || !dealerId.trim()) return undefined;
+  const dealerId = resolveSocialDealerId(principal);
+  if (!draftId.trim() || !dealerId) return undefined;
   const matches = drafts.filter((draft) => draft.draftId === draftId && draft.dealerId === dealerId);
   if (matches.length > 1) throw new Error("Social draft is ambiguous");
   return matches[0] ? { ...matches[0] } : undefined;
 }
 
-/** Creates a local draft without invoking a provider or scheduling a post. */
-export function createSocialDraft(input: DealerSocialDraft): DealerSocialDraft {
-  if (!input.draftId.trim() || !input.dealerId.trim() || !input.text.trim()) {
+/** Creates a local draft for the verified principal without provider or scheduling side effects. */
+export function createSocialDraft(
+  input: Omit<DealerSocialDraft, "dealerId">,
+  principal: VerifiedPrincipal,
+): DealerSocialDraft {
+  const dealerId = resolveSocialDealerId(principal);
+  if (!dealerId) throw new Error("Verified dealer principal is required");
+  const draft = { ...input, dealerId };
+  if (!draft.draftId.trim() || !draft.text.trim()) {
     throw new Error("Social draft identity and text are required");
   }
-  if (!Number.isFinite(Date.parse(input.updatedAt))) throw new Error("Social draft timestamp is invalid");
-  if (!["instagram", "facebook", "linkedin"].includes(input.platform)) {
+  if (!Number.isFinite(Date.parse(draft.updatedAt))) throw new Error("Social draft timestamp is invalid");
+  if (!["instagram", "facebook", "linkedin"].includes(draft.platform)) {
     throw new Error("Social platform is invalid");
   }
-  return { ...input };
+  return draft;
 }
 
 export type SeoPaidOperation = "keyword_lookup" | "serp_lookup" | "backlink_lookup";
