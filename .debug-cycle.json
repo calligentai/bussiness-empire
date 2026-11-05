@@ -1,0 +1,30 @@
+{
+  "checks": [
+    {
+      "name": "configuration-regressions",
+      "kind": "test",
+      "argv": [
+        "/opt/homebrew/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "timeout": 60
+    },
+    {
+      "name": "source-integrity",
+      "kind": "test",
+      "argv": [
+        "/usr/bin/shasum",
+        "-a",
+        "256",
+        "-c",
+        "docs/sources/SHA256SUMS"
+      ],
+      "timeout": 30
+    }
+  ]
+}
