@@ -67,7 +67,7 @@ describe("offline supplier/Odoo reconciliation", () => {
     expect(outcome.status).toBe("supplier_offline");
     expect(outcome.supplierOrderId).toBeNull();
     expect(outcome.invoiceId).toBe("invoice_order_test_1");
-    expect(outcome.humanAction).toBe("PLACE_SUPPLIER_ORDER_MANUALLY");
+    expect(outcome.humanAction).toBe("VERIFY_SUPPLIER_ORDER");
     expect(supplier).toHaveBeenCalledTimes(1);
 
     const recovered = await runReconciliation(order, { supplier: okSupplier(), odoo: okOdoo() }, persistence);
@@ -84,7 +84,7 @@ describe("offline supplier/Odoo reconciliation", () => {
     expect(outcome.status).toBe("odoo_offline");
     expect(outcome.supplierOrderId).toBe("supplier_order_order_test_1");
     expect(outcome.invoiceId).toBeNull();
-    expect(outcome.humanAction).toBe("VERIFY_AND_BOOK_JOURNAL");
+    expect(outcome.humanAction).toBe("VERIFY_ODOO_JOURNAL");
 
     const recovered = await runReconciliation(order, { supplier: okSupplier(), odoo: okOdoo() }, persistence);
     expect(recovered.status).toBe("odoo_offline");
@@ -153,11 +153,52 @@ describe("offline supplier/Odoo reconciliation", () => {
 
     expect(first.status).toBe(lostTransport === "supplier" ? "supplier_offline" : "odoo_offline");
     expect(retry.status).toBe(first.status);
+    expect(retry.humanAction).toBe(lostTransport === "supplier" ? "VERIFY_SUPPLIER_ORDER" : "VERIFY_ODOO_JOURNAL");
     expect(supplierEffects).toBe(1);
     expect(odooEffects).toBe(1);
     expect(retrySupplier).not.toHaveBeenCalled();
     if (lostTransport === "supplier") expect(retryOdoo).not.toHaveBeenCalled();
     else expect(retryOdoo).not.toHaveBeenCalled();
+  });
+
+  it.each(["supplier", "odoo"] as const)("does not replay a %s side effect if completion persistence fails after the remote call", async (side) => {
+    const records = new Map<string, ReconciliationRecord>();
+    let failCompletionWrite = true;
+    const persistence: ReconciliationStore = {
+      async claim(id) {
+        const record = records.get(id) ?? { supplierOrderId: null, invoiceId: null, supplierState: "pending", odooState: "pending" };
+        records.set(id, record);
+        return record;
+      },
+      async read(id) { return records.get(id) ?? null; },
+      async finalize(id, record) {
+        const isRemoteCompletion = side === "supplier"
+          ? record.supplierState === "complete"
+          : record.odooState === "complete";
+        if (failCompletionWrite && isRemoteCompletion) {
+          failCompletionWrite = false;
+          throw new Error("simulated process crash before completion was persisted");
+        }
+        records.set(id, record);
+      },
+    };
+    let supplierEffects = 0;
+    let odooEffects = 0;
+    const supplier = vi.fn(async (request: { orderId: string }) => {
+      supplierEffects += 1;
+      return { supplierOrderId: `supplier_${request.orderId}` };
+    });
+    const odoo = vi.fn(async (invoice: OdooInvoiceDraft) => {
+      odooEffects += 1;
+      return { id: `invoice_${invoice.externalId}` };
+    });
+
+    await expect(runReconciliation(order, { supplier, odoo }, persistence))
+      .rejects.toThrow("simulated process crash");
+
+    await runReconciliation(order, { supplier, odoo }, persistence);
+    expect(supplierEffects).toBe(1);
+    expect(odooEffects).toBe(1);
   });
 
   it("passes a stable idempotency key derived from the paid order to the supplier transport", async () => {

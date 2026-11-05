@@ -12,7 +12,7 @@ export interface SupplierOrderRequest {
 export type SupplierTransport = (request: SupplierOrderRequest) => Promise<{ supplierOrderId: string }>;
 export type OdooTransport = (invoice: OdooInvoiceDraft) => Promise<{ id: string }>;
 export type ReconciliationStatus = "reconciled" | "supplier_offline" | "odoo_offline" | "offline" | "already_reconciled";
-export type HumanRecoveryAction = "PLACE_SUPPLIER_ORDER_MANUALLY" | "VERIFY_AND_BOOK_JOURNAL" | "MANUAL_RECONCILIATION";
+export type HumanRecoveryAction = "VERIFY_SUPPLIER_ORDER" | "VERIFY_ODOO_JOURNAL" | "MANUAL_RECONCILIATION";
 export interface ReconciliationOutcome {
   status: ReconciliationStatus;
   supplierOrderId: string | null;
@@ -55,30 +55,42 @@ export async function runReconciliation(
   }
   let { supplierOrderId, invoiceId, supplierState, odooState } = record;
   if (supplierState === "pending") {
+    // Persist uncertainty before the remote side effect. If the process stops after
+    // the supplier accepts the order but before the success record is durable, a
+    // retry must not place a second order automatically.
+    supplierState = "uncertain";
+    await store.finalize(order.id, { supplierOrderId, invoiceId, supplierState, odooState });
     try {
       const placed = await transports.supplier({ orderId: order.id, idempotencyKey: order.id, lines });
       if (!placed?.supplierOrderId) throw new Error("Supplier transport returned no supplier order id");
       supplierOrderId = placed.supplierOrderId;
       supplierState = "complete";
     } catch {
-      supplierState = "uncertain";
+      // Keep the durable uncertainty marker. A transport error cannot prove the
+      // supplier did not accept the order.
     }
-    await store.finalize(order.id, { supplierOrderId, invoiceId, supplierState, odooState });
+    if (supplierState === "complete") await store.finalize(order.id, { supplierOrderId, invoiceId, supplierState, odooState });
   }
   if (odooState === "pending") {
+    // Apply the same write-ahead uncertainty marker to the accounting side effect.
+    odooState = "uncertain";
+    await store.finalize(order.id, { supplierOrderId, invoiceId, supplierState, odooState });
     try {
       const booked = await transports.odoo(invoiceDraft);
       if (!booked?.id) throw new Error("Odoo transport returned no invoice id");
       invoiceId = booked.id;
       odooState = "complete";
     } catch {
-      odooState = "uncertain";
+      // Keep the durable uncertainty marker; do not blindly book the journal twice.
     }
-    await store.finalize(order.id, { supplierOrderId, invoiceId, supplierState, odooState });
+    if (odooState === "complete") await store.finalize(order.id, { supplierOrderId, invoiceId, supplierState, odooState });
   }
+  if (supplierState === "uncertain" && odooState === "uncertain") return outcome("offline", supplierOrderId, invoiceId, "MANUAL_RECONCILIATION");
+  if (supplierState === "uncertain") return outcome("supplier_offline", supplierOrderId, invoiceId, "VERIFY_SUPPLIER_ORDER");
+  if (odooState === "uncertain") return outcome("odoo_offline", supplierOrderId, invoiceId, "VERIFY_ODOO_JOURNAL");
   if (!supplierOrderId && !invoiceId) return outcome("offline", supplierOrderId, invoiceId, "MANUAL_RECONCILIATION");
-  if (!invoiceId) return outcome("odoo_offline", supplierOrderId, invoiceId, "VERIFY_AND_BOOK_JOURNAL");
-  if (!supplierOrderId) return outcome("supplier_offline", supplierOrderId, invoiceId, "PLACE_SUPPLIER_ORDER_MANUALLY");
+  if (!invoiceId) return outcome("odoo_offline", supplierOrderId, invoiceId, "VERIFY_ODOO_JOURNAL");
+  if (!supplierOrderId) return outcome("supplier_offline", supplierOrderId, invoiceId, "VERIFY_SUPPLIER_ORDER");
   return outcome("reconciled", supplierOrderId, invoiceId, null);
 }
 
