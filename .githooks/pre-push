@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Last gate before code leaves the machine. Checks the tree being pushed (HEAD),
+# not the working copy, so `git commit --no-verify` can't slip a broken hash through.
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+git -C "$root" archive HEAD | tar -x -C "$tmp"
+cd "$tmp"
+
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256sum --quiet -c docs/sources/SHA256SUMS >/dev/null
+else
+  shasum -a 256 -c docs/sources/SHA256SUMS >/dev/null
+fi

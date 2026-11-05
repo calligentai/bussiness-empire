@@ -6,3 +6,8 @@ node_modules/
 .venv/
 __pycache__/
 *.pyc
+.nuxt/
+.output/
+storybook-static/
+test-results/
+playwright-report/

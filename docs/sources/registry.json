@@ -1,0 +1,35 @@
+{
+  "imported_on": "2026-10-21",
+  "documents": [
+    {
+      "source": "/Users/admin/Downloads/BUSINESS_EMPIRE_Master_Execution_Plan_v1.1_TDD_Production.md",
+      "path": "docs/plans/BUSINESS_EMPIRE_Master_Execution_Plan_v1.1_TDD_Production.md",
+      "sha256": "4e76b3fb91498cae99c759385e9541741661bb8349630107666311e5fe25e9ad",
+      "role": "active design baseline"
+    },
+    {
+      "source": "/Users/admin/Downloads/BUSINESS_EMPIRE_Master_Execution_Plan_v1.md",
+      "path": "docs/plans/archive/BUSINESS_EMPIRE_Master_Execution_Plan_v1.md",
+      "sha256": "3871de5a4f0caef5034882b5d10fba01f34dbeffc6cab977d299a3bb272ce9b7",
+      "role": "historical version"
+    },
+    {
+      "source": "/Users/admin/Downloads/de_koffiefabriek_strategisch_masterplan.md",
+      "path": "docs/background/de_koffiefabriek_strategisch_masterplan.md",
+      "sha256": "5fdea9deefbab1893c99c00be6991204555e51091d7fbbeb92b4525b53a345ea",
+      "role": "background; not automatically Empire scope"
+    },
+    {
+      "source": "/Users/admin/Downloads/de_koffiefabriek_technische_specificatie_communicatieprotocol.md",
+      "path": "docs/background/de_koffiefabriek_technische_specificatie_communicatieprotocol.md",
+      "sha256": "ed395c267ed22bcb03b7452c4463d1e659423ebadea6608f1a70531f123d360a",
+      "role": "background; hardware requirements not validated"
+    },
+    {
+      "source": "/Users/admin/Projects/LAVA-BEAN/docs/rea/Hifany_LavaBean_REA_Codex_bijgewerkt.md",
+      "path": "docs/rea/Hifany_LavaBean_REA_Codex_bijgewerkt.md",
+      "sha256": "c95c4b028cd41076adecf9cd472df1e49711d9e34842a3aaff6c2cbcd5655e14",
+      "role": "research method; not execution authorization"
+    }
+  ]
+}
