@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { createVerifiedPrincipal } from "../../packages/contracts/auth";
+<<<<<<< HEAD
 import { DealerAdLibrarySourceRegistry } from "../../packages/contracts/dealer/ad-library";
+=======
+import { DealerAdLibrarySourceRegistry } from "../../packages/contracts/dealer";
+>>>>>>> origin/feature/BUS-123-m6-r6-4-follow-up-dealer-dashboard-for-public-ad-library-sources-0
 
 // Fixture identity only. This page is a local demo and is not production-authenticated.
 const now = Math.floor(Date.now() / 1000);

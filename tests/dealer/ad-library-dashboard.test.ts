@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createVerifiedPrincipal } from "../../packages/contracts/auth";
+<<<<<<< HEAD
 import { DealerAdLibrarySourceRegistry } from "../../packages/contracts/dealer/ad-library";
+=======
+import { DealerAdLibrarySourceRegistry } from "../../packages/contracts/dealer";
+>>>>>>> origin/feature/BUS-123-m6-r6-4-follow-up-dealer-dashboard-for-public-ad-library-sources-0
 import AdLibraryDashboard from "../../components/AdLibraryDashboard.vue";
 
 const now = Math.floor(Date.now() / 1000);
