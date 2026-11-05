@@ -1,4 +1,4 @@
-import type { DealerRole } from "../auth";
+import type { DealerRole, VerifiedPrincipal } from "../auth";
 
 export type DealerStatus = "active" | "suspended" | "closed";
 
@@ -25,6 +25,77 @@ export interface DealerMembership {
   dealerId: string;
   userId: string;
   role: DealerRole;
+}
+
+export type SocialPlatform = "instagram" | "facebook" | "linkedin";
+
+export interface DealerSocialSetup {
+  dealerId: string;
+  platform: SocialPlatform;
+  connectionStatus: "disconnected";
+}
+
+export interface DealerSocialDraft {
+  draftId: string;
+  dealerId: string;
+  platform: SocialPlatform;
+  text: string;
+  updatedAt: string;
+}
+
+/** Resolves dealer scope only from a verified principal with a non-empty user and dealer ID. */
+function resolveSocialDealerId(principal: VerifiedPrincipal): string | undefined {
+  if (
+    principal.verified !== true ||
+    typeof principal.userId !== "string" ||
+    !principal.userId.trim() ||
+    typeof principal.dealerId !== "string" ||
+    !principal.dealerId.trim()
+  ) return undefined;
+  return principal.dealerId;
+}
+
+/** Returns only the active principal's local disconnected setup fixtures. */
+export function readSocialSetupForDealer(
+  setups: readonly DealerSocialSetup[],
+  principal: VerifiedPrincipal,
+): DealerSocialSetup[] {
+  const dealerId = resolveSocialDealerId(principal);
+  if (!dealerId) return [];
+  return setups
+    .filter((setup) => setup.dealerId === dealerId && setup.connectionStatus === "disconnected")
+    .map((setup) => ({ ...setup }));
+}
+
+/** Reads local drafts for the verified principal only; absent/cross-dealer ownership fails closed. */
+export function readSocialDraftForDealer(
+  drafts: readonly DealerSocialDraft[],
+  draftId: string,
+  principal: VerifiedPrincipal,
+): DealerSocialDraft | undefined {
+  const dealerId = resolveSocialDealerId(principal);
+  if (!draftId.trim() || !dealerId) return undefined;
+  const matches = drafts.filter((draft) => draft.draftId === draftId && draft.dealerId === dealerId);
+  if (matches.length > 1) throw new Error("Social draft is ambiguous");
+  return matches[0] ? { ...matches[0] } : undefined;
+}
+
+/** Creates a local draft for the verified principal without provider or scheduling side effects. */
+export function createSocialDraft(
+  input: Omit<DealerSocialDraft, "dealerId">,
+  principal: VerifiedPrincipal,
+): DealerSocialDraft {
+  const dealerId = resolveSocialDealerId(principal);
+  if (!dealerId) throw new Error("Verified dealer principal is required");
+  const draft = { ...input, dealerId };
+  if (!draft.draftId.trim() || !draft.text.trim()) {
+    throw new Error("Social draft identity and text are required");
+  }
+  if (!Number.isFinite(Date.parse(draft.updatedAt))) throw new Error("Social draft timestamp is invalid");
+  if (!["instagram", "facebook", "linkedin"].includes(draft.platform)) {
+    throw new Error("Social platform is invalid");
+  }
+  return draft;
 }
 
 export type SeoPaidOperation = "keyword_lookup" | "serp_lookup" | "backlink_lookup";
