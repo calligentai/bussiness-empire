@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Preserve organization-level CodeRabbit settings and only enable the repository's
+# non-default integration branches for automatic review.
+inheritance: true
+
+reviews:
+  auto_review:
+    enabled: true
+    base_branches:
+      - "^lavabean$"
+      - "^feature/paperclip-orchestrator$"
+      - "^feature/dev-workflow$"
