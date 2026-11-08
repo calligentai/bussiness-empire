@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { products } from "../data/products";
 
+const lavaBeanLots = products.filter((product) => product.brand !== "DRI");
+const driProducts = products.filter((product) => product.brand === "DRI");
+
 useSeoMeta({
   title: "Lava Bean — Volcanic precision. No noise.",
   description:
@@ -49,8 +52,19 @@ const stats = [
       <h2 id="shop-title" class="lb-section__title">Three beans. Zero guesswork.</h2>
     </div>
     <div class="lb-grid">
-      <ProductCard v-for="product in products" :key="product.slug" :product="product" />
+      <ProductCard v-for="product in lavaBeanLots" :key="product.slug" :product="product" />
     </div>
+
+    <section id="dri" class="lb-dri" aria-labelledby="dri-title">
+      <div class="lb-section__head">
+        <p class="lb-eyebrow">DRI Coffee</p>
+        <h2 id="dri-title" class="lb-section__title">Specialty Arabica from Rwanda.</h2>
+      </div>
+      <p class="lb-dri__note">Sold as DRI Coffee, separate from the Lava Bean lots.</p>
+      <div class="lb-grid">
+        <ProductCard v-for="product in driProducts" :key="product.slug" :product="product" />
+      </div>
+    </section>
   </section>
 
   <section id="provenance" class="lb-provenance">
@@ -207,6 +221,18 @@ const stats = [
   font-size: var(--lb-text-100);
   letter-spacing: var(--lb-tracking-wide);
   text-align: right;
+}
+
+.lb-dri {
+  margin-top: var(--lb-space-8);
+  padding-top: var(--lb-space-7);
+  border-top: var(--lb-border-hairline) solid var(--lb-color-line);
+}
+
+.lb-dri__note {
+  max-width: 46ch;
+  margin-bottom: var(--lb-space-5);
+  color: var(--lb-color-muted);
 }
 
 .lb-section__head {

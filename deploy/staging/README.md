@@ -25,6 +25,33 @@ port 18081; do not change this to 0.0.0.0 without adding access control.
 The health endpoint is /healthz. Every staging response carries X-Robots-Tag:
 noindex, nofollow, noarchive and Cache-Control: no-store.
 
+## Second local-image service (port 18082)
+
+The running Coolify Compose resource
+`/data/coolify/services/ywwvl15ktujn5pydtfrug0mb/docker-compose.yml` is a
+separate staging copy. It already binds `100.111.84.46:18082:3000` with
+`pull_policy: never` and the image name `lavabean-staging:<git sha>`. Do not
+point it at a registry, and do not change its port, environment, read-only
+filesystem, memory, CPU, or health settings.
+
+Leave the original service on port 18081 untouched. Build and retag only on
+the iMac, then change the 18082 service image tag to the new full Git revision:
+
+```sh
+docker build \
+  -f deploy/staging/Dockerfile \
+  --build-arg APP_REVISION=FULL_REVISION \
+  -t lavabean-staging:FULL_REVISION \
+  .
+```
+
+In that service's compose file, replace the `image:` value with
+`lavabean-staging:FULL_REVISION`. Keep `pull_policy: never` and
+`100.111.84.46:18082:3000`. Redeploy only service
+`ywwvl15ktujn5pydtfrug0mb`. Confirm `http://100.111.84.46:18082/healthz`
+reports the new revision and that `/product/dri-coffee-specialty-arabica-rwanda`
+loads. Confirm port 18081 still reports its previous revision.
+
 ## Rollback
 
 Keep the previous release directory, rendered Compose and image.
