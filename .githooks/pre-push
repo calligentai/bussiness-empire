@@ -24,5 +24,11 @@ for tree in $trees; do
     cd "$tmp/$tree"
     git init -q
     ./verify.sh
+    # Older verify.sh versions stop after the doc hashes; app trees still need the full gate.
+    if [ -f package.json ] && ! grep -q 'pnpm build' verify.sh; then
+      pnpm install --frozen-lockfile
+      pnpm test
+      pnpm build
+    fi
   )
 done
