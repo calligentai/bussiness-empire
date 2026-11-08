@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
 # Auto-CI: refuses the commit if a recorded doc hash, a test or the build fails.
+# Checks an export of the index, so the result covers exactly what gets committed.
 set -euo pipefail
-exec "$(git rev-parse --show-toplevel)/verify.sh"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+git checkout-index --all --prefix="$tmp/"
+"$tmp/verify.sh"

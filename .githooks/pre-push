@@ -1,10 +1,21 @@
 #!/usr/bin/env bash
-# Last gate before code leaves the machine. Checks the tree being pushed (HEAD),
+# Last gate before code leaves the machine. Checks every tree being pushed,
 # not the working copy, so `git commit --no-verify` can't slip a broken tree through.
 set -euo pipefail
 root="$(git rev-parse --show-toplevel)"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
-git -C "$root" archive HEAD | tar -x -C "$tmp"
-"$tmp/verify.sh"
+# Stdin lines are "<local ref> <local oid> <remote ref> <remote oid>"; an all-zero
+# local oid is a deletion. Collected first so verify.sh can't consume the input.
+trees="$(
+  while read -r _ local_oid _ _; do
+    [[ "$local_oid" =~ ^0+$ ]] || git -C "$root" rev-parse -q --verify "$local_oid^{tree}" || true
+  done | sort -u
+)"
+
+for tree in $trees; do
+  mkdir "$tmp/$tree"
+  git -C "$root" archive "$tree" | tar -x -C "$tmp/$tree"
+  "$tmp/$tree/verify.sh"
+done
