@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { VerifiedPrincipal } from "../packages/contracts/auth";
-<<<<<<< HEAD
 import { DealerAdLibrarySourceRegistry } from "../packages/contracts/dealer/ad-library";
-=======
-import { DealerAdLibrarySourceRegistry } from "../packages/contracts/dealer";
->>>>>>> origin/feature/BUS-123-m6-r6-4-follow-up-dealer-dashboard-for-public-ad-library-sources-0
 
 const props = defineProps<{ registry: DealerAdLibrarySourceRegistry; principal: VerifiedPrincipal }>();
 const url = ref("");

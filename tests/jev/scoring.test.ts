@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { JevRubricError, JevScoreError, LAVABEAN_JEV_RUBRIC, scoreJev } from "../../server/jev/scoring";
@@ -49,7 +49,7 @@ describe("LAVABEAN_JEV_RUBRIC", () => {
   });
 
   it("is documented in docs/jev/scoring-rubric.md", () => {
-    const docPath = fileURLToPath(new URL("../../docs/jev/scoring-rubric.md", import.meta.url));
+    const docPath = resolve(process.cwd(), "docs/jev/scoring-rubric.md");
     const doc = readFileSync(docPath, "utf8");
     for (const dimension of LAVABEAN_JEV_RUBRIC.dimensions) {
       expect(doc).toContain(dimension.id);
