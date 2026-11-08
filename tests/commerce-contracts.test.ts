@@ -33,7 +33,8 @@ describe("R3.1 Medusa product contract", () => {
       for (const variant of product.variants) {
         expect(variant.id).toMatch(/^variant_/);
         expect(variant.title.length).toBeGreaterThan(0);
-        expect(variant.sku).toMatch(/^LB-/);
+        const skuPattern = product.metadata?.brand === "DRI" ? /^DRI-/ : /^LB-/;
+        expect(variant.sku).toMatch(skuPattern);
         expect(Array.isArray(variant.options)).toBe(true);
         expect(variant.options.length).toBeGreaterThan(0);
         expect(variant.price_set.id).toMatch(/^pset_/);

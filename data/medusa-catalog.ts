@@ -118,6 +118,85 @@ export const catalog: StoreProduct[] = [
     ],
     images: [],
   },
+  {
+    id: "prod_dri_rwanda",
+    title: "DRI Coffee – Specialty Arabica from Rwanda, Medium Roast",
+    handle: "dri-coffee-specialty-arabica-rwanda",
+    subtitle: "DRI Coffee",
+    description:
+      "100% Arabica from Rwanda's volcanic highlands at 1,600–2,000 m. Fully washed and medium roasted, with floral and light fruity notes and a clean finish. Suited to filter, pour-over, and espresso.",
+    status: "published",
+    thumbnail: "/products/dri-rwanda-specialty-arabica.jpg",
+    origin_country: "RW",
+    metadata: {
+      brand: "DRI",
+      origin: "Rwanda",
+      process: "Fully washed",
+      notes: ["Floral", "Light fruit", "Clean finish"],
+      roast: "Medium",
+      altitude: "1,600–2,000 m",
+      recipe: "Filter, pour-over, espresso",
+      recipeLabel: "Brew",
+      imageAlt:
+        "Three DRI roasted coffee bags in 1 kg, 500 g, and 250 g sizes on a bed of roasted beans.",
+    },
+    options: [
+      {
+        id: "opt_dri_rwanda_weight",
+        title: "Weight",
+        values: [
+          { id: "optval_dri_rw_250g", value: "250 g" },
+          { id: "optval_dri_rw_500g", value: "500 g" },
+          { id: "optval_dri_rw_1kg", value: "1 kg" },
+        ],
+      },
+    ],
+    variants: [
+      {
+        id: "variant_dri_rwanda_250g",
+        title: "250 g",
+        sku: "DRI-RW-250G",
+        options: [{ id: "optval_dri_rw_250g", value: "250 g" }],
+        price_set: {
+          id: "pset_dri_rwanda_250g",
+          prices: [{ id: "price_dri_rwanda_250g_eur", amount: 9.49, currency_code: "eur" }],
+        },
+        inventory_quantity: null,
+        manage_inventory: false,
+      },
+      {
+        id: "variant_dri_rwanda_500g",
+        title: "500 g",
+        sku: "DRI-RW-500G",
+        options: [{ id: "optval_dri_rw_500g", value: "500 g" }],
+        price_set: {
+          id: "pset_dri_rwanda_500g",
+          prices: [{ id: "price_dri_rwanda_500g_eur", amount: 16.96, currency_code: "eur" }],
+        },
+        inventory_quantity: null,
+        manage_inventory: false,
+      },
+      {
+        id: "variant_dri_rwanda_1kg",
+        title: "1 kg",
+        sku: "DRI-RW-1KG",
+        options: [{ id: "optval_dri_rw_1kg", value: "1 kg" }],
+        price_set: {
+          id: "pset_dri_rwanda_1kg",
+          prices: [{ id: "price_dri_rwanda_1kg_eur", amount: 29.96, currency_code: "eur" }],
+        },
+        inventory_quantity: null,
+        manage_inventory: false,
+      },
+    ],
+    images: [
+      {
+        id: "img_dri_rwanda_01",
+        url: "/products/dri-rwanda-specialty-arabica.jpg",
+        rank: 0,
+      },
+    ],
+  },
 ];
 
 const applicablePrice = (
