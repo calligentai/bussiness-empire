@@ -5,5 +5,5 @@ set -euo pipefail
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
-git checkout-index --all --prefix="$tmp/"
+git checkout-index --all --ignore-skip-worktree-bits --prefix="$tmp/"
 "$tmp/verify.sh"

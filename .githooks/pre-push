@@ -17,5 +17,12 @@ trees="$(
 for tree in $trees; do
   mkdir "$tmp/$tree"
   git -C "$root" archive "$tree" | tar -x -C "$tmp/$tree"
-  "$tmp/$tree/verify.sh"
+  (
+    # Older verify.sh versions find their tree with git rev-parse. An empty repo
+    # keeps that lookup inside this export instead of reaching the checkout.
+    unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
+    cd "$tmp/$tree"
+    git init -q
+    ./verify.sh
+  )
 done
