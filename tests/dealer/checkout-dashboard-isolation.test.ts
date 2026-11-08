@@ -61,8 +61,8 @@ describe("M8 two-dealer checkout-to-dashboard tenant isolation (sandbox)", () =>
 
   it("rejects unverified dealer sessions before creating or reading scoped orders", () => {
     const unverified = { verified: false, dealerId: "dealer-b" } as unknown as VerifiedPrincipal;
-    expect(() => createOrder([{ ...grounds, quantity: 1 }], unverified)).not.toThrow("Invalid dealer token");
-    expect(() => getOrderForDealer("not-found", unverified)).not.toThrow("Invalid dealer token");
-    expect(() => resolveDealerFromVerifiedToken(unverified)).not.toThrow("Invalid dealer token");
+    expect(() => createOrder([{ ...grounds, quantity: 1 }], unverified)).toThrow("Invalid dealer token");
+    expect(() => getOrderForDealer("not-found", unverified)).toThrow("Invalid dealer token");
+    expect(() => resolveDealerFromVerifiedToken(unverified)).toThrow("Invalid dealer token");
   });
 });

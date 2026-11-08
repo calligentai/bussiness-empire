@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-# Auto-CI: refuses the commit if any recorded doc hash no longer matches.
+# Auto-CI: refuses the commit if a recorded doc hash, a test or the build fails.
 set -euo pipefail
-exec "$(git rev-parse --show-toplevel)/verify.sh" >/dev/null
+exec "$(git rev-parse --show-toplevel)/verify.sh"

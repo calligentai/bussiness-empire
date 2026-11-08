@@ -14,7 +14,7 @@ Koffiefabriek documents in docs/background are background only. Their claims and
 
 From repository root, run: ./verify.sh
 
-That script is the whole CI. GitHub Actions is deliberately not used: the calligentai account is billing-locked, and paid hosted minutes are out of scope.
+That script is the whole CI: source-document hashes, frozen-lockfile install, unit tests and the production build. GitHub Actions is deliberately not used: the calligentai account is billing-locked, and paid hosted minutes are out of scope.
 
 It runs automatically at two points: `.githooks/pre-commit` calls `verify.sh` and refuses the commit, and `.githooks/pre-push` re-checks the tree being pushed (so `--no-verify` can't get around it). Enable on a fresh clone once:
 
@@ -24,4 +24,4 @@ Update `docs/sources/SHA256SUMS` in the same commit whenever a tracked source do
 
 Also run: git diff --check
 
-Documentation bootstrap has no application dependencies. Git, authenticated GitHub CLI and SHA-256 verification are required. Runtime isolation, manifests and lockfiles remain mandatory before application implementation.
+Git, authenticated GitHub CLI, SHA-256 verification, Node and pnpm are required.
