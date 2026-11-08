@@ -24,8 +24,9 @@ for tree in $trees; do
     cd "$tmp/$tree"
     git init -q
     ./verify.sh
-    # Older verify.sh versions stop after the doc hashes; app trees still need the full gate.
-    if [ -f package.json ] && ! grep -q 'pnpm build' verify.sh; then
+    # Older verify.sh versions stop after the doc hashes, and a pushed script can't
+    # vouch for itself, so the hook runs the app gate on every app tree.
+    if [ -f package.json ]; then
       pnpm install --frozen-lockfile
       pnpm test
       pnpm build
