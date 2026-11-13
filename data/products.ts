@@ -7,7 +7,21 @@ const text = (metadata: Record<string, unknown> | null, key: string): string =>
 
 const toLegacyProduct = (product: StoreProduct): Product => {
   const variant = product.variants[0];
-  const amount = variant?.calculated_price?.calculated_amount ?? 0;
+  const sizes =
+    product.variants.length > 1
+      ? product.variants.map((item) => ({
+          id: item.id,
+          label: item.title,
+          priceCents: Math.round((item.calculated_price?.calculated_amount ?? 0) * 100),
+        }))
+      : undefined;
+  const amount = sizes
+    ? Math.min(...sizes.map((size) => size.priceCents)) / 100
+    : (variant?.calculated_price?.calculated_amount ?? 0);
+  const brand = text(product.metadata, "brand");
+  const imageSrc = product.thumbnail ?? product.images[0]?.url ?? "";
+  const imageAlt = text(product.metadata, "imageAlt");
+  const recipeLabel = text(product.metadata, "recipeLabel");
 
   return {
     slug: product.handle,
@@ -19,8 +33,13 @@ const toLegacyProduct = (product: StoreProduct): Product => {
       : [],
     roast: text(product.metadata, "roast"),
     priceCents: Math.round(amount * 100),
+    ...(!sizes && variant?.title ? { unitLabel: variant.title } : {}),
     altitude: text(product.metadata, "altitude"),
     recipe: text(product.metadata, "recipe"),
+    ...(brand ? { brand, description: product.description ?? "" } : {}),
+    ...(recipeLabel ? { recipeLabel } : {}),
+    ...(imageSrc && imageAlt ? { image: { src: imageSrc, alt: imageAlt } } : {}),
+    ...(sizes ? { sizes } : {}),
   };
 };
 

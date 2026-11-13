@@ -1,10 +1,20 @@
 <script setup lang="ts">
+import { useCart } from "./composables/useCart";
+
 const navigation = [
   { label: "Shop", to: "/#shop" },
   { label: "Provenance", to: "/#provenance" },
   { label: "Science", to: "/#science" },
   { label: "Dealer demo", to: "/dealer" },
 ];
+
+const { itemCount } = useCart();
+const cartDialog = ref<HTMLDialogElement | null>(null);
+const openCart = () => cartDialog.value?.showModal();
+const closeCart = () => cartDialog.value?.close();
+const onDialogClick = (event: MouseEvent) => {
+  if (event.target === cartDialog.value) closeCart();
+};
 </script>
 
 <template>
@@ -22,8 +32,24 @@ const navigation = [
           </li>
         </ul>
       </nav>
-      <NuxtLink to="/product/virunga-washed" class="lb-header__cta">Shop the bean</NuxtLink>
+      <div class="lb-header__actions">
+        <button type="button" class="lb-header__cart" aria-haspopup="dialog" @click="openCart">
+          Cart
+          <ClientOnly><span>{{ itemCount }}</span></ClientOnly>
+        </button>
+        <NuxtLink to="/product/virunga-washed" class="lb-header__cta">Shop the bean</NuxtLink>
+      </div>
     </div>
+    <dialog
+      ref="cartDialog"
+      class="lb-drawer"
+      aria-label="Cart"
+      @click="onDialogClick"
+    >
+      <ClientOnly>
+        <CartDrawer @close="closeCart" />
+      </ClientOnly>
+    </dialog>
   </header>
 
   <main id="main">
@@ -115,9 +141,57 @@ const navigation = [
   text-transform: uppercase;
 }
 
+.lb-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--lb-space-3);
+}
+
+.lb-header__cart {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lb-space-2);
+  border: var(--lb-border-hairline) solid var(--lb-color-ink);
+  border-radius: var(--lb-radius-sm);
+  padding: var(--lb-space-2) var(--lb-space-3);
+  background: var(--lb-color-paper);
+  color: var(--lb-color-ink);
+  font: inherit;
+  font-size: var(--lb-text-200);
+  letter-spacing: var(--lb-tracking-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.lb-header__cart:hover {
+  background: var(--lb-color-ink);
+  color: var(--lb-color-paper);
+}
+
 .lb-header__cta:hover {
   background: var(--lb-color-ink);
   color: var(--lb-color-paper);
+}
+
+.lb-drawer:not([open]) {
+  display: none;
+}
+
+.lb-drawer {
+  width: min(32rem, calc(100vw - var(--lb-space-6)));
+  max-height: calc(100vh - var(--lb-space-6));
+  border: var(--lb-border-hairline) solid var(--lb-color-line);
+  border-radius: var(--lb-radius-md);
+  padding: var(--lb-space-5);
+  background: var(--lb-color-paper);
+  color: var(--lb-color-ink);
+}
+
+.lb-drawer::backdrop {
+  background: var(--lb-color-ink);
 }
 
 .lb-footer {

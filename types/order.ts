@@ -3,6 +3,7 @@ export interface CartItem {
   name: string;
   priceCents: number;
   quantity: number;
+  variantId?: string;
 }
 
 export interface Order {

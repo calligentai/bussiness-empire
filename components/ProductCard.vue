@@ -9,17 +9,25 @@ const price = (cents: number) =>
 
 <template>
   <article class="lb-card">
-    <div class="lb-card__visual" aria-hidden="true">
+    <div v-if="product.image" class="lb-card__visual lb-card__visual--photo">
+      <span class="lb-card__roast">{{ product.roast }}</span>
+      <img class="lb-card__photo" :src="product.image.src" :alt="product.image.alt" />
+    </div>
+    <div v-else class="lb-card__visual" aria-hidden="true">
       <span class="lb-card__roast">{{ product.roast }}</span>
       <span class="lb-card__bean" />
     </div>
     <div class="lb-card__body">
-      <p class="lb-eyebrow">{{ product.origin }} · {{ product.process }}</p>
+      <p class="lb-eyebrow">
+        <template v-if="product.brand">{{ product.brand }} · </template>{{ product.origin }} · {{ product.process }}
+      </p>
       <h3 class="lb-card__name">
         <NuxtLink :to="`/product/${product.slug}`">{{ product.name }}</NuxtLink>
       </h3>
       <p class="lb-card__notes">{{ product.notes.join(" · ") }}</p>
-      <p class="lb-card__price">{{ price(product.priceCents) }}</p>
+      <p class="lb-card__price">
+        <template v-if="product.sizes">From </template>{{ price(product.priceCents) }}
+      </p>
     </div>
   </article>
 </template>
@@ -75,6 +83,24 @@ const price = (cents: number) =>
   font-size: var(--lb-text-100);
   letter-spacing: var(--lb-tracking-wide);
   text-transform: uppercase;
+}
+
+.lb-card__visual--photo {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--lb-color-paper);
+}
+
+.lb-card__visual--photo .lb-card__roast {
+  position: static;
+  padding: var(--lb-space-3) var(--lb-space-4) 0;
+  color: var(--lb-color-ink);
+}
+
+.lb-card__photo {
+  width: 100%;
+  height: auto;
 }
 
 .lb-card__body {

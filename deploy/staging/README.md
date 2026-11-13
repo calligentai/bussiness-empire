@@ -25,6 +25,53 @@ port 18081; do not change this to 0.0.0.0 without adding access control.
 The health endpoint is /healthz. Every staging response carries X-Robots-Tag:
 noindex, nofollow, noarchive and Cache-Control: no-store.
 
+## Second local-image service (port 18082)
+
+The running Coolify Compose resource
+`/data/coolify/services/ywwvl15ktujn5pydtfrug0mb/docker-compose.yml` is a
+separate staging copy. It binds `100.111.84.46:18082:3000` with
+`pull_policy: never` and the image name `lavabean-staging:<git sha>`. Do not
+point it at a registry. Leave port 18081 untouched.
+
+This release adds two settings on 18082 only: `PAYMENT_PROVIDER=manual` and
+`ORDER_DATA_DIR=/data/orders`, backed by the named volume
+`lavabean-18082-orders`. Memory, CPU, the read-only root, the healthcheck, and
+the port stay as they are. The rendered file is
+`deploy/staging/compose.18082.yaml`. Payment and order behaviour is described
+in `deploy/staging/COMMERCE.md`. No new container is required.
+
+Leave the original service on port 18081 untouched. Build and retag only on
+the iMac, then point service `ywwvl15ktujn5pydtfrug0mb` at the new image.
+
+From a source checkout:
+
+```sh
+docker build \
+  -f deploy/staging/Dockerfile \
+  --build-arg APP_REVISION=FULL_REVISION \
+  -t lavabean-staging:FULL_REVISION \
+  .
+```
+
+From the prebuilt runtime archive (no pnpm on the iMac):
+
+```sh
+tar -xzf lavabean-runtime.tar.gz -C /opt/lavabean-staging/runtime/FULL_REVISION
+docker build \
+  -f /opt/lavabean-staging/runtime/FULL_REVISION/Dockerfile.runtime \
+  --build-arg APP_REVISION=FULL_REVISION \
+  -t lavabean-staging:FULL_REVISION \
+  /opt/lavabean-staging/runtime/FULL_REVISION
+```
+
+Replace that service's Compose with `compose.18082.yaml` rendered so
+`@@REVISION@@` is the full Git SHA. Keep `pull_policy: never` and
+`100.111.84.46:18082:3000`. Redeploy only service
+`ywwvl15ktujn5pydtfrug0mb`. Confirm `http://100.111.84.46:18082/healthz`
+reports the new revision, `/product/dri-coffee-specialty-arabica-rwanda` loads,
+and a test order placed in the browser can be opened again at `/order/LB-…`.
+Confirm port 18081 still reports its previous revision.
+
 ## Rollback
 
 Keep the previous release directory, rendered Compose and image.

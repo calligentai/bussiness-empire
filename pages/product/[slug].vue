@@ -14,23 +14,39 @@ useSeoMeta({
   description: `${product.name}: ${product.origin} ${product.process}, ${product.notes.join(", ")}.`,
 });
 
-const price = new Intl.NumberFormat("en-NL", {
-  style: "currency",
-  currency: "EUR",
-}).format(product.priceCents / 100);
+const formatPrice = (cents: number) =>
+  new Intl.NumberFormat("en-NL", {
+    style: "currency",
+    currency: "EUR",
+  }).format(cents / 100);
+
+const selectedSizeId = ref(product.sizes?.[0]?.id ?? "");
+const selectedSize = computed(() =>
+  product.sizes?.find((size) => size.id === selectedSizeId.value)
+);
+const activePriceCents = computed(
+  () => selectedSize.value?.priceCents ?? product.priceCents
+);
+const price = computed(() => formatPrice(activePriceCents.value));
 
 const facts = computed(() => [
   { label: "Origin", value: product.origin },
   { label: "Process", value: product.process },
   { label: "Altitude", value: product.altitude },
   { label: "Roast", value: product.roast },
-  { label: "Reference recipe", value: product.recipe },
+  { label: product.recipeLabel ?? "Reference recipe", value: product.recipe },
 ]);
 
 const { addItem } = useCart();
 const added = ref(false);
 const addToCart = () => {
-  addItem({ slug: product.slug, name: product.name, priceCents: product.priceCents });
+  const size = selectedSize.value;
+  addItem({
+    slug: size ? `${product.slug}--${size.id}` : product.slug,
+    variantId: size?.id,
+    name: size ? `${product.name} (${size.label})` : product.name,
+    priceCents: activePriceCents.value,
+  });
   added.value = true;
   setTimeout(() => (added.value = false), 2000);
 };
@@ -47,21 +63,40 @@ const addToCart = () => {
     </nav>
 
     <div class="lb-product__grid">
-      <div class="lb-product__visual" aria-hidden="true">
+      <div v-if="product.image" class="lb-product__visual lb-product__visual--photo">
+        <img class="lb-product__photo" :src="product.image.src" :alt="product.image.alt" />
+      </div>
+      <div v-else class="lb-product__visual" aria-hidden="true">
         <span class="lb-product__lot">LOT 022</span>
         <div class="lb-product__bean"><span /></div>
       </div>
 
       <div class="lb-product__details">
-        <p class="lb-eyebrow">{{ product.origin }} · {{ product.process }} · {{ product.altitude }}</p>
+        <p class="lb-eyebrow">
+          <template v-if="product.brand">{{ product.brand }} · </template>{{ product.origin }} · {{ product.process }} · {{ product.altitude }}
+        </p>
         <h1 class="lb-product__title">{{ product.name }}</h1>
         <p class="lb-product__notes">{{ product.notes.join(" · ") }}</p>
-        <p class="lb-product__price">{{ price }} <span>/ 250 g</span></p>
+        <p v-if="selectedSize" class="lb-product__price">{{ price }} <span>/ {{ selectedSize.label }}</span></p>
+        <p v-else class="lb-product__price">{{ price }} <span>/ {{ product.unitLabel ?? "1 kg" }}</span></p>
+
+        <fieldset v-if="product.sizes" class="lb-sizes">
+          <legend>Size</legend>
+          <div class="lb-sizes__options">
+            <label v-for="size in product.sizes" :key="size.id" class="lb-sizes__option">
+              <input v-model="selectedSizeId" type="radio" name="size" :value="size.id" />
+              <span>{{ size.label }}</span>
+              <span>{{ formatPrice(size.priceCents) }}</span>
+            </label>
+          </div>
+        </fieldset>
 
         <LavaButton size="lg" @click="addToCart">Add to cart</LavaButton>
-        <p v-if="added" class="lb-product__added">Added to cart</p>
+        <p v-if="added" class="lb-product__added">
+          Added to cart. <NuxtLink to="/cart">View cart</NuxtLink>
+        </p>
 
-        <p class="lb-product__shipping">
+        <p v-if="product.brand !== 'DRI'" class="lb-product__shipping">
           Roasted to order. Ships within two working days from the Netherlands.
         </p>
 
@@ -74,7 +109,12 @@ const addToCart = () => {
       </div>
     </div>
 
-    <section class="lb-product__story" aria-labelledby="story-title">
+    <section v-if="product.brand === 'DRI'" class="lb-product__story" aria-labelledby="story-title">
+      <p class="lb-eyebrow">DRI Coffee</p>
+      <h2 id="story-title">Specialty Arabica from Rwanda.</h2>
+      <p>{{ product.description }}</p>
+    </section>
+    <section v-else class="lb-product__story" aria-labelledby="story-title">
       <p class="lb-eyebrow">Why this lot</p>
       <h2 id="story-title">Grown on basalt, roasted for clarity.</h2>
       <p>
@@ -125,6 +165,72 @@ const addToCart = () => {
   border-radius: var(--lb-radius-md);
   background: var(--lb-color-surface);
   overflow: hidden;
+}
+
+.lb-product__visual--photo {
+  background: var(--lb-color-paper);
+  border: var(--lb-border-hairline) solid var(--lb-color-line);
+}
+
+.lb-product__photo {
+  width: 100%;
+  max-height: 640px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.lb-sizes {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lb-sizes legend {
+  margin-bottom: var(--lb-space-2);
+  color: var(--lb-color-muted);
+  font-family: var(--lb-font-mono);
+  font-size: var(--lb-text-100);
+  letter-spacing: var(--lb-tracking-wide);
+  text-transform: uppercase;
+}
+
+.lb-sizes__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lb-space-2);
+}
+
+.lb-sizes__option {
+  position: relative;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--lb-space-2);
+  border: var(--lb-border-hairline) solid var(--lb-color-line);
+  border-radius: var(--lb-radius-sm);
+  padding: var(--lb-space-2) var(--lb-space-4);
+  font-family: var(--lb-font-mono);
+  font-size: var(--lb-text-200);
+  cursor: pointer;
+}
+
+.lb-sizes__option input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.lb-sizes__option:has(input:checked) {
+  border-color: var(--lb-color-ink);
+  background: var(--lb-color-ink);
+  color: var(--lb-color-paper);
+}
+
+.lb-sizes__option:has(input:focus-visible) {
+  outline: var(--lb-border-strong) solid var(--lb-color-ink);
+  outline-offset: var(--lb-space-1);
 }
 
 .lb-product__lot {
