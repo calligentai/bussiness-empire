@@ -7,9 +7,39 @@ export interface CartState {
   items: CartItem[];
 }
 
+const CART_STORAGE_KEY = "lavabean.cart.v1";
+
 const cart = ref<CartItem[]>([]);
 const orders = ref<Order[]>([]);
 const processedWebhookIds = new Set<string>();
+let cartHydrated = false;
+
+const persistCart = () => {
+  if (typeof localStorage === "undefined") return;
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart.value));
+};
+
+const hydrateCart = () => {
+  if (cartHydrated || typeof localStorage === "undefined") return;
+  cartHydrated = true;
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw) as CartItem[];
+    if (!Array.isArray(parsed)) return;
+    cart.value = parsed.filter(
+      (item) =>
+        item &&
+        typeof item.slug === "string" &&
+        typeof item.name === "string" &&
+        Number.isInteger(item.priceCents) &&
+        Number.isInteger(item.quantity) &&
+        item.quantity > 0,
+    );
+  } catch {
+    cart.value = [];
+  }
+};
 
 export interface PaymentWebhookEvent {
   id: string;
@@ -25,6 +55,7 @@ export interface RefundResult {
 }
 
 export const useCart = () => {
+  hydrateCart();
   const items = computed(() => cart.value);
   const itemCount = computed(() =>
     cart.value.reduce((total, item) => total + item.quantity, 0)
@@ -37,13 +68,16 @@ export const useCart = () => {
     const existing = cart.value.find((i) => i.slug === item.slug);
     if (existing) {
       existing.quantity += quantity;
+      persistCart();
       return;
     }
     cart.value.push({ ...item, quantity });
+    persistCart();
   };
 
   const removeItem = (slug: string) => {
     cart.value = cart.value.filter((i) => i.slug !== slug);
+    persistCart();
   };
 
   const updateQuantity = (slug: string, quantity: number) => {
@@ -54,10 +88,12 @@ export const useCart = () => {
       return;
     }
     item.quantity = quantity;
+    persistCart();
   };
 
   const clearCart = () => {
     cart.value = [];
+    persistCart();
   };
 
   return {

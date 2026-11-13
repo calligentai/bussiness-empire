@@ -43,6 +43,7 @@ const addToCart = () => {
   const size = selectedSize.value;
   addItem({
     slug: size ? `${product.slug}--${size.id}` : product.slug,
+    variantId: size?.id,
     name: size ? `${product.name} (${size.label})` : product.name,
     priceCents: activePriceCents.value,
   });
@@ -77,7 +78,7 @@ const addToCart = () => {
         <h1 class="lb-product__title">{{ product.name }}</h1>
         <p class="lb-product__notes">{{ product.notes.join(" · ") }}</p>
         <p v-if="selectedSize" class="lb-product__price">{{ price }} <span>/ {{ selectedSize.label }}</span></p>
-        <p v-else class="lb-product__price">{{ price }} <span>/ 250 g</span></p>
+        <p v-else class="lb-product__price">{{ price }} <span>/ {{ product.unitLabel ?? "1 kg" }}</span></p>
 
         <fieldset v-if="product.sizes" class="lb-sizes">
           <legend>Size</legend>
@@ -91,7 +92,9 @@ const addToCart = () => {
         </fieldset>
 
         <LavaButton size="lg" @click="addToCart">Add to cart</LavaButton>
-        <p v-if="added" class="lb-product__added">Added to cart</p>
+        <p v-if="added" class="lb-product__added">
+          Added to cart. <NuxtLink to="/cart">View cart</NuxtLink>
+        </p>
 
         <p v-if="product.brand !== 'DRI'" class="lb-product__shipping">
           Roasted to order. Ships within two working days from the Netherlands.

@@ -17,6 +17,7 @@ export interface Product {
   notes: string[];
   roast: string;
   priceCents: number;
+  unitLabel?: string;
   altitude: string;
   recipe: string;
   brand?: string;

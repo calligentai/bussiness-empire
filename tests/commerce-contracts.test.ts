@@ -160,5 +160,6 @@ describe("R3.1 Nuxt catalogue is derived from the Medusa contract", () => {
     expect(product?.roast.length).toBeGreaterThan(0);
     expect(product?.altitude.length).toBeGreaterThan(0);
     expect(product?.recipe.length).toBeGreaterThan(0);
+    expect(product?.unitLabel).toBe("1 kg");
   });
 });

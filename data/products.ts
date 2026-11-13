@@ -33,6 +33,7 @@ const toLegacyProduct = (product: StoreProduct): Product => {
       : [],
     roast: text(product.metadata, "roast"),
     priceCents: Math.round(amount * 100),
+    ...(!sizes && variant?.title ? { unitLabel: variant.title } : {}),
     altitude: text(product.metadata, "altitude"),
     recipe: text(product.metadata, "recipe"),
     ...(brand ? { brand, description: product.description ?? "" } : {}),
