@@ -1,6 +1,11 @@
 .env
 .env.*
 !.env.example
+apps/medusa/.env
+apps/medusa/.medusa
+apps/medusa/.runtime.json
+apps/medusa/.seed-state.json
+apps/medusa/.medusa-pid
 .DS_Store
 node_modules/
 .venv/

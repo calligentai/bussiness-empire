@@ -1,0 +1,231 @@
+[
+  {
+    "title": "Virunga Washed",
+    "handle": "virunga-washed",
+    "subtitle": "Washed Rwandan lot",
+    "description": "A washed lot from the Virunga highlands with red apple, cocoa nib and brown sugar.",
+    "thumbnail": null,
+    "origin_country": "RW",
+    "metadata": {
+      "origin": "Rwanda",
+      "process": "Washed",
+      "notes": [
+        "Red apple",
+        "Cocoa nib",
+        "Brown sugar"
+      ],
+      "roast": "Medium",
+      "altitude": "1,900 m",
+      "recipe": "12.4 g in · 36 g out · 28 s"
+    },
+    "images": [],
+    "options": [
+      {
+        "title": "Weight",
+        "values": [
+          "1 kg"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "title": "1 kg",
+        "sku": "LB-VIR-1KG",
+        "fixture_variant_id": "variant_virunga_1kg",
+        "manage_inventory": true,
+        "inventory_quantity": 24,
+        "option": {
+          "Weight": "1 kg"
+        },
+        "prices": [
+          {
+            "amount": 18.5,
+            "currency_code": "eur"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Kivu Natural",
+    "handle": "kivu-natural",
+    "subtitle": "Natural Rwandan lot",
+    "description": "A natural lot from Lake Kivu with strawberry, dark cherry and cane syrup.",
+    "thumbnail": null,
+    "origin_country": "RW",
+    "metadata": {
+      "origin": "Rwanda",
+      "process": "Natural",
+      "notes": [
+        "Strawberry",
+        "Dark cherry",
+        "Cane syrup"
+      ],
+      "roast": "Light",
+      "altitude": "1,750 m",
+      "recipe": "13 g in · 39 g out · 26 s"
+    },
+    "images": [],
+    "options": [
+      {
+        "title": "Weight",
+        "values": [
+          "1 kg"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "title": "1 kg",
+        "sku": "LB-KIV-1KG",
+        "fixture_variant_id": "variant_kivu_1kg",
+        "manage_inventory": true,
+        "inventory_quantity": 18,
+        "option": {
+          "Weight": "1 kg"
+        },
+        "prices": [
+          {
+            "amount": 21,
+            "currency_code": "eur"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Basalt Dark",
+    "handle": "basalt-dark",
+    "subtitle": "Honey Rwandan lot",
+    "description": "A honey-processed lot from the basalt soils with bitter chocolate, hazelnut and molasses.",
+    "thumbnail": null,
+    "origin_country": "RW",
+    "metadata": {
+      "origin": "Rwanda",
+      "process": "Honey",
+      "notes": [
+        "Bitter chocolate",
+        "Hazelnut",
+        "Molasses"
+      ],
+      "roast": "Dark",
+      "altitude": "1,820 m",
+      "recipe": "12 g in · 34 g out · 30 s"
+    },
+    "images": [],
+    "options": [
+      {
+        "title": "Weight",
+        "values": [
+          "1 kg"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "title": "1 kg",
+        "sku": "LB-BAS-1KG",
+        "fixture_variant_id": "variant_basalt_1kg",
+        "manage_inventory": true,
+        "inventory_quantity": 12,
+        "option": {
+          "Weight": "1 kg"
+        },
+        "prices": [
+          {
+            "amount": 19.5,
+            "currency_code": "eur"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "DRI Coffee – Specialty Arabica from Rwanda, Medium Roast",
+    "handle": "dri-coffee-specialty-arabica-rwanda",
+    "subtitle": "DRI Coffee",
+    "description": "100% Arabica from Rwanda's volcanic highlands at 1,600–2,000 m. Fully washed and medium roasted, with floral and light fruity notes and a clean finish. Suited to filter, pour-over, and espresso.",
+    "thumbnail": "/products/dri-rwanda-specialty-arabica.jpg",
+    "origin_country": "RW",
+    "metadata": {
+      "brand": "DRI",
+      "origin": "Rwanda",
+      "process": "Fully washed",
+      "notes": [
+        "Floral",
+        "Light fruit",
+        "Clean finish"
+      ],
+      "roast": "Medium",
+      "altitude": "1,600–2,000 m",
+      "recipe": "Filter, pour-over, espresso",
+      "recipeLabel": "Brew",
+      "imageAlt": "Three DRI roasted coffee bags in 1 kg, 500 g, and 250 g sizes on a bed of roasted beans."
+    },
+    "images": [
+      {
+        "url": "/products/dri-rwanda-specialty-arabica.jpg"
+      }
+    ],
+    "options": [
+      {
+        "title": "Weight",
+        "values": [
+          "250 g",
+          "500 g",
+          "1 kg"
+        ]
+      }
+    ],
+    "variants": [
+      {
+        "title": "250 g",
+        "sku": "DRI-RW-250G",
+        "fixture_variant_id": "variant_dri_rwanda_250g",
+        "manage_inventory": false,
+        "inventory_quantity": null,
+        "option": {
+          "Weight": "250 g"
+        },
+        "prices": [
+          {
+            "amount": 9.49,
+            "currency_code": "eur"
+          }
+        ]
+      },
+      {
+        "title": "500 g",
+        "sku": "DRI-RW-500G",
+        "fixture_variant_id": "variant_dri_rwanda_500g",
+        "manage_inventory": false,
+        "inventory_quantity": null,
+        "option": {
+          "Weight": "500 g"
+        },
+        "prices": [
+          {
+            "amount": 16.96,
+            "currency_code": "eur"
+          }
+        ]
+      },
+      {
+        "title": "1 kg",
+        "sku": "DRI-RW-1KG",
+        "fixture_variant_id": "variant_dri_rwanda_1kg",
+        "manage_inventory": false,
+        "inventory_quantity": null,
+        "option": {
+          "Weight": "1 kg"
+        },
+        "prices": [
+          {
+            "amount": 29.96,
+            "currency_code": "eur"
+          }
+        ]
+      }
+    ]
+  }
+]

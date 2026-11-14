@@ -1,11 +1,67 @@
 # Coolify service ywwvl15ktujn5pydtfrug0mb.
 # Bind stays on 100.111.84.46:18082. Do not retarget port 18081.
-# pull_policy never: load the image built on the iMac, do not pull it.
+# pull_policy never: load images built on the iMac. Do not pull them during deploy.
+# postgres:16-alpine is the one official image. Load it once with
+# `docker pull postgres:16-alpine` before the first start, then leave pull_policy never.
 services:
+  postgres:
+    image: postgres:16-alpine
+    pull_policy: never
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: medusa
+      POSTGRES_PASSWORD: ${MEDUSA_DB_PASSWORD:?set MEDUSA_DB_PASSWORD}
+      POSTGRES_DB: medusa
+    volumes:
+      - lavabean-18082-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medusa -d medusa"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    mem_limit: 512m
+    cpus: 1.0
+
+  medusa:
+    image: lavabean-medusa:@@REVISION@@
+    pull_policy: never
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://medusa:${MEDUSA_DB_PASSWORD}@postgres:5432/medusa
+      JWT_SECRET: ${MEDUSA_JWT_SECRET:?set MEDUSA_JWT_SECRET}
+      COOKIE_SECRET: ${MEDUSA_COOKIE_SECRET:?set MEDUSA_COOKIE_SECRET}
+      LAVABEAN_INTERNAL_TOKEN: ${LAVABEAN_INTERNAL_TOKEN:?set LAVABEAN_INTERNAL_TOKEN}
+      MEDUSA_ADMIN_EMAIL: ${MEDUSA_ADMIN_EMAIL:?set MEDUSA_ADMIN_EMAIL}
+      MEDUSA_ADMIN_PASSWORD: ${MEDUSA_ADMIN_PASSWORD:?set MEDUSA_ADMIN_PASSWORD}
+      SEED_STATE_PATH: /data/seed-state.json
+      STORE_CORS: http://100.111.84.46:18082
+      ADMIN_CORS: http://100.111.84.46:18082
+      AUTH_CORS: http://100.111.84.46:18082
+    volumes:
+      - lavabean-18082-medusa:/data
+    expose:
+      - "9000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:9000/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 180s
+    mem_limit: 1536m
+    cpus: 1.5
+
   lavabean:
     image: lavabean-staging:@@REVISION@@
     pull_policy: never
     restart: unless-stopped
+    depends_on:
+      medusa:
+        condition: service_healthy
     ports:
       - "100.111.84.46:18082:3000"
     environment:
@@ -15,9 +71,11 @@ services:
       NITRO_HOST: 0.0.0.0
       NITRO_PORT: "3000"
       PAYMENT_PROVIDER: manual
-      ORDER_DATA_DIR: /data/orders
+      MEDUSA_BACKEND_URL: http://medusa:9000
+      MEDUSA_PUBLISHABLE_KEY_FILE: /seed/seed-state.json
+      LAVABEAN_INTERNAL_TOKEN: ${LAVABEAN_INTERNAL_TOKEN}
     volumes:
-      - lavabean-18082-orders:/data/orders
+      - lavabean-18082-medusa:/seed:ro
     read_only: true
     tmpfs:
       - /tmp:size=64m,mode=1777
@@ -35,4 +93,6 @@ services:
         max-file: "3"
 
 volumes:
-  lavabean-18082-orders:
+  # Order rows live in this database. There is no separate order-file volume.
+  lavabean-18082-postgres:
+  lavabean-18082-medusa:

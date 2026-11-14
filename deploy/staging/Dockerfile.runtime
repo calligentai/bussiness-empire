@@ -9,7 +9,8 @@ ENV NODE_ENV=production \
     NITRO_HOST=0.0.0.0 \
     NITRO_PORT=3000 \
     PAYMENT_PROVIDER=manual \
-    ORDER_DATA_DIR=/data/orders
+    MEDUSA_BACKEND_URL=http://medusa:9000 \
+    MEDUSA_PUBLISHABLE_KEY_FILE=/seed/seed-state.json
 COPY .output ./.output
 USER node
 EXPOSE 3000
