@@ -1,0 +1,28 @@
+Lava Bean M3 staging artifacts
+Service: ywwvl15ktujn5pydtfrug0mb
+Bind: 100.111.84.46:18082:3000
+Do not change 100.111.84.46:18081.
+
+Storefront runtime archive: deploy/staging/lavabean-runtime.tar.gz
+  Built from .output plus deploy/staging/Dockerfile.runtime.
+  No pnpm on the iMac.
+
+Medusa image: build on the iMac from apps/medusa/Dockerfile.
+  This environment built that Dockerfile as lavabean-medusa:local (4fafe500cc95).
+  npm ci runs inside the image. The dependency tree is too large to commit as an archive.
+  deploy/staging/Dockerfile.medusa.runtime is the runtime Dockerfile if a prebuilt
+  .medusa/server directory, with production node_modules and src/data/catalog.json,
+  is already on disk. This change does not commit that directory.
+
+Postgres: docker pull postgres:16-alpine once. compose.18082.yaml then uses pull_policy never.
+
+Required environment, not in git:
+  MEDUSA_DB_PASSWORD
+  MEDUSA_JWT_SECRET
+  MEDUSA_COOKIE_SECRET
+  LAVABEAN_INTERNAL_TOKEN
+  MEDUSA_ADMIN_EMAIL
+  MEDUSA_ADMIN_PASSWORD
+
+Orders are rows in volume lavabean-18082-postgres.
+The publishable key is written to volume lavabean-18082-medusa at /data/seed-state.json.

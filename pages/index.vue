@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { products } from "../data/products";
+import type { Product } from "../types/product";
+
+const { data, error } = await useFetch<Product[]>("/api/catalog");
+if (error.value || !data.value) {
+  throw createError({ statusCode: 503, statusMessage: "Catalog unavailable" });
+}
+const products = data.value;
 
 const lavaBeanLots = products.filter((product) => product.brand !== "DRI");
 const driProducts = products.filter((product) => product.brand === "DRI");

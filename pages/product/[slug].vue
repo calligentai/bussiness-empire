@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { findProduct } from "../../data/products";
+import type { Product } from "../../types/product";
 import { useCart } from "../../composables/useCart";
 
 const route = useRoute();
-const product = findProduct(String(route.params.slug));
-
-if (!product) {
+const slug = String(route.params.slug);
+const { data, error } = await useFetch<Product>(`/api/catalog/${encodeURIComponent(slug)}`);
+if (error.value || !data.value) {
   throw createError({ statusCode: 404, statusMessage: "Coffee lot not found" });
 }
+const product = data.value;
 
 useSeoMeta({
   title: `${product.name} — Lava Bean`,

@@ -1,8 +1,8 @@
 # Plan vs code audit
 
 **Plan:** `docs/plans/BUSINESS_EMPIRE_Master_Execution_Plan_v1.1_TDD_Production.md` (v1.1, 20 October 2026).
-**Tree audited:** `deploy/imacserver-staging-20261103` at `30962b7`, plus PR #49 (`e1001f3`, DRI Rwanda). That is the code behind the staging service the owner can open.
-**This change** then wires one manual sandbox order. The "After" column includes that change. It does not reclassify a fixture as a live system.
+**Tree audited:** `deploy/imacserver-staging-20261103` at `30962b7`, plus PR #49 (`e1001f3`, DRI Rwanda), plus the file-backed sandbox in PR #51.
+**This change** replaces that file order store with Medusa 2.22.7 and Postgres. A requirement is (a) only when a test exercises it against the running server.
 
 Classes:
 
@@ -16,10 +16,11 @@ Classes:
 
 | | (a) | (b) | (c) | Total |
 |---|---:|---:|---:|---:|
-| Before this change | 3 | 16 | 16 | 35 |
-| After this change | 5 | 14 | 16 | 35 |
+| Before the file sandbox (staging at `e1001f3`) | 3 | 16 | 16 | 35 |
+| After the file sandbox (PR #51) | 5 | 14 | 16 | 35 |
+| After this change (Medusa) | 7 | 12 | 16 | 35 |
 
-The three requirements that were already (a) are the Lava Bean brand DNA, the tokenised components, and the Nuxt home/product templates (R2.1–R2.3). This change moves R3.2 and R3.3 to (a) for the manual sandbox only.
+The three requirements that were already (a) before any checkout work are the Lava Bean brand DNA, the tokenised components, and the Nuxt home/product templates (R2.1–R2.3). PR #51 moved R3.2 and R3.3 to (a) for a file-backed manual order. This change moves R3.1 and R3.4 to (a). Catalog, cart completion, capture, order status, refunds, and duplicate webhooks run against Medusa 2.22.7 and Postgres. Stripe and Mollie stay unwired.
 
 ## Milestone reading
 
@@ -28,7 +29,7 @@ The three requirements that were already (a) are the Lava Bean brand DNA, the to
 | M0 Sources and feasibility | Not met | Not met | No current source register, no GoHighLevel/Lovable matrix, no ADR set |
 | M1 Paperclip, git, CI | Not met | Not met | Paperclip is not on this branch. The only hook checks document hashes |
 | M2 Brand | Mostly met | Mostly met | Home visual snapshots were removed. Storybook is not what staging serves |
-| M3 Commerce | Not met | Shopper path met for one manual test order | Catalog is still an in-repo fixture. No Medusa process. No refund webhook on the HTTP order |
+| M3 Commerce | Not met | Met for the manual sandbox against Medusa | Stripe and Mollie are still refused. No VAT. The browser basket is not a live Medusa cart until Pay now |
 | M4 Supplier and Odoo | Not met | Not met | Mapping and journal math exist in memory. Nothing transmits an order or books a ledger |
 | M5 Dealers and OpenSEO | Not met | Not met | Contracts and tests only. `/dealer` is a labeled fiction. `/seo` is 404 |
 | M6 CRM and growth | Not met | Not met | In-memory leads only. `/crm` is 404. No phone, social, or ad route on this branch |
@@ -78,20 +79,24 @@ No board or gate-progress model is in the repository.
 
 ### M3
 
-**R3.1 Medusa product, catalog, and price contracts. (b) → (b).**
-`data/medusa-catalog.ts`, `types/medusa.ts`, `data/products.ts`, `tests/commerce-contracts.test.ts` (`9d011ca`, PR #16, extended by `e1001f3`). The shapes match a Medusa Store API product well enough for the tests. The data is a TypeScript array in the Nuxt process. There is no Medusa server, database, or publishable key. Checkout now uses this fixture as the price authority, which does not turn it into Medusa.
+**R3.1 Medusa product, catalog, and price contracts. (b) → (a).**
+Before: `data/medusa-catalog.ts` was the price list inside the Nuxt process. There was no Medusa server.
+After: `apps/medusa` is Medusa 2.22.7. `src/scripts/seed.ts` loads `src/data/catalog.json`, which `tests/medusa-seed-catalog.test.ts` checks against the same four products, DRI sizes, prices, and `/products/dri-rwanda-specialty-arabica.jpg`. Postgres holds the products. `GET /store/products` returns DRI 500 g at €16.96 with that photo. `tests/commerce-medusa.test.ts` calls that route. The storefront `GET /api/catalog` reads the Store API, and the home and product pages render it. The TypeScript catalog remains the seed input, not the runtime price list.
 
 **R3.2 Product detail, cart, and checkout in Nuxt. (b) → (a).**
-Before: `pages/product/[slug].vue` could push a line into a module-level Vue ref (`composables/useCart.ts`). `pages/checkout.vue` rendered "0 items / Total 0.00 EUR / Pay now" whenever that ref was empty, which is every fresh visit. There was no `/cart` route. Customer and shipping fields did not exist. `localStorage` was claimed in the body of unmerged PR #13 and is absent from the merged composable at PR #16 (`3791b94`).
-After: `/cart`, a header cart drawer, checkout with name, email, and shipping address, and `POST /api/checkout`. The cart is stored in `localStorage` under `lavabean.cart.v1`. `tests/e2e/checkout.spec.ts` adds the DRI 500 g variant, changes the quantity, checks the total, pays, and lands on a confirmation page. Desktop and mobile both passed against `node .output/server/index.mjs`.
+Before: `pages/product/[slug].vue` could push a line into a module-level Vue ref (`composables/useCart.ts`). `pages/checkout.vue` rendered an empty Pay now form. There was no `/cart` route.
+After PR #51: `/cart`, a header cart drawer, and checkout stored the basket in `localStorage` under `lavabean.cart.v1`.
+After this change: product pages load prices from Medusa through `GET /api/catalog`. Pay now posts to `POST /api/checkout`, which calls `POST /store/lavabean/checkout`. That route creates a Medusa cart, adds the variant, sets the address, adds the zero-cost shipping option, and completes the cart. The drawer is still the browser basket until that click. `tests/e2e/checkout.spec.ts` adds DRI 500 g, sets quantity 2, checks €33.92, pays, and reloads the order. Desktop and mobile both passed against the built storefront with Medusa on port 9000.
 
 **R3.3 Payment sandbox and order status. (b) → (a) for the manual provider only.**
-Before: `processPayment` in `composables/useCart.ts` waits 10 ms and returns a fake id. `pages/order/[id].vue` read the same in-memory array, so a reload could not find the order.
-After: `server/commerce/store.ts` captures with `PAYMENT_PROVIDER=manual` (the same idea as Medusa's system provider, `pp_system_default`). A successful test payment creates one order, number `LB-` plus a counter, status `paid`. A declined outcome stays `failed` and is still readable. `GET /api/orders/:id` returns it after reload. The Playwright test asserts the order number, `paid`, total 3392 cents, SKU `DRI-RW-500G`, and quantity 2, then reloads and requests the API.
+Before: `processPayment` in `composables/useCart.ts` waited 10 ms and returned a fake id.
+After PR #51: a Nitro module wrote a JSON order file.
+After this change: checkout uses Medusa's system provider `pp_system_default`, then `capturePaymentWorkflow`. A paid test creates one Medusa order (`order_…`) and a shopper number `LB-` plus a counter, status `paid`. A declined outcome is a checkout record with `medusaOrderId: null` and does not add an order row. `GET /api/orders/:id` reads it back from Medusa. `tests/commerce-medusa.test.ts` asserts one order for the paid DRI case and zero orders for the decline. The Playwright test asserts `paid`, 3392 cents, SKU `DRI-RW-500G`, and quantity 2, then reloads.
 Stripe and Mollie are not called. `sk_live_`, `rk_live_`, and Mollie `live_` keys are refused. `PAYMENT_PROVIDER=stripe` or `mollie` returns 501. `APP_ENV=production` refuses checkout. See `deploy/staging/COMMERCE.md`.
 
-**R3.4 Refund, error, and duplicate-webhook tests. (b) → (b).**
-`tests/commerce.test.ts` and `tests/commerce-r34.test.ts` drive `useOrders` / `applyPaymentWebhook` / `refundOrder` in the Vue composable (PR #16 and the R3.4 follow-up). Those functions are not called by `POST /api/checkout`. There is no webhook route. A refund of an HTTP order is not implemented. The new store does keep one order per idempotency key, and a mismatched replay returns `idempotency_conflict`. That is not the refund and webhook suite the plan names.
+**R3.4 Refund, error, and duplicate-webhook tests. (b) → (a).**
+Before: `tests/commerce-r34.test.ts` drove `useOrders` in the Vue composable. Checkout did not call it.
+After: `POST /admin/lavabean/orders/:id/refund` runs Medusa `refundPaymentWorkflow`. A second refund returns `already_refunded`. A failed checkout returns `not_refundable`. An unknown id returns `order_not_found`. `POST /hooks/lavabean/payment` records an event id once and returns `applied: false` on the repeat. A later paid event after a refund returns `already_refunded` and leaves the status refunded. `tests/commerce-medusa.test.ts` checks the Medusa payment status is `refunded`. Empty carts, bad customers, and a missing DRI size still fail in `tests/commerce-checkout.test.ts`. The Vue composable is still imported by the dealer unit tests. It is not on the shopper path.
 
 ### M4
 
@@ -170,7 +175,7 @@ Staging shows one shop and one fictional dealer page. The rest of the demo is ab
 - **PR #42** is accurate that the service is a storefront plus a fictional dealer demo and that no real payment is attached. Calling the empty form a sandbox checkout overstates what a visitor could do. Browser checks reported there do not include placing an order.
 - **PR #47** is a docs-only gap map. The generated summary in that PR body says the PR added a shopping cart, checkout, and order confirmation. The diff is a markdown file on `lavabean`, and it is not on this branch.
 - **`README.md`** says `./verify.sh` is the whole CI. The script only runs `sha256sum -c docs/sources/SHA256SUMS`.
-- **`docs/environment-assessment.md`** says Nuxt and Medusa are not in use. This branch is Nuxt, and Medusa is still not installed. Both halves should not be read as the current inventory.
+- **`docs/environment-assessment.md`** says Nuxt and Medusa are not in use. This branch is Nuxt, and Medusa 2.22.7 runs as `apps/medusa`. The assessment is not the current inventory.
 - **`pages/dealer/index.vue`** is labeled as fiction. Dealer, SEO, CRM, and isolation PRs that talk about dashboards are describing contracts or this sample page, not a logged-in dealer.
 - **PRs #34, #36, and #38** describe later `lavabean` work (ad fixture, disconnected social fixtures, in-memory reconciliation). They are not in the staging revision the iMac is running, and the first two are fixtures even on `lavabean`.
 
@@ -182,10 +187,10 @@ Staging shows one shop and one fictional dealer page. The rest of the demo is ab
 | `/product/…` | Product page. DRI is on PR #49 | Same, plus size choice and add to cart |
 | `/cart` | 404 | Cart with quantities and total |
 | `/checkout` | Empty Pay now form | Customer, shipping, manual pay |
-| `/order/LB-…` | 404 or "not found" after reload | Confirmation and status from the order file |
+| `/order/LB-…` | 404 or "not found" after reload | Confirmation and status from the Medusa order |
 | `/dealer` | Fictional demo | Unchanged |
 | `/seo`, `/crm`, `/admin`, `/account` | 404 | Still 404 |
 
 ## What this change does not finish
 
-Medusa is not running. Stripe test and Mollie test are refused on purpose until a client exists. Refunds and payment webhooks are still the old in-memory composable. Supplier, Odoo, CRM, SEO, phone, social, ads, Paperclip, and the M8 demo are untouched. Orders survive a process restart only when `ORDER_DATA_DIR` points at the Compose volume. They are not a database backup.
+Stripe test and Mollie test still return 501. There is no shopper refund button; refunds are the Medusa admin route. The browser cart is not a Medusa cart until Pay now. Shipping is €0 and tax is off, so the total stays the catalog total; VAT is M4. Redis is not running. Medusa logs that its local event bus is not what it recommends for more than one process. This compose runs one Medusa process, and completed orders are in Postgres. The old `useOrders` composable remains for dealer unit tests. Supplier, Odoo, CRM, SEO, phone, social, ads, Paperclip, and the M8 demo are untouched. A Postgres restore drill was not run. This environment did not deploy to the iMac.

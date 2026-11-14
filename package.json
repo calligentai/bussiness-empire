@@ -18,7 +18,7 @@
     "test:brand": "vitest run tests/brand-rules.test.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:e2e": "pnpm build && playwright test",
+    "test:e2e": "node scripts/medusa-up.mjs && pnpm build && playwright test",
     "verify": "pnpm tokens:build && pnpm brand:check && pnpm test && pnpm build && pnpm build-storybook && playwright test",
     "test:e2e:update": "pnpm build && playwright test --update-snapshots",
     "prepare": "nuxt prepare",

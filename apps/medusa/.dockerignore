@@ -1,0 +1,7 @@
+node_modules
+.medusa
+.env
+.runtime.json
+.seed-state.json
+.medusa-pid
+uploads

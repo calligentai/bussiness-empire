@@ -33,12 +33,13 @@ separate staging copy. It binds `100.111.84.46:18082:3000` with
 `pull_policy: never` and the image name `lavabean-staging:<git sha>`. Do not
 point it at a registry. Leave port 18081 untouched.
 
-This release adds two settings on 18082 only: `PAYMENT_PROVIDER=manual` and
-`ORDER_DATA_DIR=/data/orders`, backed by the named volume
-`lavabean-18082-orders`. Memory, CPU, the read-only root, the healthcheck, and
-the port stay as they are. The rendered file is
-`deploy/staging/compose.18082.yaml`. Payment and order behaviour is described
-in `deploy/staging/COMMERCE.md`. No new container is required.
+This release adds Medusa and Postgres beside the storefront on 18082 only.
+The storefront bind stays `100.111.84.46:18082:3000`. Postgres is not published
+on the host. Orders are rows in volume `lavabean-18082-postgres`. The rendered
+file is `deploy/staging/compose.18082.yaml`. Payment behaviour is described in
+`deploy/staging/COMMERCE.md`. Load `postgres:16-alpine` once before the first
+start (`docker pull postgres:16-alpine`); the compose file then uses
+`pull_policy: never` for every image.
 
 Leave the original service on port 18081 untouched. Build and retag only on
 the iMac, then point service `ywwvl15ktujn5pydtfrug0mb` at the new image.
@@ -53,7 +54,7 @@ docker build \
   .
 ```
 
-From the prebuilt runtime archive (no pnpm on the iMac):
+From the prebuilt storefront runtime archive (no pnpm on the iMac):
 
 ```sh
 tar -xzf lavabean-runtime.tar.gz -C /opt/lavabean-staging/runtime/FULL_REVISION
@@ -63,6 +64,19 @@ docker build \
   -t lavabean-staging:FULL_REVISION \
   /opt/lavabean-staging/runtime/FULL_REVISION
 ```
+
+Medusa image, from a source checkout (npm runs inside the image):
+
+```sh
+docker build \
+  -f apps/medusa/Dockerfile \
+  -t lavabean-medusa:FULL_REVISION \
+  apps/medusa
+```
+
+Set `MEDUSA_DB_PASSWORD`, `MEDUSA_JWT_SECRET`, `MEDUSA_COOKIE_SECRET`,
+`LAVABEAN_INTERNAL_TOKEN`, `MEDUSA_ADMIN_EMAIL`, and `MEDUSA_ADMIN_PASSWORD`
+in the Coolify environment for this service. They are not in the repository.
 
 Replace that service's Compose with `compose.18082.yaml` rendered so
 `@@REVISION@@` is the full Git SHA. Keep `pull_policy: never` and
@@ -77,6 +91,9 @@ Confirm port 18081 still reports its previous revision.
 Keep the previous release directory, rendered Compose and image.
 In Coolify replace this service's Compose with the previous rendered Compose
 and redeploy. Confirm /healthz reports the previous Git revision and smoke-test
-the same pages. No shared database or production credentials are attached.
+the same pages. The original 18081 service has no database. The 18082 service
+does: keep volume `lavabean-18082-postgres` when you roll the images back, or
+the orders in that database go away with the volume. Do not put production
+payment keys in this environment.
 For the first release, stop this staging service in Coolify to roll back to
 no staging deployment. Never stop or recreate unrelated services.

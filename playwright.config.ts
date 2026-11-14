@@ -30,7 +30,7 @@ export default defineConfig({
     },
   ],
   webServer: deployedBaseURL ? undefined : {
-    command: "NITRO_HOST=127.0.0.1 NITRO_PORT=3456 node .output/server/index.mjs",
+    command: "node scripts/run-storefront.mjs",
     url: "http://127.0.0.1:3456",
     reuseExistingServer: false,
     timeout: 120_000,
