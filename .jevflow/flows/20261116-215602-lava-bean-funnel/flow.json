@@ -1,0 +1,33 @@
+{
+ "schema_version": 1,
+ "title": "Rwanda single-origin landing funnel",
+ "goal": "Design a beautiful luxurious landing page funnel system for Lava Bean Single Origin, washed, arabica coffee from Rwanda.",
+ "mode": "enforce",
+ "phases": [
+  {
+   "id": "build",
+   "name": "Build funnel pages",
+   "done_when": "funnel pages exist and add no brand-check violations (AdLibraryDashboard.vue raw colours pre-date this work)",
+   "check": "test -f pages/rwanda/index.vue && test -f pages/rwanda/select.vue && test -f components/FunnelSteps.vue && ! (pnpm -s brand:check 2>&1 | grep -v AdLibraryDashboard | grep -q FAIL)",
+   "depends_on": []
+  },
+  {
+   "id": "verify",
+   "name": "Tests and build",
+   "done_when": "unit tests and production build pass",
+   "check": "pnpm -s test && pnpm -s build",
+   "depends_on": [
+    "build"
+   ]
+  },
+  {
+   "id": "visual",
+   "name": "Screenshot review",
+   "done_when": "funnel screenshots captured at 390px and 1440px",
+   "check": "ls docs/design/funnel/*.png | wc -l | awk '$1>=4{exit 0}{exit 1}'",
+   "depends_on": [
+    "verify"
+   ]
+  }
+ ]
+}
