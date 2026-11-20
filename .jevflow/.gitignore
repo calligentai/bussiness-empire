@@ -1,0 +1,7 @@
+sessions/
+**/state.json.lock
+**/lock
+**/runs/
+**/last_run.json
+*.tmp
+view.html
