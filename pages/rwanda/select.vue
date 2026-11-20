@@ -32,11 +32,16 @@ const submitting = ref(false);
 
 const continueToCheckout = async () => {
   submitting.value = true;
-  addItem(
-    { slug: product.slug, name: product.name, priceCents: product.priceCents },
-    kilos.value,
-  );
-  await navigateTo("/checkout");
+  try {
+    addItem(
+      { slug: product.slug, name: product.name, priceCents: product.priceCents },
+      kilos.value,
+    );
+    await navigateTo("/checkout");
+  } catch (error) {
+    submitting.value = false;
+    throw error;
+  }
 };
 </script>
 
